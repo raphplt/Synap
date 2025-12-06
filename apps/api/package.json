@@ -1,0 +1,49 @@
+{
+  "name": "api",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "build": "nest build",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "start": "nest start",
+    "dev": "nest start --watch",
+    "start:debug": "nest start --debug --watch",
+    "start:prod": "node dist/main",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix"
+  },
+  "dependencies": {
+    "@memex/shared": "workspace:*",
+    "@nestjs/common": "latest",
+    "@nestjs/config": "latest",
+    "@nestjs/core": "latest",
+    "@nestjs/jwt": "latest",
+    "@nestjs/passport": "latest",
+    "@nestjs/platform-express": "latest",
+    "@nestjs/throttler": "latest",
+    "@nestjs/typeorm": "latest",
+    "argon2": "latest",
+    "class-transformer": "latest",
+    "class-validator": "latest",
+    "helmet": "latest",
+    "passport": "latest",
+    "passport-jwt": "latest",
+    "pg": "latest",
+    "reflect-metadata": "latest",
+    "rxjs": "latest",
+    "typeorm": "latest"
+  },
+  "devDependencies": {
+    "@memex/config": "workspace:*",
+    "@nestjs/cli": "latest",
+    "@nestjs/schematics": "latest",
+    "@nestjs/testing": "latest",
+    "@types/express": "latest",
+    "@types/node": "latest",
+    "@types/passport-jwt": "latest",
+    "source-map-support": "latest",
+    "ts-loader": "latest",
+    "ts-node": "latest",
+    "tsconfig-paths": "latest",
+    "typescript": "latest"
+  }
+}

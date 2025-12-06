@@ -1,0 +1,13 @@
+{
+  "name": "@memex/config",
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "latest",
+    "prettier": "latest",
+    "eslint": "latest",
+    "eslint-config-turbo": "latest"
+  }
+}

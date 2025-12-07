@@ -1,0 +1,11 @@
+Error: NativeWind only supports Tailwind CSS v3
+    at tailwindConfig (C:\Users\rapha\Documents\Travail\Projets\MEMEX\node_modules\.pnpm\nativewind@4.2.1_react-native-reanimated@4.2.0_react-native-worklets@0.7.1_@babel+core@7.28.5_at56sqa4rpa54wp4dmzj24trfa\node_modules\nativewind\dist\metro\tailwind\index.js:22:15)
+    at withNativeWind (C:\Users\rapha\Documents\Travail\Projets\MEMEX\node_modules\.pnpm\nativewind@4.2.1_react-native-reanimated@4.2.0_react-native-worklets@0.7.1_@babel+core@7.28.5_at56sqa4rpa54wp4dmzj24trfa\node_modules\nativewind\dist\metro\index.js:18:57)
+    at Object.<anonymous> (C:\Users\rapha\Documents\Travail\Projets\MEMEX\apps\mobile\metro.config.js:21:18)
+    at Module._compile (node:internal/modules/cjs/loader:1730:14)
+    at Object..js (node:internal/modules/cjs/loader:1895:10)
+    at Module.load (node:internal/modules/cjs/loader:1465:32)
+    at Function._load (node:internal/modules/cjs/loader:1282:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+    at Module.require (node:internal/modules/cjs/loader:1487:12)

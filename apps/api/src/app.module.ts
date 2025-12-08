@@ -1,16 +1,24 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { AuthModule } from './auth/auth.module';
+import { FeedModule } from "./feed/feed.module";
+import { WikiModule } from "./wiki/wiki.module";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Card } from "./cards/card.entity";
 
 @Module({
-  imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    ThrottlerModule.forRoot([{
-        ttl: 60,
-        limit: 10,
-    }]),
-    AuthModule,
-  ],
+	imports: [
+		TypeOrmModule.forRoot({
+			type: "postgres",
+			host: "localhost",
+			port: 5432,
+			username: "user",
+			password: "password",
+			database: "memex",
+			autoLoadEntities: true,
+			synchronize: true,
+		}),
+		TypeOrmModule.forFeature([Card]),
+		FeedModule,
+		WikiModule,
+	],
 })
 export class AppModule {}

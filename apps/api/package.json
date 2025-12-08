@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@memex/shared": "workspace:*",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "latest",
     "@nestjs/config": "latest",
     "@nestjs/core": "latest",
@@ -22,6 +23,7 @@
     "@nestjs/throttler": "latest",
     "@nestjs/typeorm": "latest",
     "argon2": "latest",
+    "axios": "^1.13.2",
     "class-transformer": "latest",
     "class-validator": "latest",
     "helmet": "latest",

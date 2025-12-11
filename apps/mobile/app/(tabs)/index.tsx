@@ -10,21 +10,16 @@ import { FlashList } from "@shopify/flash-list";
 import { FeedItem } from "../../components/FeedItem";
 import { ICard } from "@memex/shared";
 import { useFeed } from "../../hooks/useFeed";
-// import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { height } = Dimensions.get("window");
-const TAB_BAR_HEIGHT = 49 + 34; // Approx
+const TAB_BAR_HEIGHT = 49 + 34;
 const ITEM_HEIGHT = height - TAB_BAR_HEIGHT;
 
 export default function FeedScreen() {
-	// const insets = useSafeAreaInsets();
-
-	// --- 1. React Query for Infinite Scroll ---
 	const { data, fetchNextPage, hasNextPage, isLoading } = useFeed();
 
 	const flattenData = data?.pages.flatMap((page) => page.data) || [];
 
-	// --- 2. Viewability Tracking (for pausing videos/animations) ---
 	const [viewableItems, setViewableItems] = useState<ViewToken[]>([]);
 	const onViewableItemsChanged = useCallback(
 		({ viewableItems: vItems }: { viewableItems: ViewToken[] }) => {
@@ -36,7 +31,6 @@ export default function FeedScreen() {
 		itemVisiblePercentThreshold: 80,
 	}).current;
 
-	// --- 3. Render Item ---
 	const renderItem = useCallback(
 		({ item, index }: { item: ICard; index: number }) => {
 			const isVisible = viewableItems.some((v) => v.item.id === item.id);
@@ -59,7 +53,7 @@ export default function FeedScreen() {
 			<FlashList
 				data={flattenData}
 				renderItem={renderItem}
-				estimatedItemSize={ITEM_HEIGHT}
+				// estimatedItemSize={ITEM_HEIGHT}
 				pagingEnabled
 				decelerationRate="fast"
 				snapToAlignment="center"
@@ -70,7 +64,7 @@ export default function FeedScreen() {
 				onEndReachedThreshold={0.5}
 				onViewableItemsChanged={onViewableItemsChanged}
 				viewabilityConfig={viewabilityConfig}
-				keyExtractor={(item, index) => item.id + index} // fallbacks if id duplicate in mocks
+				keyExtractor={(item, index) => item.id + index}
 			/>
 		</View>
 	);

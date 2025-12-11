@@ -13,7 +13,6 @@ import Animated, {
 	withSpring,
 	interpolate,
 	withTiming,
-	runOnJS,
 } from "react-native-reanimated";
 import { ICard } from "@memex/shared";
 import { LinearGradient } from "expo-linear-gradient";

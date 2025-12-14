@@ -11,6 +11,10 @@ export class CardsService {
     private readonly cardsRepository: Repository<Card>
   ) {}
 
+  async countCards(): Promise<number> {
+    return await this.cardsRepository.count();
+  }
+
   async upsertCard(payload: CreateCardInput): Promise<Card> {
     const existing = await this.cardsRepository.findOne({
       where: { sourceLink: payload.sourceLink }
@@ -32,6 +36,19 @@ export class CardsService {
       .skip(cursor)
       .take(take)
       .getMany();
+
+    if (items.length === 0) {
+      const fallback = await this.cardsRepository
+        .createQueryBuilder('card')
+        .orderBy('RANDOM()')
+        .take(take)
+        .getMany();
+
+      return {
+        items: fallback,
+        nextCursor: fallback.length === take ? take : null
+      };
+    }
 
     const nextCursor = items.length === take ? cursor + items.length : null;
 

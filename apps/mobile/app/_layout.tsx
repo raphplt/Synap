@@ -6,11 +6,14 @@ import { PropsWithChildren, useEffect } from 'react';
 import { AppState, AppStateStatus, Platform } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { verifyInstallation } from 'nativewind';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: Infinity,
+      refetchOnMount: 'always',
+      refetchOnReconnect: true,
       refetchOnWindowFocus: false
     }
   }
@@ -28,6 +31,14 @@ const RootView = GestureHandlerRootView as React.ComponentType<
 
 export default function RootLayout() {
   useEffect(() => {
+    if (__DEV__) {
+      try {
+        verifyInstallation();
+      } catch (error) {
+        console.error('NativeWind setup error:', error);
+      }
+    }
+
     const subscription = AppState.addEventListener('change', onAppStateChange);
     return () => subscription.remove();
   }, []);

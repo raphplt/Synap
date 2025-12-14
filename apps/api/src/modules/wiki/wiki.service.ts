@@ -37,11 +37,20 @@ export class WikiIngestService {
   }
 
   private pickMediaUrl(payload: WikipediaApiResponse): string {
-    if (payload.thumbnail == null || payload.thumbnail.width < 500) {
-      throw new Error('Thumbnail manquante ou trop petite (<500px).');
+    const original = payload.originalimage;
+    const thumb = payload.thumbnail;
+
+    const chosen = original ?? thumb;
+    if (chosen == null) {
+      throw new Error('Image manquante.');
     }
 
-    return payload.originalimage?.source ?? payload.thumbnail.source;
+    const width = chosen.width ?? 0;
+    if (width < 500) {
+      throw new Error('Image trop petite (<500px).');
+    }
+
+    return chosen.source;
   }
 
   async fetchSummary(title: string): Promise<WikipediaApiResponse> {

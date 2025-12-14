@@ -19,6 +19,7 @@ npm-debug.log*
 *.aab
 android
 ios
+nativewind-env.d.ts
 
 # TypeScript
 *.tsbuildinfo

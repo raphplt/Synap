@@ -1,9 +1,28 @@
 import { FeedResponseDto } from '@memex/shared';
+import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+
+function guessLanHost(): string | null {
+  const hostUri =
+    (Constants.expoConfig as any)?.hostUri ??
+    (Constants as any)?.expoGoConfig?.debuggerHost ??
+    (Constants as any)?.manifest?.debuggerHost ??
+    (Constants as any)?.manifest2?.extra?.expoClient?.hostUri;
+
+  if (typeof hostUri !== 'string' || hostUri.length === 0) return null;
+
+  const host = hostUri.split(':')[0];
+  return host.length > 0 ? host : null;
+}
 
 export function getApiBaseUrl(): string {
   if (process.env.EXPO_PUBLIC_API_URL != null && process.env.EXPO_PUBLIC_API_URL.length > 0) {
     return process.env.EXPO_PUBLIC_API_URL;
+  }
+
+  const host = guessLanHost();
+  if (host != null) {
+    return `http://${host}:3000`;
   }
 
   return Platform.select({

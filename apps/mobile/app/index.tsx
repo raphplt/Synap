@@ -23,9 +23,9 @@ export default function HomeScreen() {
 
 	if (isLoading) {
 		return (
-			<View className="flex-1 items-center justify-center bg-ink">
+			<View style={{ flex: 1, backgroundColor: "#0f172a" }} className="flex-1 items-center justify-center bg-ink">
 				<ActivityIndicator color="#22d3ee" size="large" />
-				<Text className="text-black mt-3">Chargement du feed</Text>
+				<Text className="text-sand mt-3">Chargement du feed</Text>
 			</View>
 		);
 	}
@@ -51,9 +51,9 @@ export default function HomeScreen() {
 	}
 
 	return (
-		<SafeAreaView>
-			<View className="flex-1 bg-ink">
-				<Text>Items</Text>
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#0f172a" }} className="bg-ink">
+			<View style={{ flex: 1 }} className="bg-ink">
+				<Text className="text-gray-500 text-2xl">Items</Text>
 				<FeedList
 					items={items}
 					onEndReached={loadMore}

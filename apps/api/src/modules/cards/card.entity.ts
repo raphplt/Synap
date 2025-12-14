@@ -5,42 +5,42 @@ import {
   Index,
   PrimaryGeneratedColumn,
   UpdateDateColumn
-} from 'typeorm';
+} from 'typeorm'
 
 @Entity({ name: 'cards' })
 @Index(['sourceLink'], { unique: true })
 @Index(['sourceType', 'sourceId'], { unique: true })
 export class Card {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+    id!: string
 
   @Column({ type: 'varchar', length: 255 })
-  title!: string;
+    title!: string
 
   @Column({ type: 'text' })
-  summary!: string;
+    summary!: string
 
   @Column({ type: 'text' })
-  content!: string;
+    content!: string
 
   @Column({ type: 'text' })
-  mediaUrl!: string;
+    mediaUrl!: string
 
   @Column({ type: 'text' })
-  sourceLink!: string;
+    sourceLink!: string
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  sourceAttribution?: string | null;
+    sourceAttribution?: string | null
 
   @Column({ type: 'varchar', length: 64, nullable: true })
-  sourceType?: string | null;
+    sourceType?: string | null
 
   @Column({ type: 'varchar', length: 255, nullable: true })
-  sourceId?: string | null;
+    sourceId?: string | null
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
-  createdAt!: Date;
+    createdAt!: Date
 
   @UpdateDateColumn({ type: 'timestamp with time zone' })
-  updatedAt!: Date;
+    updatedAt!: Date
 }

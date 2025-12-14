@@ -8,6 +8,7 @@
     "start": "node dist/main.js",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
+    "lint:fix": "eslint \"src/**/*.{ts,tsx}\" --fix",
     "ingest": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/scripts/ingest.ts"
   },
   "dependencies": {

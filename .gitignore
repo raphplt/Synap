@@ -1,0 +1,30 @@
+# Node
+node_modules
+dist
+build
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.DS_Store
+
+# Logs
+*.log
+
+# Expo / React Native
+.expo
+.expo-shared
+*.apk
+*.aab
+android
+ios
+
+# TypeScript
+*.tsbuildinfo
+
+# Coverage
+coverage
+.nyc_output
+
+.turbo

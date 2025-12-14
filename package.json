@@ -1,0 +1,22 @@
+{
+  "name": "memex",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev --parallel",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format",
+    "api:ingest": "npm --workspace apps/api run ingest"
+  },
+  "devDependencies": {
+    "turbo": "^2.2.3",
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "npm@11.6.1"
+}

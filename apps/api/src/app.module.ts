@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { CardsModule } from './modules/cards/cards.module';
-import { WikiModule } from './modules/wiki/wiki.module';
-import { Card } from './modules/cards/card.entity';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { CardsModule } from './modules/cards/cards.module'
+import { WikiModule } from './modules/wiki/wiki.module'
+import { Card } from './modules/cards/card.entity'
+import { AppController } from './app.controller'
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Card } from './modules/cards/card.entity';
     }),
     CardsModule,
     WikiModule
-  ]
+  ],
+  controllers: [AppController]
 })
 export class AppModule {}

@@ -2,19 +2,6 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CardsService } from '../cards/cards.service';
 import { WikiIngestService } from './wiki.service';
 
-const DEFAULT_SEED_TITLES = [
-  'Tour Eiffel',
-  'Albert Einstein',
-  'Marie Curie',
-  'Système solaire',
-  'Internet',
-  'Renaissance',
-  'ADN',
-  'Évolution (biologie)',
-  'Mona Lisa',
-  'Égypte antique'
-];
-
 @Injectable()
 export class WikiSeedService implements OnModuleInit {
   private readonly logger = new Logger(WikiSeedService.name);
@@ -32,11 +19,11 @@ export class WikiSeedService implements OnModuleInit {
       const count = await this.cardsService.countCards();
       if (count > 0) return;
 
-      this.logger.log('DB vide: seed automatique via Wikipédia…');
-      await this.wikiService.ingestTitles(DEFAULT_SEED_TITLES);
+      const seedCount = Math.min(50, Math.max(1, Number(process.env.MEMEX_SEED_COUNT ?? 20)));
+      this.logger.log(`DB vide: seed automatique via Wikipédia (random x${seedCount})…`);
+      await this.wikiService.ingestRandom(seedCount);
     } catch (error) {
       this.logger.warn(`Seed ignoré: ${String(error)}`);
     }
   }
 }
-

@@ -6,6 +6,8 @@ export interface CardBase {
   mediaUrl: string;
   sourceLink: string;
   sourceAttribution?: string | null;
+  sourceType?: string | null;
+  sourceId?: string | null;
   createdAt?: string | Date;
   updatedAt?: string | Date;
 }

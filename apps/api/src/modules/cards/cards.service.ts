@@ -11,14 +11,30 @@ export class CardsService {
     private readonly cardsRepository: Repository<Card>
   ) {}
 
+  async findBySource(sourceType: string, sourceId: string): Promise<Card | null> {
+    return await this.cardsRepository.findOne({
+      where: { sourceType, sourceId }
+    });
+  }
+
   async countCards(): Promise<number> {
     return await this.cardsRepository.count();
   }
 
   async upsertCard(payload: CreateCardInput): Promise<Card> {
-    const existing = await this.cardsRepository.findOne({
-      where: { sourceLink: payload.sourceLink }
-    });
+    const hasSourceKey =
+      payload.sourceType != null &&
+      payload.sourceType.length > 0 &&
+      payload.sourceId != null &&
+      payload.sourceId.length > 0;
+
+    const existing = hasSourceKey
+      ? await this.cardsRepository.findOne({
+        where: { sourceType: payload.sourceType as string, sourceId: payload.sourceId as string }
+      })
+      : await this.cardsRepository.findOne({
+        where: { sourceLink: payload.sourceLink }
+      });
 
     if (existing != null) {
       const merged = this.cardsRepository.merge(existing, payload);

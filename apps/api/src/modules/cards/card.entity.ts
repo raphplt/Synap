@@ -9,6 +9,7 @@ import {
 
 @Entity({ name: 'cards' })
 @Index(['sourceLink'], { unique: true })
+@Index(['sourceType', 'sourceId'], { unique: true })
 export class Card {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
@@ -30,6 +31,12 @@ export class Card {
 
   @Column({ type: 'varchar', length: 255, nullable: true })
   sourceAttribution?: string | null;
+
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  sourceType?: string | null;
+
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  sourceId?: string | null;
 
   @CreateDateColumn({ type: 'timestamp with time zone' })
   createdAt!: Date;

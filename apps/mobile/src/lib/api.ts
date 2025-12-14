@@ -2,6 +2,11 @@ import { FeedResponseDto } from '@memex/shared';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
 
+function normalizeBaseUrl(raw: string): string {
+  const trimmed = raw.trim().replace(/^['"]|['"]$/g, '');
+  return trimmed.replace(/\/+$/, '');
+}
+
 function guessLanHost(): string | null {
   const hostUri =
     (Constants.expoConfig as any)?.hostUri ??
@@ -17,7 +22,7 @@ function guessLanHost(): string | null {
 
 export function getApiBaseUrl(): string {
   if (process.env.EXPO_PUBLIC_API_URL != null && process.env.EXPO_PUBLIC_API_URL.length > 0) {
-    return process.env.EXPO_PUBLIC_API_URL;
+    return normalizeBaseUrl(process.env.EXPO_PUBLIC_API_URL);
   }
 
   const host = guessLanHost();
@@ -25,11 +30,13 @@ export function getApiBaseUrl(): string {
     return `http://${host}:3000`;
   }
 
-  return Platform.select({
-    ios: 'http://localhost:3000',
-    android: 'http://10.0.2.2:3000',
-    default: 'http://localhost:3000'
-  }) as string;
+  return normalizeBaseUrl(
+    Platform.select({
+      ios: 'http://localhost:3000',
+      android: 'http://10.0.2.2:3000',
+      default: 'http://localhost:3000'
+    }) as string
+  );
 }
 
 export async function fetchFeed(cursor = 0, baseUrl = getApiBaseUrl()): Promise<FeedResponseDto> {

@@ -1,10 +1,11 @@
 import { FeedResponseDto } from '@memex/shared';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { useCallback } from 'react';
-import { fetchFeed, getApiBaseUrl } from '../lib/api';
+import { useCallback, useEffect, useRef } from 'react';
+import { fetchFeed, getApiBaseUrl, ingestRandomWiki } from '../lib/api';
 
 export function useFeed() {
   const baseUrl = getApiBaseUrl();
+  const hasKickedRef = useRef(false);
 
   const query = useInfiniteQuery<FeedResponseDto>({
     queryKey: ['feed', baseUrl],
@@ -18,6 +19,22 @@ export function useFeed() {
     },
     retry: 1
   });
+
+  useEffect(() => {
+    const firstCount = query.data?.pages?.[0]?.items?.length ?? 0;
+    if (query.status !== 'success') return;
+
+    if (!hasKickedRef.current && firstCount < 5) {
+      hasKickedRef.current = true;
+      ingestRandomWiki(20, baseUrl)
+        .then(async () => {
+          await query.refetch();
+        })
+        .catch(() => {
+          hasKickedRef.current = false;
+        });
+    }
+  }, [baseUrl, query.data?.pages, query.status]);
 
   const loadMore = useCallback(() => {
     if (query.isFetchingNextPage || query.isLoading) return;

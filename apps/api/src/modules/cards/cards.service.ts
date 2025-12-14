@@ -46,27 +46,18 @@ export class CardsService {
   }
 
   async getFeed(cursor = 0, take = 10): Promise<FeedResponseDto> {
+    const safeTake = Math.min(50, Math.max(1, take));
+    const safeCursor = Math.max(0, cursor);
+
     const items = await this.cardsRepository
       .createQueryBuilder('card')
-      .orderBy('RANDOM()')
-      .skip(cursor)
-      .take(take)
+      .orderBy('card.createdAt', 'DESC')
+      .addOrderBy('card.id', 'DESC')
+      .skip(safeCursor)
+      .take(safeTake)
       .getMany();
 
-    if (items.length === 0) {
-      const fallback = await this.cardsRepository
-        .createQueryBuilder('card')
-        .orderBy('RANDOM()')
-        .take(take)
-        .getMany();
-
-      return {
-        items: fallback,
-        nextCursor: fallback.length === take ? take : null
-      };
-    }
-
-    const nextCursor = items.length === take ? cursor + items.length : null;
+    const nextCursor = items.length === safeTake ? safeCursor + items.length : null;
 
     return { items, nextCursor };
   }

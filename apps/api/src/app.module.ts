@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { CardsModule } from './modules/cards/cards.module'
+import { FeedModule } from './modules/feed/feed.module'
 import { WikiModule } from './modules/wiki/wiki.module'
 import { Card } from './modules/cards/card.entity'
 import { AppController } from './app.controller'
@@ -21,6 +22,7 @@ import { AppController } from './app.controller'
       logging: false
     }),
     CardsModule,
+    FeedModule,
     WikiModule
   ],
   controllers: [AppController]

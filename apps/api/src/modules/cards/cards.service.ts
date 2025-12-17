@@ -46,7 +46,7 @@ export class CardsService {
   }
 
   async getFeed (cursor = 0, take = 10): Promise<FeedResponseDto> {
-    const safeTake = Math.min(50, Math.max(1, take))
+    const safeTake = Math.min(100, Math.max(1, take));
     const safeCursor = Math.max(0, cursor)
 
     const items = await this.cardsRepository

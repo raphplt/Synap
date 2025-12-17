@@ -40,7 +40,7 @@ export function getApiBaseUrl(): string {
 }
 
 export async function fetchFeed(cursor = 0, baseUrl = getApiBaseUrl()): Promise<FeedResponseDto> {
-  const response = await fetch(`${baseUrl}/feed?cursor=${cursor}`);
+  const response = await fetch(`${baseUrl}/feed?cursor=${cursor}&take=50`);
 
   if (!response.ok) {
     const message = await response.text();

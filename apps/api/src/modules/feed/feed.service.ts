@@ -13,14 +13,14 @@ export class FeedService {
   ) {}
 
   private getBufferMin (): number {
-    const value = Number(process.env.MEMEX_FEED_BUFFER_MIN ?? 100)
-    return Number.isFinite(value) ? Math.max(0, value) : 100
+    const value = Number(process.env.MEMEX_FEED_BUFFER_MIN ?? 200)
+    return Number.isFinite(value) ? Math.max(0, value) : 200
   }
 
   private getFillBatchSize (): number {
-    const value = Number(process.env.MEMEX_FEED_FILL_BATCH ?? 20)
-    const clamped = Number.isFinite(value) ? value : 20
-    return Math.min(50, Math.max(1, clamped))
+    const value = Number(process.env.MEMEX_FEED_FILL_BATCH ?? 50)
+    const clamped = Number.isFinite(value) ? value : 50
+    return Math.min(100, Math.max(1, clamped))
   }
 
   private async ensureBuffer (): Promise<void> {

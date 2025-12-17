@@ -24,16 +24,16 @@ export function useFeed() {
     const firstCount = query.data?.pages?.[0]?.items?.length ?? 0;
     if (query.status !== 'success') return;
 
-    if (!hasKickedRef.current && firstCount < 5) {
-      hasKickedRef.current = true;
-      ingestRandomWiki(20, baseUrl)
-        .then(async () => {
-          await query.refetch();
-        })
-        .catch(() => {
-          hasKickedRef.current = false;
-        });
-    }
+    if (!hasKickedRef.current && firstCount < 10) {
+					hasKickedRef.current = true;
+					ingestRandomWiki(50, baseUrl)
+						.then(async () => {
+							await query.refetch();
+						})
+						.catch(() => {
+							hasKickedRef.current = false;
+						});
+				}
   }, [baseUrl, query.data?.pages, query.status]);
 
   const loadMore = useCallback(() => {

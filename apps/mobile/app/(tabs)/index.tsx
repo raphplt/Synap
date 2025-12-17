@@ -3,7 +3,6 @@ import { useMemo } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
 import { FeedList } from "../../src/components/FeedList";
 import { useFeed } from "../../src/hooks/useFeed";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function HomeScreen() {
 	const {
@@ -50,11 +49,7 @@ export default function HomeScreen() {
 	}
 
 	return (
-		<SafeAreaView
-			style={{ flex: 1, backgroundColor: "#0f172a" }}
-			className="bg-ink"
-            edges={['top']}
-		>
+		<View style={{ flex: 1, backgroundColor: "#0f172a" }} className="bg-ink">
 			<View style={{ flex: 1 }} className="bg-ink">
 				<FeedList
 					items={items}
@@ -65,6 +60,6 @@ export default function HomeScreen() {
 				/>
 				<StatusBar style="light" />
 			</View>
-		</SafeAreaView>
+		</View>
 	);
 }

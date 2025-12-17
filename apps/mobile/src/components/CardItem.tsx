@@ -2,7 +2,8 @@ import { CardBase } from '@memex/shared';
 import { Image } from "expo-image";
 import { LinearGradient, LinearGradientProps } from "expo-linear-gradient";
 import React, { useCallback, useMemo } from "react";
-import { Dimensions, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
@@ -10,13 +11,13 @@ import Animated, {
 } from "react-native-reanimated";
 import clsx from "clsx";
 
-const { height: screenHeight } = Dimensions.get("window");
-
 type CardItemProps = {
 	card: CardBase;
+	height: number;
 };
 
-export function CardItem({ card }: CardItemProps) {
+export function CardItem({ card, height }: CardItemProps) {
+	const insets = useSafeAreaInsets();
 	const Gradient =
 		LinearGradient as unknown as React.ComponentType<LinearGradientProps>;
 	const rotation = useSharedValue(0);
@@ -44,7 +45,7 @@ export function CardItem({ card }: CardItemProps) {
 	);
 
 	return (
-		<View style={{ height: screenHeight }} className="bg-ink">
+		<View style={{ height }} className="bg-ink">
 			<Animated.View
 				style={[frontAnimatedStyle, { position: "absolute", inset: 0 }]}
 			>
@@ -57,9 +58,15 @@ export function CardItem({ card }: CardItemProps) {
 						cachePolicy="memory-disk"
 					/>
 					<Gradient
-						colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.7)"]}
-						locations={[0.35, 1]}
-						style={{ flex: 1, padding: 24, justifyContent: "flex-end" }}
+						colors={["rgba(0,0,0,0.1)", "rgba(0,0,0,0.8)"]}
+						locations={[0.2, 1]}
+						style={{
+							flex: 1,
+							padding: 24,
+							paddingTop: Math.max(24, insets.top),
+							paddingBottom: Math.max(24, insets.bottom),
+							justifyContent: "flex-end",
+						}}
 					>
 						<View className="flex-row items-center mb-4">
 							<View className="h-2 w-12 rounded-full bg-amber mr-3" />
@@ -86,7 +93,13 @@ export function CardItem({ card }: CardItemProps) {
 			>
 				<Pressable style={{ flex: 1 }} onPress={toggle}>
 					<Gradient colors={["#0f172a", "#1e293b"]} style={{ flex: 1 }}>
-						<ScrollView contentContainerStyle={{ padding: 24, paddingBottom: 48 }}>
+						<ScrollView
+							contentContainerStyle={{
+								padding: 24,
+								paddingTop: Math.max(24, insets.top),
+								paddingBottom: Math.max(48, insets.bottom),
+							}}
+						>
 							<View className="mb-4">
 								<Text className="text-neon text-xs uppercase tracking-widest mb-2">
 									Face B

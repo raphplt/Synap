@@ -49,15 +49,22 @@ _C'est ici que l'utilisateur passe 90% de son temps. Doit tourner à 60fps const
 - **Actions Latérales :** Like (Sauvegarder), Share, **Rate (SRS)**.
 - **Zone SRS :** Une fois la carte retournée, boutons d'auto-évaluation ("Oublié", "Difficile", "Facile") qui envoient le feedback à l'API.
 
-#### **Tab 2: Explore / Library (Le "Knowledge Graph")**
+#### **Tab 2: L'Atlas (Collections & Maîtrise)**
 
-_Pour sortir du flux passif et rechercher activement. C'est la structure qui manque aux réseaux sociaux._
+_Le trophée de l'utilisateur, là où il contemple son empire intellectuel. Ne montre pas une liste, mais une **conquête**._
 
-- **Contenu :**
-- **Barre de Recherche :** Recherche Full-text (Elastic/MeiliSearch à terme) sur les titres et contenus.
-- **Featured Decks :** Collections curées (ex: "Les modèles mentaux", "Histoire de la Rome Antique").
-- **Catégories :** Grille visuelle des thématiques.
-- **Ma Bibliothèque :** Accès aux cartes "Sauvegardées" et "Maîtrisées" (Mastered).
+- **Concept Clé :** Un "Pokedex de l'intelligence" organisé sous forme de Decks thématiques.
+- **Structure :**
+    - **Header "Mon Capital Cognitif" :** Rappel du KRu (ex: 142 Cartes Acquises / 12 Gold) et grade actuel (ex: Architecte - Niv 4).
+    - **Grille de Decks :** Présentation façon album Panini ou couvertures de livres.
+        - *États :* Verrouillé (grisé), En cours (standard), Maîtrisé (100% - cadre doré/holographique).
+        - *Progression :* Jauge circulaire sur chaque deck.
+    - **Drill-down (Détail du Deck) :** 
+        - Visualisation des cartes individuelles.
+        - **Cartes Gold :** Mémoire long terme validée, aspect premium brillant.
+        - **Cartes Fragiles :** À révoir prochainement (effet "fissuré" ou clignotement).
+
+- **Mécanique "Gold" :** Statut ultime atteint après 5 rappels espacés consécutifs sans erreur.
 
 #### **Tab 3: Brain Profile (La Gamification)**
 

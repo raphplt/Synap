@@ -84,7 +84,8 @@ Concrètement :
 
 * une carte devient *Mastered*  
 * puis *Gold*  
-* uniquement après validation active (rappels \+ quiz)
+* uniquement après validation active (rappels + quiz)
+* **Status final :** Une carte devient **Gold** (ancrage long terme) après 5 succès consécutifs dans l'algorithme SRS.
 
 * Les vues ne comptent pas  
 * Le scroll ne compte pas  
@@ -187,6 +188,12 @@ Ou plus produit :
 * Cerveau qui évolue
 
 L’utilisateur **voit** son intelligence progresser.
+
+### **5\) L'Atlas (Conquête de Savoir)**
+
+* Visualisation globale de la "conquête" intellectuelle.
+* Organisation par **Decks** thématiques.
+* Collectionnite positive : transformer les cartes en trophées (Normal -> Mastered -> Gold).
 
 ## **11\. Gamification**
 

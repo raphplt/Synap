@@ -64,6 +64,9 @@
 - [ ] **Algorithme SRS (Spaced Repetition)**
   - [ ] Implémenter la logique SuperMemo-2 (SM2) ou FSRS simplifié dans un `SrsService`.
   - [ ] Calcul du `nextReviewDate` basé sur le feedback utilisateur (Easy/Good/Hard/Again).
+  - [ ] **Logique "Gold" :** Incrémenter un compteur de succès consécutifs. Au 5ème succès sans erreur, passer la carte au statut `GOLD`.
+- [ ] **Endpoint `/atlas`**
+  - [ ] Retourner les stats par Deck (Nombre de cartes, progression %, cartes Gold).
 - [ ] **Endpoint `/feed` Intelligent**
   - [ ] **Feed Mixer (Règle 70/20/10) :**
     - 70% **New** : Cartes jamais vues (filtrées par intérêts user).
@@ -88,8 +91,10 @@
 - [ ] **Streak (Série)**
   - [ ] Indicateur visuel "Flamme/Connexion" dans le header.
   - [ ] Logique locale : Si `lastActivity` = hier, Streak +1. Si avant-hier, Streak reset.
-- [ ] **Profil Joueur**
+- [ ] **Profil Joueur & Atlas**
   - [ ] Créer page Profil : Afficher Stats simples ("Cartes maîtrisées", "Série actuelle", "Niveau Cerveau").
+  - [ ] **Écran Atlas :** Grille de decks avec progression et badges.
+  - [ ] **Détail Deck :** Vue en grille des cartes avec distinction visuelle Gold/Fragile.
 
 ---
 

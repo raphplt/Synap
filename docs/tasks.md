@@ -1,145 +1,105 @@
-# 🗺️ ROADMAP & TASKS : MEMEX
+# 🗺️ ROADMAP : CAP SUR LA BÊTA (v0.9)
 
-> **Document de Suivi de Projet**
-> Ce fichier liste les tâches techniques précises pour mener le projet du POC jusqu'à la scalabilité SaaS.
-> **Méthodologie :** Modular Monolith, Feature-First, DevOps dès le J1.
+> **Objectif Unique :** Livrer une application fonctionnelle, "installable", avec une boucle de rétention complète (Auth + Feed + SRS + Gamification) et un contenu de haute qualité (Multi-sources).
 
 ---
 
-## 🗓️ PHASE 1 : THE THIN SLICE (POC)
+## 🏗️ 1. ARCHITECTURE & REFACTO (Fondations)
+*Avant de construire plus haut, on solidifie les bases actuelles.*
 
-**Objectif :** Valider la fluidité technique (60fps) et la qualité du contenu visuel.
-**Est. Durée :** 2-3 semaines.
-
-### 🔌 BACKEND (API - NestJS)
-
-- [ ] **Init Monorepo :** Configuration Turborepo + pnpm workspaces + Shared Types (Strict Mode).
-- [ ] **DB Setup :** Container Docker PostgreSQL + TypeORM Config + Migration Initiale.
-- [ ] **Entity `Card` :** Création du schéma (UUID, title, summary, content, mediaUrl, sourceLink).
-- [ ] **Service `WikiIngest` (v0.1) :**
-  - [ ] Implémenter le fetch sur l'API `fr.wikipedia.org`.
-  - [ ] **Filtre Bloquant :** Rejeter tout article sans `thumbnail` ou dont la width < 500px.
-  - [ ] **Cleaning :** Regex pour nettoyer le HTML/Wikitext (retirer les `[1]`, `{{...}}`).
-  - [ ] **Upsert :** Sauvegarder en base uniquement si non existant.
-- [ ] **Endpoint `GET /feed` :**
-  - [ ] Logique de pagination par curseur (`take: 10`, `skip: cursor`).
-  - [ ] Retourner 10 cartes aléatoires de la DB (pas d'algo complexe pour le moment).
-
-### 📱 MOBILE (Frontend - Expo)
-
-- [ ] **Init Project :** Expo SDK Latest + NativeWind v4 + Reanimated 3.
-- [ ] **Navigation :** Setup Expo Router v3 (Stack de base : Feed / Details).
-- [ ] **Component `FeedList` :**
-  - [ ] Implémenter `@shopify/flash-list`.
-  - [ ] Configurer `estimatedItemSize` (hauteur écran).
-  - [ ] Activer `pagingEnabled` pour le snap effect "TikTok".
-- [ ] **Component `CardItem` :**
-  - [ ] Layout Plein Écran (Image background + Linear Gradient overlay).
-  - [ ] Typographie lisible (NativeWind classes).
-- [ ] **Animation "Flip" :**
-  - [ ] Utiliser `useAnimatedStyle` et `withSpring` pour retourner la carte sur un tap.
-  - [ ] Afficher le contenu détaillé au verso (ScrollView).
-- [ ] **Offline Cache :** Configurer TanStack Query avec un `staleTime` infini pour le feed chargé.
-
-### ☁️ DEVOPS / INFRA
-
-- [ ] **Dockerisation :** Créer un `Dockerfile` optimisé pour l'API (Multi-stage build : Build TS -> Node Alpine).
-- [ ] **CI Pipeline (Github Actions) :**
-  - [ ] Job `Lint` (ESLint + Prettier).
-  - [ ] Job `Typecheck` (tsc --noEmit).
-- [ ] **CD Staging :** Déploiement auto sur Railway/Render au push sur `main`.
-- [ ] **Mobile Build :** Configurer EAS Build (Expo Application Services) pour générer un APK de dev.
+- [ ] **Internationalisation (i18n) Stricte**
+  - [ ] Installer `i18next` + `react-i18next` sur le mobile.
+  - [ ] Créer la structure `locales/fr.json` et `locales/en.json`.
+  - [ ] **Action :** Extraire *toutes* les strings hardcodées du POC actuel (Titres, boutons, erreurs) vers les fichiers JSON.
+- [ ] **Standardisation API/DTO**
+  - [ ] Vérifier que chaque endpoint utilise un DTO validé par `class-validator`.
+  - [ ] Refactoriser les contrôleurs : Interdire le retour d'entités TypeORM brutes (Mapper systématique `Entity -> ResponseDTO`).
 
 ---
 
-## 🗓️ PHASE 2 : MVP (MARKET READY)
+## 🔐 2. AUTHENTIFICATION & UTILISATEURS
+*Passage d'un mode "visiteur anonyme" à "joueur identifié".*
 
-**Objectif :** Rétention & Gamification. Lancement Stores.
+### Backend (NestJS)
+- [ ] **Module `Auth`**
+  - [ ] Installer et configurer `Passport-JWT` + `Argon2` (hashing).
+  - [ ] Implémenter les endpoints : `POST /auth/signup`, `POST /auth/login`, `GET /auth/me`.
+  - [ ] **Guard Global :** Sécuriser toutes les routes par défaut (APP_GUARD), sauf `/auth/*` et `/health`.
+- [ ] **Module `User`**
+  - [ ] Mettre à jour l'Entity `User` : Ajouter `xp` (int), `streak` (int), `lastActivityAt` (Date).
+  - [ ] **Onboarding Data :** Stocker les `interests` (tags JSONB) sélectionnés à l'inscription.
 
-### 🔌 BACKEND
-
-- [ ] **Auth Module :**
-  - [ ] Setup Passport-JWT + Argon2.
-  - [ ] Endpoints `/auth/register`, `/auth/login`.
-  - [ ] **Social Auth :** Google & Apple (Requis pour iOS).
-- [ ] **User Domain :**
-  - [ ] Entity `User` (email, username, avatar, xp, level, streak).
-  - [ ] Entity `UserCardInteraction` (userId, cardId, status, nextReviewDate).
-- [ ] **Service `SRSAlgorithm` :**
-  - [ ] Implémenter la logique de rappel (SuperMemo-2 simplifié).
-  - [ ] Mettre à jour `/feed` pour mixer : 70% New / 20% Review / 10% Quiz.
-- [ ] **Interactions API :**
-  - [ ] `POST /cards/:id/view` (Tracking temps passé).
-  - [ ] `POST /cards/:id/like`.
-
-### 📱 MOBILE
-
-- [ ] **Onboarding Flow :** 3 écrans (Centres d'intérêt -> Auth -> Tuto).
-- [ ] **Gamification UI :**
-  - [ ] Jauge XP animée en haut du feed.
-  - [ ] Animation "Level Up" (Lottie ou Reanimated).
-  - [ ] Visualisation "Synapse Streak" (Série en cours).
-- [ ] **Quiz Components :**
-  - [ ] UI "Vrai/Faux" (Swipe gesture).
-  - [ ] UI "QCM" (4 boutons).
-  - [ ] Feedback Haptic (Vibration) sur succès/échec.
-- [ ] **In-App Review :** Trigger natif après 5 jours de streak.
-
-### ☁️ DEVOPS
-
-- [ ] **Environnements :** Séparation stricte des variables (`.env.production` vs `.env.staging`).
-- [ ] **Monitoring :**
-  - [ ] Intégration **Sentry** (API & Mobile) pour les crashs.
-  - [ ] Intégration **PostHog** pour l'analytique produit (Funnel d'inscription, Rétention).
-- [ ] **Backups :** Dump automatique de la DB vers S3 chaque nuit (PGDump).
-- [ ] **Rate Limiting :** Configurer `@nestjs/throttler` (Global + Strict sur Auth).
+### Mobile (Expo)
+- [ ] **État Global (Session)**
+  - [ ] Créer un store Zustand `useAuthStore` (token, user, actions login/logout).
+  - [ ] Persistance du Token : Implémenter `expo-secure-store` (Ne jamais utiliser AsyncStorage pour les tokens).
+- [ ] **Écrans d'Auth**
+  - [ ] **Landing :** Écran d'accueil "Non connecté" (Vidéo/Image d'ambiance + Boutons CTA).
+  - [ ] **Login / Signup :** Formulaires simples (Email/Pass) avec validation Zod.
+  - [ ] **Onboarding :** Écran de sélection de 3 thèmes favoris (détermine le seed initial du feed).
 
 ---
 
-## 🗓️ PHASE 3 : SCALE & MONETIZATION
+## 💾 3. DATA ENGINE : "BEYOND WIKIPEDIA"
+*Le cœur du changement. On ne dépend plus uniquement de l'API Wiki. On crée un pipeline d'ingestion agnostique.*
 
-**Objectif :** Rentabilité et Volume (10k+ users).
-
-### 🔌 BACKEND
-
-- [ ] **Ingestion Avancée :**
-  - [ ] Scripts d'import pour sources JSON (Maths, Code).
-  - [ ] Auto-Tagging (NLP basique pour catégoriser les articles Wiki).
-- [ ] **Search Engine :** Implémenter Full-Text Search (Postgres `tsvector` ou MeiliSearch).
-- [ ] **Monétisation :**
-  - [ ] Webhooks RevenueCat (Gestion abonnements).
-  - [ ] Unlock Features (Mode Offline, Stats).
-
-### 📱 MOBILE
-
-- [ ] **Social Features :**
-  - [ ] Espace Commentaires (Bottom Sheet).
-  - [ ] Partage Deep Link (Ouvrir l'app sur une carte spécifique).
-- [ ] **Mode "Focus" :** Filtres par tags (ex: afficher que "Histoire").
-- [ ] **Perf Tuning :**
-  - [ ] Optimiser le TTI (Time to Interactive).
-  - [ ] Réduire le bundle size.
-
-### ☁️ DEVOPS
-
-- [ ] **Caching Layer :** Ajouter Redis pour cacher les réponses de `/feed` et les sessions.
-- [ ] **CDN :** Servir les images via Cloudflare ou AWS CloudFront.
-- [ ] **Tests E2E :** Script Maestro pour tester le parcours critique (Login -> Scroll -> Quiz) avant chaque release.
+### Backend (Ingestion Pipeline)
+- [ ] **Refacto du Modèle de Données**
+  - [ ] Update Entity `Card` : Ajouter colonne `origin` ('WIKIPEDIA', 'CURATED_JSON', 'AI_GENERATED') et `externalId`.
+  - [ ] **Qualité :** Ajouter colonne `qualityScore` (0-100) pour prioriser les meilleures cartes dans l'algo.
+- [ ] **Service `IngestionFactory`**
+  - [ ] Créer une interface générique `ContentProvider`.
+  - [ ] **Adapter Wikipedia (Existant) :** Améliorer le nettoyage du wikitext (supprimer artefacts visuels, templates cassés).
+  - [ ] **Adapter "Curated" (Nouveau) :** Script d'import pour ingérer des fichiers JSON/Markdown locaux.
+    - *Format cible :* `data/curated/biais-cognitifs.json` (ex: "Les 50 Biais Cognitifs").
+- [ ] **Seeding Initial**
+  - [ ] Préparer un dataset "Gold" de ~200 cartes manuelles/vérifiées (JSON) pour le lancement Bêta.
 
 ---
 
-## 🗓️ PHASE 4 : MATURITY (SAAS)
+## 🧠 4. ALGORITHME & FEED (Le Cerveau)
+*Implémentation de la promesse "Smart Feed".*
 
-**Objectif :** Plateforme UGC & IA.
+### Backend
+- [ ] **Algorithme SRS (Spaced Repetition)**
+  - [ ] Implémenter la logique SuperMemo-2 (SM2) ou FSRS simplifié dans un `SrsService`.
+  - [ ] Calcul du `nextReviewDate` basé sur le feedback utilisateur (Easy/Good/Hard/Again).
+- [ ] **Endpoint `/feed` Intelligent**
+  - [ ] **Feed Mixer (Règle 70/20/10) :**
+    - 70% **New** : Cartes jamais vues (filtrées par intérêts user).
+    - 20% **Review** : Cartes dont `nextReviewDate < NOW`.
+    - 10% **Challenge** : Quiz sur des cartes "Learning".
+  - [ ] **Anti-doublon :** Exclure (via Redis ou Query SQL complexe) les cartes vues < 24h (hors Review).
 
-### 🔌 BACKEND
+### Mobile
+- [ ] **Interactions Carte**
+  - [ ] Tracking du temps de lecture ("View" validée uniquement si > 3s).
+  - [ ] **Actions SRS :** Après le flip, afficher les boutons d'auto-évaluation (ex: "Oublié" vs "Retenu") qui appellent l'API SRS.
 
-- [ ] **UGC Platform :** CRUD pour création de cartes par les users.
-- [ ] **Moderation :** Queue de validation (Back-office Admin).
-- [ ] **AI Recommendation :** Vecteurs (PgVector) pour recommander du contenu sémantiquement proche.
+---
 
-### ☁️ DEVOPS
+## 🎮 5. GAMIFICATION & ENGAGEMENT
+*Rendre l'apprentissage addictif.*
 
-- [ ] **Infrastructure as Code :** Terraform pour gérer l'infra AWS.
-- [ ] **Kubernetes :** Migration vers K8s si auto-scaling nécessaire.
-- [ ] **Security Audit :** Pentest externe.
+### Mobile (UI)
+- [ ] **Jauge de Progression**
+  - [ ] Barre d'XP fluide en haut du feed.
+  - [ ] Animation + Haptic Feedback à chaque carte validée/lue.
+- [ ] **Streak (Série)**
+  - [ ] Indicateur visuel "Flamme/Connexion" dans le header.
+  - [ ] Logique locale : Si `lastActivity` = hier, Streak +1. Si avant-hier, Streak reset.
+- [ ] **Profil Joueur**
+  - [ ] Créer page Profil : Afficher Stats simples ("Cartes maîtrisées", "Série actuelle", "Niveau Cerveau").
+
+---
+
+## 🚀 6. DEVOPS & QUALITÉ (Ship It)
+
+- [ ] **Environnements**
+  - [ ] Séparer strictement `API_URL` pour Dev (localhost) et Prod (VPS/Cloud).
+- [ ] **CI/CD**
+  - [ ] Pipeline GitHub Actions : Lint + Build + Test (Jest sur l'algo SRS).
+  - [ ] **EAS Build :** Configurer `eas.json` pour générer les APK/IPA de preview.
+- [ ] **Analytics (Indispensable Bêta)**
+  - [ ] Installer **PostHog** (ou Amplitude).
+  - [ ] Tracker événements clés : `SIGNUP`, `CARD_VIEW`, `CARD_FLIP`, `QUIZ_COMPLETE`.

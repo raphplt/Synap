@@ -218,13 +218,49 @@ export async function getDeckBySlug(
 	return response.json();
 }
 
+// Categories API
+export interface Category {
+	id: string;
+	name: string;
+	slug: string;
+	description?: string | null;
+	imageUrl?: string | null;
+	sortOrder: number;
+}
+
 export async function getCategories(
 	baseUrl = getApiBaseUrl()
-): Promise<unknown[]> {
+): Promise<Category[]> {
 	const response = await fetch(`${baseUrl}/decks/categories`);
 
 	if (!response.ok) {
 		throw new Error(`HTTP ${response.status}`);
+	}
+
+	return response.json();
+}
+
+// User API
+export async function updateUserInterests(
+	userId: string,
+	interests: string[],
+	token: string,
+	baseUrl = getApiBaseUrl()
+): Promise<UserResponseDto> {
+	const response = await fetch(`${baseUrl}/users/${userId}`, {
+		method: "PATCH",
+		headers: {
+			"content-type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ interests }),
+	});
+
+	if (!response.ok) {
+		const error = await response
+			.json()
+			.catch(() => ({ message: "Unknown error" }));
+		throw new Error(error.message ?? `HTTP ${response.status}`);
 	}
 
 	return response.json();

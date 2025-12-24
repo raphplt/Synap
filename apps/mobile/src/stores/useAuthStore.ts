@@ -19,7 +19,7 @@ interface AuthState {
 	setUser: (user: UserResponseDto) => void
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
 	token: null,
 	user: null,
 	isAuthenticated: false,
@@ -27,85 +27,97 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 	isInitialized: false,
 
 	initialize: async () => {
-		set({ isLoading: true })
+		console.log("[Auth] Initializing...");
+		set({ isLoading: true });
 
 		try {
-			const token = await SecureStore.getItemAsync(TOKEN_KEY)
-			const userJson = await SecureStore.getItemAsync(USER_KEY)
+			const token = await SecureStore.getItemAsync(TOKEN_KEY);
+			const userJson = await SecureStore.getItemAsync(USER_KEY);
+
+			console.log("[Auth] Token found:", !!token);
+			console.log("[Auth] User found:", !!userJson);
 
 			if (token && userJson) {
-				const user = JSON.parse(userJson) as UserResponseDto
+				const user = JSON.parse(userJson) as UserResponseDto;
+				console.log("[Auth] Restoring session for:", user.username);
 				set({
 					token,
 					user,
 					isAuthenticated: true,
 					isLoading: false,
 					isInitialized: true,
-				})
+				});
 			} else {
+				console.log("[Auth] No session found");
 				set({
 					token: null,
 					user: null,
 					isAuthenticated: false,
 					isLoading: false,
 					isInitialized: true,
-				})
+				});
 			}
 		} catch (error) {
-			console.error("Failed to initialize auth:", error)
+			console.error("[Auth] Failed to initialize:", error);
 			set({
 				token: null,
 				user: null,
 				isAuthenticated: false,
 				isLoading: false,
 				isInitialized: true,
-			})
+			});
 		}
 	},
 
 	login: async (response: LoginResponseDto) => {
-		set({ isLoading: true })
+		console.log("[Auth] Logging in user:", response.user.username);
+		set({ isLoading: true });
 
 		try {
-			await SecureStore.setItemAsync(TOKEN_KEY, response.accessToken)
-			await SecureStore.setItemAsync(USER_KEY, JSON.stringify(response.user))
+			await SecureStore.setItemAsync(TOKEN_KEY, response.accessToken);
+			await SecureStore.setItemAsync(USER_KEY, JSON.stringify(response.user));
+
+			console.log("[Auth] Session saved successfully");
 
 			set({
 				token: response.accessToken,
 				user: response.user,
 				isAuthenticated: true,
 				isLoading: false,
-			})
+			});
 		} catch (error) {
-			console.error("Failed to save auth:", error)
-			set({ isLoading: false })
-			throw error
+			console.error("[Auth] Failed to save session:", error);
+			set({ isLoading: false });
+			throw error;
 		}
 	},
 
 	logout: async () => {
-		set({ isLoading: true })
+		console.log("[Auth] Logging out...");
+		set({ isLoading: true });
 
 		try {
-			await SecureStore.deleteItemAsync(TOKEN_KEY)
-			await SecureStore.deleteItemAsync(USER_KEY)
+			await SecureStore.deleteItemAsync(TOKEN_KEY);
+			await SecureStore.deleteItemAsync(USER_KEY);
+
+			console.log("[Auth] Session cleared");
 
 			set({
 				token: null,
 				user: null,
 				isAuthenticated: false,
 				isLoading: false,
-			})
+			});
 		} catch (error) {
-			console.error("Failed to clear auth:", error)
-			set({ isLoading: false })
+			console.error("[Auth] Failed to clear session:", error);
+			set({ isLoading: false });
 		}
 	},
 
 	setUser: (user: UserResponseDto) => {
-		set({ user })
+		set({ user });
 		SecureStore.setItemAsync(USER_KEY, JSON.stringify(user)).catch((error) => {
-			console.error("Failed to update user:", error)
-		})
+			console.error("[Auth] Failed to update user:", error);
+		});
 	},
-}))
+}));

@@ -1,6 +1,6 @@
-import { CardBase } from '@memex/shared';
-import { FlashList } from '@shopify/flash-list';
-import React from 'react';
+import { CardBase } from "@memex/shared";
+import { FlashList } from "@shopify/flash-list";
+import React from "react";
 import { ActivityIndicator, RefreshControl, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CardItem } from "./CardItem";
@@ -11,6 +11,8 @@ type FeedListProps = {
 	refreshing: boolean;
 	onRefresh: () => void;
 	isFetchingNextPage: boolean;
+	onCardFlip?: (cardId: string) => void;
+	onCardLike?: (cardId: string) => void;
 };
 
 export function FeedList({
@@ -19,6 +21,8 @@ export function FeedList({
 	refreshing,
 	onRefresh,
 	isFetchingNextPage,
+	onCardFlip,
+	onCardLike,
 }: FeedListProps) {
 	const [listHeight, setListHeight] = React.useState<number>(0);
 	const insets = useSafeAreaInsets();
@@ -35,10 +39,14 @@ export function FeedList({
 				<FlashList
 					data={items}
 					renderItem={({ item }: { item: CardBase }) => (
-						<CardItem card={item} height={listHeight} />
+						<CardItem
+							card={item}
+							height={listHeight}
+							onFlip={onCardFlip}
+							onLike={onCardLike}
+						/>
 					)}
 					pagingEnabled
-					// estimatedItemSize={listHeight}
 					showsVerticalScrollIndicator={false}
 					onEndReached={onEndReached}
 					onEndReachedThreshold={0.8}
@@ -49,7 +57,7 @@ export function FeedList({
 					ListFooterComponent={
 						isFetchingNextPage ? (
 							<View className="py-4 items-center justify-center">
-								<ActivityIndicator color="#22d3ee" />
+								<ActivityIndicator color="#06D6A0" />
 							</View>
 						) : null
 					}
@@ -57,7 +65,7 @@ export function FeedList({
 						<RefreshControl
 							refreshing={refreshing}
 							onRefresh={onRefresh}
-							tintColor="#22d3ee"
+							tintColor="#06D6A0"
 						/>
 					}
 				/>

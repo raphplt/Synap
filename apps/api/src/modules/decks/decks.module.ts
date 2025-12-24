@@ -2,13 +2,14 @@ import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Deck } from "./deck.entity"
 import { Category } from "./category.entity"
+import { UserCardInteraction } from "../srs/user-card-interaction.entity";
 import { DecksService } from "./decks.service"
-import { DecksController } from "./decks.controller"
+import { DecksController, AtlasController } from "./decks.controller";
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Deck, Category])],
+	imports: [TypeOrmModule.forFeature([Deck, Category, UserCardInteraction])],
 	providers: [DecksService],
-	controllers: [DecksController],
+	controllers: [DecksController, AtlasController],
 	exports: [DecksService],
 })
 export class DecksModule {}

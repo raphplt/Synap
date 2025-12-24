@@ -9,6 +9,7 @@ import { AuthModule } from "./modules/auth/auth.module";
 import { UserModule } from "./modules/users/user.module";
 import { SrsModule } from "./modules/srs/srs.module";
 import { DecksModule } from "./modules/decks/decks.module";
+import { SeedModule } from "./modules/seed/seed.module";
 import { Card } from "./modules/cards/card.entity";
 import { User } from "./modules/users/user.entity";
 import { UserCardInteraction } from "./modules/srs/user-card-interaction.entity";
@@ -36,6 +37,7 @@ import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 		UserModule,
 		SrsModule,
 		DecksModule,
+		SeedModule,
 		CardsModule,
 		FeedModule,
 		WikiModule,

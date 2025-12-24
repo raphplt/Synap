@@ -1,12 +1,23 @@
+import { useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { useRouter, Href } from "expo-router";
-import { Text, View, Pressable } from "react-native";
+import { Text, View, Pressable, Image } from "react-native";
 import { useTranslation } from "react-i18next";
 import { LinearGradient } from "expo-linear-gradient";
+import { useAuthStore } from "../src/stores/useAuthStore";
 
 export default function LandingScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+
+	// Redirect if already authenticated
+	useEffect(() => {
+		if (isAuthenticated) {
+			console.log("[Landing] Already authenticated, redirecting to tabs");
+			router.replace("/(tabs)" as Href);
+		}
+	}, [isAuthenticated, router]);
 
 	return (
 		<View className="flex-1 bg-synap-teal">
@@ -18,9 +29,10 @@ export default function LandingScreen() {
 				{/* Hero Section */}
 				<View className="items-center mb-16">
 					{/* Brain Icon Placeholder - Replace with Lottie animation */}
-					<View className="w-32 h-32 rounded-full bg-synap-teal-medium border-2 border-synap-emerald items-center justify-center mb-8">
-						<Text className="text-6xl">🧠</Text>
-					</View>
+					<Image
+						source={require("../assets/icon.png")}
+						className="w-32 h-32 rounded-full bg-white/20 m-4"
+					/>
 
 					{/* Logo */}
 					<Text className="text-4xl font-bold text-white tracking-tight mb-4">

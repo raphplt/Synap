@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { StatusBar } from "expo-status-bar";
 import { useRouter, Href } from "expo-router";
 import {
@@ -18,11 +18,20 @@ export default function LoginScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const authLogin = useAuthStore((state) => state.login);
+	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+
+	// Redirect if already authenticated
+	useEffect(() => {
+		if (isAuthenticated) {
+			console.log("[Login] Already authenticated, redirecting to tabs");
+			router.replace("/(tabs)" as Href);
+		}
+	}, [isAuthenticated, router]);
 
 	const handleLogin = async () => {
 		if (!email.trim() || !password.trim()) return;

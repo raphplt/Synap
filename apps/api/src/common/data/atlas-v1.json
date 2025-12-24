@@ -1,0 +1,366 @@
+{
+  "version": "1.0",
+  "name": "Atlas SYNAP",
+  "categories": [
+    {
+      "name": "Sciences Cognitives & Psychologie",
+      "slug": "sciences-cognitives",
+      "description": "Le socle pour comprendre sa propre machine biologique",
+      "imageUrl": "🧠",
+      "decks": [
+        { "name": "Biais Cognitifs", "slug": "biais-cognitifs", "description": "Les erreurs logiques systématiques" },
+        { "name": "Modèles Mentaux", "slug": "modeles-mentaux", "description": "Frameworks de décision : Rasoir d'Ockham, Inversion" },
+        { "name": "Neurosciences de base", "slug": "neurosciences-base", "description": "Neurones, synapses et plasticité" },
+        { "name": "Psychologie Sociale", "slug": "psychologie-sociale", "description": "Influence, conformisme et dynamique de groupe" },
+        { "name": "Dopamine & Addiction", "slug": "dopamine-addiction", "description": "Le fonctionnement du circuit de la récompense" },
+        { "name": "Intelligence Émotionnelle", "slug": "intelligence-emotionnelle", "description": "Décoder et gérer les émotions" },
+        { "name": "Mémoire & Apprentissage", "slug": "memoire-apprentissage", "description": "L'encodage et la courbe de l'oubli" },
+        { "name": "Perception & Illusions", "slug": "perception-illusions", "description": "Comment le cerveau reconstruit la réalité" },
+        { "name": "Psychologie du Développement", "slug": "psychologie-developpement", "description": "De l'enfance à l'âge adulte" },
+        { "name": "Grands Expérimentateurs", "slug": "grands-experimentateurs", "description": "Milgram, Pavlov, Skinner" }
+      ]
+    },
+    {
+      "name": "Efficacité & Meta-Learning",
+      "slug": "efficacite-meta-learning",
+      "description": "Apprendre à apprendre pour un avantage compétitif invisible",
+      "imageUrl": "⚡",
+      "decks": [
+        { "name": "Techniques de Mémorisation", "slug": "techniques-memorisation", "description": "Palais mental, Loci" },
+        { "name": "Gestion du Temps", "slug": "gestion-temps", "description": "Pomodoro, Loi de Parkinson" },
+        { "name": "Deep Work", "slug": "deep-work", "description": "Maximiser la concentration intense" },
+        { "name": "Prise de Notes", "slug": "prise-notes", "description": "Zettelkasten, Mind Mapping" },
+        { "name": "Lecture Rapide", "slug": "lecture-rapide", "description": "Méthodes et exercices de scan" },
+        { "name": "Habitudes Atomiques", "slug": "habitudes-atomiques", "description": "Construire des routines durables" },
+        { "name": "Pensée Critique", "slug": "pensee-critique", "description": "Analyser les arguments et les sources" },
+        { "name": "Apprentissage Accéléré", "slug": "apprentissage-accelere", "description": "La méthode Feynman" },
+        { "name": "Organisation Digitale", "slug": "organisation-digitale", "description": "Second Brain, gestion de flux" },
+        { "name": "Créativité & Idéation", "slug": "creativite-ideation", "description": "SCAMPER, brainstorming latéral" }
+      ]
+    },
+    {
+      "name": "Philosophie & Sagesse",
+      "slug": "philosophie-sagesse",
+      "description": "Développer une colonne vertébrale intellectuelle",
+      "imageUrl": "🏛️",
+      "decks": [
+        { "name": "Stoïcisme", "slug": "stoicisme", "description": "Marc Aurèle, Sénèque, Épictète" },
+        { "name": "Épicurisme", "slug": "epicurisme", "description": "La recherche du plaisir stable" },
+        { "name": "Existentialisme", "slug": "existentialisme", "description": "Sartre, Camus, la liberté" },
+        { "name": "Philosophie Politique", "slug": "philosophie-politique", "description": "Contrat social, démocratie" },
+        { "name": "Éthique & Morale", "slug": "ethique-morale", "description": "Dilemmes célèbres et théories" },
+        { "name": "Philosophies d'Orient", "slug": "philosophies-orient", "description": "Bouddhisme, Taoïsme, Zen" },
+        { "name": "Épistémologie", "slug": "epistemologie", "description": "Que pouvons-nous savoir ?" },
+        { "name": "Le Siècle des Lumières", "slug": "siecle-lumieres", "description": "Raison et émancipation" },
+        { "name": "Phénoménologie", "slug": "phenomenologie", "description": "L'étude de l'expérience directe" },
+        { "name": "Logique Formelle", "slug": "logique-formelle", "description": "Syllogismes et paradoxes" }
+      ]
+    },
+    {
+      "name": "Histoire du Monde",
+      "slug": "histoire-monde",
+      "description": "Relier les points du passé pour comprendre le présent",
+      "imageUrl": "🌍",
+      "decks": [
+        { "name": "Égypte Ancienne", "slug": "egypte-ancienne", "description": "Dieux, pyramides et hiéroglyphes" },
+        { "name": "Grèce & Rome", "slug": "grece-rome", "description": "L'origine de l'Occident" },
+        { "name": "Moyen Âge Européen", "slug": "moyen-age-europeen", "description": "Féodalité, cathédrales, pestes" },
+        { "name": "Renaissance & Explorations", "slug": "renaissance-explorations", "description": "De Vinci à Magellan" },
+        { "name": "Révolutions Industrielles", "slug": "revolutions-industrielles", "description": "Vapeur, électricité, automation" },
+        { "name": "Première Guerre Mondiale", "slug": "premiere-guerre-mondiale", "description": "Tranchées et géopolitique" },
+        { "name": "Seconde Guerre Mondiale", "slug": "seconde-guerre-mondiale", "description": "Conflit total et Shoah" },
+        { "name": "Guerre Froide", "slug": "guerre-froide", "description": "Espionnage, blocs et espace" },
+        { "name": "Histoire du Japon", "slug": "histoire-japon", "description": "Samouraïs, Shogunat et modernité" },
+        { "name": "Décolonisation & Indépendances", "slug": "decolonisation-independances", "description": "Afrique et Asie" }
+      ]
+    },
+    {
+      "name": "Sciences Physiques & Naturelles",
+      "slug": "sciences-physiques",
+      "description": "Les lois fondamentales de la réalité",
+      "imageUrl": "🔬",
+      "decks": [
+        { "name": "Physique Quantique", "slug": "physique-quantique", "description": "Le monde de l'infiniment petit" },
+        { "name": "Relativité", "slug": "relativite", "description": "Espace, temps et gravité" },
+        { "name": "Astronomie", "slug": "astronomie", "description": "Planètes, étoiles et galaxies" },
+        { "name": "Cosmologie", "slug": "cosmologie", "description": "Big Bang et destin de l'univers" },
+        { "name": "Chimie Moléculaire", "slug": "chimie-moleculaire", "description": "Atomes et liaisons" },
+        { "name": "Thermodynamique", "slug": "thermodynamique", "description": "Énergie et entropie" },
+        { "name": "Géologie", "slug": "geologie", "description": "Tectonique des plaques et minéraux" },
+        { "name": "Météorologie", "slug": "meteorologie", "description": "Phénomènes climatiques" },
+        { "name": "Optique", "slug": "optique", "description": "Lumière, couleurs et spectres" },
+        { "name": "Physique des Particules", "slug": "physique-particules", "description": "CERN et boson de Higgs" }
+      ]
+    },
+    {
+      "name": "Technologie & Futurisme",
+      "slug": "technologie-futurisme",
+      "description": "Comprendre les outils qui reprogramment l'humain",
+      "imageUrl": "🤖",
+      "decks": [
+        { "name": "Intelligence Artificielle", "slug": "intelligence-artificielle", "description": "LLM, Machine Learning" },
+        { "name": "Blockchain & Crypto", "slug": "blockchain-crypto", "description": "Bitcoin et décentralisation" },
+        { "name": "Internet des Objets (IoT)", "slug": "iot", "description": "Monde connecté" },
+        { "name": "Cybersécurité", "slug": "cybersecurite", "description": "Hack, cryptage et défense" },
+        { "name": "Exploration Spatiale", "slug": "exploration-spatiale", "description": "Mars, colonisation, SpaceX" },
+        { "name": "Biotechnologies", "slug": "biotechnologies", "description": "CRISPR et édition génomique" },
+        { "name": "Robotique", "slug": "robotique", "description": "Androïdes et automation industrielle" },
+        { "name": "Réalité Virtuelle & Augmentée", "slug": "realite-virtuelle", "description": "Le métavers" },
+        { "name": "Énergies du Futur", "slug": "energies-futur", "description": "Fusion nucléaire, hydrogène" },
+        { "name": "Histoire de l'Informatique", "slug": "histoire-informatique", "description": "De Turing à l'iPhone" }
+      ]
+    },
+    {
+      "name": "Économie & Finance",
+      "slug": "economie-finance",
+      "description": "Les flux qui dirigent le monde",
+      "imageUrl": "📈",
+      "decks": [
+        { "name": "Macroéconomie", "slug": "macroeconomie", "description": "PIB, inflation, chômage" },
+        { "name": "Microéconomie", "slug": "microeconomie", "description": "Offre, demande et marchés" },
+        { "name": "Histoire de la Monnaie", "slug": "histoire-monnaie", "description": "Du troc aux monnaies numériques" },
+        { "name": "Finance de Marché", "slug": "finance-marche", "description": "Bourse, actions et obligations" },
+        { "name": "Finance Personnelle", "slug": "finance-personnelle", "description": "Épargne, intérêts composés" },
+        { "name": "Économie Comportementale", "slug": "economie-comportementale", "description": "Pourquoi nous dépensons mal" },
+        { "name": "Théorie des Jeux", "slug": "theorie-jeux", "description": "Stratégies et équilibres" },
+        { "name": "Commerce International", "slug": "commerce-international", "description": "Flux mondiaux et douanes" },
+        { "name": "Banques Centrales", "slug": "banques-centrales", "description": "Taux d'intérêt et création monétaire" },
+        { "name": "Inégalités & Développement", "slug": "inegalites-developpement", "description": "Indice de Gini, pauvreté" }
+      ]
+    },
+    {
+      "name": "Communication & Relations",
+      "slug": "communication-relations",
+      "description": "Maîtriser l'art de l'interaction humaine",
+      "imageUrl": "🗣️",
+      "decks": [
+        { "name": "Rhétorique & Éloquence", "slug": "rhetorique-eloquence", "description": "L'art de convaincre" },
+        { "name": "Négociation", "slug": "negociation", "description": "Méthode Harvard, compromis" },
+        { "name": "Communication Non-Violente", "slug": "communication-non-violente", "description": "Exprimer ses besoins" },
+        { "name": "Langage Corporel", "slug": "langage-corporel", "description": "Signaux non-verbaux" },
+        { "name": "Storytelling", "slug": "storytelling", "description": "Captiver par le récit" },
+        { "name": "Leadership", "slug": "leadership", "description": "Inspirer et diriger" },
+        { "name": "Intelligence Sociale", "slug": "intelligence-sociale", "description": "Empathie et networking" },
+        { "name": "Gestion des Conflits", "slug": "gestion-conflits", "description": "Désamorcer les tensions" },
+        { "name": "Art de l'Écoute", "slug": "art-ecoute", "description": "Réception et feedback" },
+        { "name": "Prise de Parole en Public", "slug": "prise-parole-public", "description": "Gérer le stress et le ton" }
+      ]
+    },
+    {
+      "name": "Arts & Esthétique",
+      "slug": "arts-esthetique",
+      "description": "Développer son regard et sa culture visuelle",
+      "imageUrl": "🎨",
+      "decks": [
+        { "name": "Histoire de la Peinture", "slug": "histoire-peinture", "description": "Du classicisme au cubisme" },
+        { "name": "Architecture", "slug": "architecture", "description": "Styles mondiaux et gratte-ciel" },
+        { "name": "Photographie", "slug": "photographie", "description": "Composition et grands maîtres" },
+        { "name": "Design Industriel", "slug": "design-industriel", "description": "Forme et fonction" },
+        { "name": "Théorie des Couleurs", "slug": "theorie-couleurs", "description": "Harmonies et psychologie" },
+        { "name": "Art Contemporain", "slug": "art-contemporain", "description": "Concepts et installations" },
+        { "name": "Cinéma : Technique", "slug": "cinema-technique", "description": "Plans, montage, éclairage" },
+        { "name": "Graphisme & Typographie", "slug": "graphisme-typographie", "description": "L'art de la lettre" },
+        { "name": "Sculpture", "slug": "sculpture", "description": "De la pierre à l'impression 3D" },
+        { "name": "Mode & Haute Couture", "slug": "mode-haute-couture", "description": "Histoire et influence" }
+      ]
+    },
+    {
+      "name": "Géopolitique & Société",
+      "slug": "geopolitique-societe",
+      "description": "Comprendre les équilibres de force mondiaux",
+      "imageUrl": "🗺️",
+      "decks": [
+        { "name": "Relations Internationales", "slug": "relations-internationales", "description": "Théories et alliances" },
+        { "name": "Conflits du Moyen-Orient", "slug": "conflits-moyen-orient", "description": "Origines et enjeux" },
+        { "name": "L'Union Européenne", "slug": "union-europeenne", "description": "Institutions et défis" },
+        { "name": "Démographie", "slug": "demographie", "description": "Vieillissement, urbanisation" },
+        { "name": "Ressources Énergétiques", "slug": "ressources-energetiques", "description": "Pétrole, gaz et lithium" },
+        { "name": "Religions Mondiales", "slug": "religions-mondiales", "description": "Dogmes et histoire" },
+        { "name": "Systèmes Politiques", "slug": "systemes-politiques", "description": "Dictature, monarchie, république" },
+        { "name": "Médias & Propagande", "slug": "medias-propagande", "description": "Fabrique de l'opinion" },
+        { "name": "Géo-économie", "slug": "geo-economie", "description": "La puissance par le commerce" },
+        { "name": "L'Arctique & les Océans", "slug": "arctique-oceans", "description": "Nouveaux fronts" }
+      ]
+    },
+    {
+      "name": "Littérature & Narration",
+      "slug": "litterature-narration",
+      "description": "Explorer les mondes de la fiction et du récit",
+      "imageUrl": "📖",
+      "decks": [
+        { "name": "Classiques Français", "slug": "classiques-francais", "description": "Molière, Hugo, Proust" },
+        { "name": "Littérature US", "slug": "litterature-us", "description": "Hemingway, Steinbeck, Morrison" },
+        { "name": "Science-Fiction", "slug": "science-fiction", "description": "Asimov, Herbert, Philip K. Dick" },
+        { "name": "Fantasy", "slug": "fantasy", "description": "Tolkien, mythes modernes" },
+        { "name": "Analyse de Récit", "slug": "analyse-recit", "description": "Le Voyage du Héros" },
+        { "name": "Poésie", "slug": "poesie", "description": "Rimes, mètres et émotions" },
+        { "name": "Littérature Japonaise", "slug": "litterature-japonaise", "description": "Mishima, Murakami" },
+        { "name": "Le Roman Noir", "slug": "roman-noir", "description": "Polar et suspense" },
+        { "name": "Dramaturgie", "slug": "dramaturgie", "description": "L'écriture pour le théâtre" },
+        { "name": "Littérature Russe", "slug": "litterature-russe", "description": "Dostoïevski, Tolstoï" }
+      ]
+    },
+    {
+      "name": "Santé & Biologie Humaine",
+      "slug": "sante-biologie",
+      "description": "Comprendre le corps humain et son fonctionnement",
+      "imageUrl": "🍎",
+      "decks": [
+        { "name": "Anatomie de base", "slug": "anatomie-base", "description": "Squelette, muscles, organes" },
+        { "name": "Système Immunitaire", "slug": "systeme-immunitaire", "description": "La défense du corps" },
+        { "name": "Génétique & ADN", "slug": "genetique-adn", "description": "L'hérédité" },
+        { "name": "Nutrition", "slug": "nutrition", "description": "Macronutriments et santé" },
+        { "name": "Microbiote", "slug": "microbiote", "description": "Le deuxième cerveau" },
+        { "name": "Physiologie du Sport", "slug": "physiologie-sport", "description": "Endurance et force" },
+        { "name": "Sommeil", "slug": "sommeil", "description": "Cycles et réparation" },
+        { "name": "Microbiologie", "slug": "microbiologie", "description": "Virus et bactéries" },
+        { "name": "Santé Mentale", "slug": "sante-mentale", "description": "Stress, anxiété, bien-être" },
+        { "name": "Biochimie", "slug": "biochimie", "description": "Hormones et neurotransmetteurs" }
+      ]
+    },
+    {
+      "name": "Entrepreneuriat & Business",
+      "slug": "entrepreneuriat-business",
+      "description": "Créer, développer et gérer une entreprise",
+      "imageUrl": "💼",
+      "decks": [
+        { "name": "Lean Startup", "slug": "lean-startup", "description": "Validation et itération" },
+        { "name": "Marketing Stratégique", "slug": "marketing-strategique", "description": "Positionnement, 4P" },
+        { "name": "Vente & Closing", "slug": "vente-closing", "description": "Techniques de conversion" },
+        { "name": "Product Management", "slug": "product-management", "description": "Cycles de vie produit" },
+        { "name": "Growth Hacking", "slug": "growth-hacking", "description": "Acquisition virale" },
+        { "name": "Branding", "slug": "branding", "description": "Identité et image de marque" },
+        { "name": "Management d'Équipe", "slug": "management-equipe", "description": "Agilité et culture" },
+        { "name": "Comptabilité de base", "slug": "comptabilite-base", "description": "Bilan, compte de résultat" },
+        { "name": "Levée de Fonds", "slug": "levee-fonds", "description": "VC, Business Angels" },
+        { "name": "Éthique des Affaires", "slug": "ethique-affaires", "description": "Responsabilité sociale" }
+      ]
+    },
+    {
+      "name": "Mathématiques & Logique",
+      "slug": "mathematiques-logique",
+      "description": "Le langage universel de la raison",
+      "imageUrl": "📐",
+      "decks": [
+        { "name": "Arithmétique", "slug": "arithmetique", "description": "Nombres et opérations" },
+        { "name": "Algèbre", "slug": "algebre", "description": "Équations et variables" },
+        { "name": "Géométrie", "slug": "geometrie", "description": "Formes et mesures" },
+        { "name": "Probabilités", "slug": "probabilites", "description": "Hasard et prédiction" },
+        { "name": "Statistiques", "slug": "statistiques", "description": "Analyse de données" },
+        { "name": "Théorie des Graphes", "slug": "theorie-graphes", "description": "Réseaux et connexions" },
+        { "name": "Cryptographie", "slug": "cryptographie", "description": "Secrets mathématiques" },
+        { "name": "Calcul Différentiel", "slug": "calcul-differentiel", "description": "Changement et pentes" },
+        { "name": "Logique Formelle Math", "slug": "logique-formelle-math", "description": "Vrai, faux et déduction" },
+        { "name": "Histoire des Maths", "slug": "histoire-maths", "description": "D'Euclide à Gödel" }
+      ]
+    },
+    {
+      "name": "Environnement & Écologie",
+      "slug": "environnement-ecologie",
+      "description": "Comprendre et protéger notre planète",
+      "imageUrl": "🌱",
+      "decks": [
+        { "name": "Biodiversité", "slug": "biodiversite", "description": "Espèces et écosystèmes" },
+        { "name": "Changement Climatique", "slug": "changement-climatique", "description": "CO2 et effet de serre" },
+        { "name": "Cycle de l'Eau", "slug": "cycle-eau", "description": "Océans et ressources" },
+        { "name": "Énergies Renouvelables", "slug": "energies-renouvelables", "description": "Solaire, éolien, hydro" },
+        { "name": "Agriculture Durable", "slug": "agriculture-durable", "description": "Permaculture, bio" },
+        { "name": "Gestion des Déchets", "slug": "gestion-dechets", "description": "Recyclage, économie circulaire" },
+        { "name": "Écologie Urbaine", "slug": "ecologie-urbaine", "description": "Villes vertes" },
+        { "name": "Faune Menacée", "slug": "faune-menacee", "description": "Extinction et protection" },
+        { "name": "Empreinte Carbone", "slug": "empreinte-carbone", "description": "Mesure et réduction" },
+        { "name": "Éthique Environnementale", "slug": "ethique-environnementale", "description": "Philosophie du vivant" }
+      ]
+    },
+    {
+      "name": "Droit & Justice",
+      "slug": "droit-justice",
+      "description": "Les règles qui régissent la société",
+      "imageUrl": "⚖️",
+      "decks": [
+        { "name": "Droit Civil", "slug": "droit-civil", "description": "Personnes et contrats" },
+        { "name": "Droit Pénal", "slug": "droit-penal", "description": "Crimes et peines" },
+        { "name": "Droit Constitutionnel", "slug": "droit-constitutionnel", "description": "Lois fondamentales" },
+        { "name": "Droits de l'Homme", "slug": "droits-homme", "description": "Traités internationaux" },
+        { "name": "Propriété Intellectuelle", "slug": "propriete-intellectuelle", "description": "Copyright, brevets" },
+        { "name": "Droit du Travail", "slug": "droit-travail", "description": "Employés et employeurs" },
+        { "name": "Droit du Numérique", "slug": "droit-numerique", "description": "RGPD, IA et données" },
+        { "name": "Droit de la Famille", "slug": "droit-famille", "description": "Mariage, successions" },
+        { "name": "Philosophie du Droit", "slug": "philosophie-droit", "description": "Justice vs Loi" },
+        { "name": "Grands Procès de l'Histoire", "slug": "grands-proces", "description": "Nuremberg, Dreyfus" }
+      ]
+    },
+    {
+      "name": "Culture Pop & Loisirs",
+      "slug": "culture-pop-loisirs",
+      "description": "Divertissement et culture de masse",
+      "imageUrl": "🍿",
+      "decks": [
+        { "name": "Histoire du Cinéma", "slug": "histoire-cinema", "description": "Du muet au numérique" },
+        { "name": "Jeux Vidéo", "slug": "jeux-video", "description": "Histoire et game design" },
+        { "name": "Séries TV", "slug": "series-tv", "description": "L'âge d'or du streaming" },
+        { "name": "Anime & Manga", "slug": "anime-manga", "description": "Culture japonaise" },
+        { "name": "Icônes de la Musique Pop", "slug": "icones-musique-pop", "description": "Beatles, MJ, Beyoncé" },
+        { "name": "Bande Dessinée", "slug": "bande-dessinee", "description": "Comics et BD franco-belge" },
+        { "name": "Le Jeu de Plateau", "slug": "jeu-plateau", "description": "Stratégie et social" },
+        { "name": "Énigmes & Casse-têtes", "slug": "enigmes-casse-tetes", "description": "Logique ludique" },
+        { "name": "Culture Internet", "slug": "culture-internet", "description": "Memes, YouTube, influence" },
+        { "name": "Science-Fiction au Cinéma", "slug": "sf-cinema", "description": "D'Odyssée à Interstellar" }
+      ]
+    },
+    {
+      "name": "Musique & Son",
+      "slug": "musique-son",
+      "description": "L'art des vibrations et des mélodies",
+      "imageUrl": "🎵",
+      "decks": [
+        { "name": "Théorie Musicale", "slug": "theorie-musicale", "description": "Notes, gammes, accords" },
+        { "name": "Musique Classique", "slug": "musique-classique", "description": "Périodes et compositeurs" },
+        { "name": "Jazz", "slug": "jazz", "description": "Improvisation et histoire" },
+        { "name": "Histoire du Rock", "slug": "histoire-rock", "description": "Rébellion et guitares" },
+        { "name": "Musique Électronique", "slug": "musique-electronique", "description": "Synthèse et clubs" },
+        { "name": "Instruments du Monde", "slug": "instruments-monde", "description": "Cordes, vents, percussions" },
+        { "name": "Acoustique", "slug": "acoustique", "description": "La physique du son" },
+        { "name": "Opéra", "slug": "opera", "description": "Voix et mise en scène" },
+        { "name": "Hip-Hop", "slug": "hip-hop", "description": "MCing, DJing et culture" },
+        { "name": "Production Audio", "slug": "production-audio", "description": "Mixing et mastering" }
+      ]
+    },
+    {
+      "name": "Spiritualité & Mythologie",
+      "slug": "spiritualite-mythologie",
+      "description": "Les récits fondateurs de l'humanité",
+      "imageUrl": "⛪",
+      "decks": [
+        { "name": "Mythologie Grecque", "slug": "mythologie-grecque", "description": "Olympe et héros" },
+        { "name": "Mythologie Nordique", "slug": "mythologie-nordique", "description": "Asgard et Ragnarök" },
+        { "name": "Histoire des Religions", "slug": "histoire-religions", "description": "Abrahamiques, Hindouisme" },
+        { "name": "Spiritualités Orientales", "slug": "spiritualites-orientales", "description": "Yoga, Méditation" },
+        { "name": "Mysticisme", "slug": "mysticisme", "description": "Alchimie et ésotérisme" },
+        { "name": "Symbolisme", "slug": "symbolisme", "description": "Archétypes et signes" },
+        { "name": "Mythologie Égyptienne", "slug": "mythologie-egyptienne", "description": "Osiris, Isis, Anubis" },
+        { "name": "Mythologie Celte", "slug": "mythologie-celte", "description": "Druides et légendes" },
+        { "name": "Philosophie de la Religion", "slug": "philosophie-religion", "description": "Foi vs Raison" },
+        { "name": "Spiritualités Laïques", "slug": "spiritualites-laiques", "description": "Mindfulness moderne" }
+      ]
+    },
+    {
+      "name": "Langues & Linguistique",
+      "slug": "langues-linguistique",
+      "description": "L'étude du langage humain",
+      "imageUrl": "🔤",
+      "decks": [
+        { "name": "Étymologie", "slug": "etymologie", "description": "Origines des mots" },
+        { "name": "Phonétique", "slug": "phonetique", "description": "L'art de prononcer" },
+        { "name": "Évolution des Langues", "slug": "evolution-langues", "description": "Indo-européen et dérivés" },
+        { "name": "Sémantique", "slug": "semantique", "description": "L'étude du sens" },
+        { "name": "Langues en Danger", "slug": "langues-danger", "description": "Préservation culturelle" },
+        { "name": "Langages Informatiques", "slug": "langages-informatiques", "description": "Code et syntaxe" },
+        { "name": "Linguistique Comparative", "slug": "linguistique-comparative", "description": "Similitudes mondiales" },
+        { "name": "Argot & Slang", "slug": "argot-slang", "description": "Langage de la rue" },
+        { "name": "Langues des Signes", "slug": "langues-signes", "description": "Communication gestuelle" },
+        { "name": "Traduction", "slug": "traduction", "description": "Défis et nuances" }
+      ]
+    }
+  ]
+}

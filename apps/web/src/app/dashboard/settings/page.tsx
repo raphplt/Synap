@@ -24,25 +24,27 @@ export default function SettingsPage() {
 
 	return (
 		<div className="space-y-6 max-w-2xl">
-			{/* Header */}
 			<div>
 				<h1 className="text-3xl font-bold text-white">Paramètres</h1>
 				<p className="text-slate-400 mt-1">Configuration du dashboard admin</p>
 			</div>
 
-			{/* API Settings */}
 			<CardUI className="bg-slate-900 border-slate-800">
 				<CardHeader>
 					<CardTitle className="text-white">Configuration API</CardTitle>
-					<CardDescription>Paramètres de connexion à l&apos;API backend</CardDescription>
+					<CardDescription>
+						Paramètres de connexion à l&apos;API backend
+					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<form onSubmit={handleSave} className="space-y-4">
 						<div className="space-y-2">
-							<Label>URL de l&apos;API</Label>
+							<Label className="text-slate-200">URL de l&apos;API</Label>
 							<Input
-								defaultValue={process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"}
-								className="bg-slate-800 border-slate-700"
+								defaultValue={
+									process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"
+								}
+								className="bg-slate-800 border-slate-700 text-slate-200"
 								disabled
 							/>
 							<p className="text-xs text-slate-500">
@@ -118,5 +120,5 @@ export default function SettingsPage() {
 				</CardContent>
 			</CardUI>
 		</div>
-	)
+	);
 }

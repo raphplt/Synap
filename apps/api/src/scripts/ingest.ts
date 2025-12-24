@@ -29,8 +29,7 @@ async function bootstrap (): Promise<void> {
 
 	try {
 		const wikiService = app.get(WikiIngestService);
-		const card = await wikiService.ingestTitle(title);
-		console.log(`Carte ingérée: ${card.title} (${card.id})`);
+		await wikiService.ingestTitle(title);
 	} catch (error) {
 		console.error("Erreur ingestion:", error);
 		process.exitCode = 1;

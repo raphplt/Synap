@@ -29,6 +29,15 @@ async function fetchApi<T>(endpoint: string, options: ApiOptions = {}): Promise<
 	return response.json()
 }
 
+// Paginated response type
+export interface PaginatedResponse<T> {
+	items: T[]
+	total: number
+	page: number
+	limit: number
+	totalPages: number
+}
+
 // Auth
 export interface LoginRequest { email: string; password: string }
 export interface LoginResponse { accessToken: string; user: User }
@@ -54,10 +63,18 @@ export interface User {
 }
 
 export const usersApi = {
-	getAll: (token: string) => fetchApi<User[]>("/users", { token }),
-	getById: (id: string, token: string) => fetchApi<User>(`/users/${id}`, { token }),
-	delete: (id: string, token: string) => fetchApi<void>(`/users/${id}`, { method: "DELETE", token }),
-}
+	getAll: (token: string, page = 1, limit = 20, search = "") =>
+		fetchApi<PaginatedResponse<User>>(
+			`/users?page=${page}&limit=${limit}${
+				search ? `&search=${encodeURIComponent(search)}` : ""
+			}`,
+			{ token }
+		),
+	getById: (id: string, token: string) =>
+		fetchApi<User>(`/users/${id}`, { token }),
+	delete: (id: string, token: string) =>
+		fetchApi<void>(`/users/${id}`, { method: "DELETE", token }),
+};
 
 // Cards
 export interface Card {
@@ -90,12 +107,30 @@ export interface CreateCardRequest {
 }
 
 export const cardsApi = {
-	getAll: (token: string) => fetchApi<Card[]>("/cards", { token }),
-	getById: (id: string, token: string) => fetchApi<Card>(`/cards/${id}`, { token }),
-	create: (data: CreateCardRequest, token: string) => fetchApi<Card>("/cards", { method: "POST", body: JSON.stringify(data), token }),
-	update: (id: string, data: Partial<CreateCardRequest>, token: string) => fetchApi<Card>(`/cards/${id}`, { method: "PATCH", body: JSON.stringify(data), token }),
-	delete: (id: string, token: string) => fetchApi<void>(`/cards/${id}`, { method: "DELETE", token }),
-}
+	getAll: (token: string, page = 1, limit = 20, search = "") =>
+		fetchApi<PaginatedResponse<Card>>(
+			`/cards?page=${page}&limit=${limit}${
+				search ? `&search=${encodeURIComponent(search)}` : ""
+			}`,
+			{ token }
+		),
+	getById: (id: string, token: string) =>
+		fetchApi<Card>(`/cards/${id}`, { token }),
+	create: (data: CreateCardRequest, token: string) =>
+		fetchApi<Card>("/cards", {
+			method: "POST",
+			body: JSON.stringify(data),
+			token,
+		}),
+	update: (id: string, data: Partial<CreateCardRequest>, token: string) =>
+		fetchApi<Card>(`/cards/${id}`, {
+			method: "PATCH",
+			body: JSON.stringify(data),
+			token,
+		}),
+	delete: (id: string, token: string) =>
+		fetchApi<void>(`/cards/${id}`, { method: "DELETE", token }),
+};
 
 // Categories
 export interface Category {
@@ -117,11 +152,29 @@ export interface CreateCategoryRequest {
 }
 
 export const categoriesApi = {
-	getAll: () => fetchApi<Category[]>("/decks/categories"),
-	create: (data: CreateCategoryRequest, token: string) => fetchApi<Category>("/categories", { method: "POST", body: JSON.stringify(data), token }),
-	update: (id: string, data: Partial<CreateCategoryRequest>, token: string) => fetchApi<Category>(`/categories/${id}`, { method: "PATCH", body: JSON.stringify(data), token }),
-	delete: (id: string, token: string) => fetchApi<void>(`/categories/${id}`, { method: "DELETE", token }),
-}
+	getAll: (token: string, page = 1, limit = 20, search = "") =>
+		fetchApi<PaginatedResponse<Category>>(
+			`/categories?page=${page}&limit=${limit}${
+				search ? `&search=${encodeURIComponent(search)}` : ""
+			}`,
+			{ token }
+		),
+	getAllPublic: () => fetchApi<Category[]>("/decks/categories"),
+	create: (data: CreateCategoryRequest, token: string) =>
+		fetchApi<Category>("/categories", {
+			method: "POST",
+			body: JSON.stringify(data),
+			token,
+		}),
+	update: (id: string, data: Partial<CreateCategoryRequest>, token: string) =>
+		fetchApi<Category>(`/categories/${id}`, {
+			method: "PATCH",
+			body: JSON.stringify(data),
+			token,
+		}),
+	delete: (id: string, token: string) =>
+		fetchApi<void>(`/categories/${id}`, { method: "DELETE", token }),
+};
 
 // Decks
 export interface Deck {
@@ -151,16 +204,45 @@ export interface CreateDeckRequest {
 
 export const decksApi = {
 	getAll: () => fetchApi<Deck[]>("/decks"),
+	getAllAdmin: (token: string, page = 1, limit = 20, search = "") =>
+		fetchApi<PaginatedResponse<Deck>>(
+			`/decks/admin?page=${page}&limit=${limit}${
+				search ? `&search=${encodeURIComponent(search)}` : ""
+			}`,
+			{ token }
+		),
 	getBySlug: (slug: string) => fetchApi<Deck>(`/decks/${slug}`),
-	create: (data: CreateDeckRequest, token: string) => fetchApi<Deck>("/decks", { method: "POST", body: JSON.stringify(data), token }),
-	update: (id: string, data: Partial<CreateDeckRequest>, token: string) => fetchApi<Deck>(`/decks/${id}`, { method: "PATCH", body: JSON.stringify(data), token }),
-	delete: (id: string, token: string) => fetchApi<void>(`/decks/${id}`, { method: "DELETE", token }),
-}
+	create: (data: CreateDeckRequest, token: string) =>
+		fetchApi<Deck>("/decks", {
+			method: "POST",
+			body: JSON.stringify(data),
+			token,
+		}),
+	update: (id: string, data: Partial<CreateDeckRequest>, token: string) =>
+		fetchApi<Deck>(`/decks/${id}`, {
+			method: "PATCH",
+			body: JSON.stringify(data),
+			token,
+		}),
+	delete: (id: string, token: string) =>
+		fetchApi<void>(`/decks/${id}`, { method: "DELETE", token }),
+};
 
 // Seed
 export const seedApi = {
-	seedGold: () => fetchApi<{ categories: number; decks: number; cards: number }>("/seed/gold", { method: "POST" }),
-}
+	seedGold: () =>
+		fetchApi<{ categories: number; decks: number; cards: number }>("/seed/gold", {
+			method: "POST",
+		}),
+	seedAtlas: () =>
+		fetchApi<{ categories: number; decks: number }>("/seed/atlas", {
+			method: "POST",
+		}),
+	seedAdmin: () =>
+		fetchApi<{ created: boolean; email: string }>("/seed/admin", {
+			method: "POST",
+		}),
+};
 
 // Stats  
 export interface DashboardStats {

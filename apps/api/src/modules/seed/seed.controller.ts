@@ -17,4 +17,10 @@ export class SeedController {
 	async seedAdminUser() {
 		return await this.seedService.seedAdminUser();
 	}
+
+	@Public()
+	@Post("atlas")
+	async seedAtlas() {
+		return await this.seedService.seedAtlas();
+	}
 }

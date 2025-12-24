@@ -1,8 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/auth-context"
-import { Category, categoriesApi, CreateCategoryRequest } from "@/lib/api"
+import {
+	Category,
+	categoriesApi,
+	CreateCategoryRequest,
+	PaginatedResponse,
+} from "@/lib/api";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,14 +35,23 @@ import {
 	DialogTrigger,
 	DialogFooter,
 } from "@/components/ui/dialog"
-import { Plus, Trash2, Edit, Search } from "lucide-react"
+import {
+	Plus,
+	Trash2,
+	Edit,
+	Search,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner"
 
 export default function CategoriesPage() {
 	const { token } = useAuth()
-	const [categories, setCategories] = useState<Category[]>([])
+	const [data, setData] = useState<PaginatedResponse<Category> | null>(null);
 	const [loading, setLoading] = useState(true)
 	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1);
+	const limit = 20;
 	const [createOpen, setCreateOpen] = useState(false)
 	const [formData, setFormData] = useState<CreateCategoryRequest>({
 		name: "",
@@ -46,20 +60,27 @@ export default function CategoriesPage() {
 		imageUrl: "",
 	})
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
+		if (!token) return;
+		setLoading(true);
 		try {
-			const categoriesData = await categoriesApi.getAll()
-			setCategories(categoriesData)
+			const response = await categoriesApi.getAll(token, page, limit, search);
+			setData(response);
 		} catch (error) {
-			console.error("Failed to fetch:", error)
+			console.error("Failed to fetch:", error);
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}
+	}, [token, page, search]);
 
 	useEffect(() => {
-		fetchData()
-	}, [])
+		fetchData();
+	}, [fetchData]);
+
+	useEffect(() => {
+		const timer = setTimeout(() => setPage(1), 300);
+		return () => clearTimeout(timer);
+	}, [search]);
 
 	const handleCreate = async (e: React.FormEvent) => {
 		e.preventDefault()
@@ -91,14 +112,12 @@ export default function CategoriesPage() {
 			.normalize("NFD")
 			.replace(/[\u0300-\u036f]/g, "")
 			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/(^-|-$)/g, "")
+			.replace(/(^-|-$)/g, "");
 	}
 
-	const filteredCategories = categories.filter(
-		(cat) =>
-			cat.name.toLowerCase().includes(search.toLowerCase()) ||
-			(cat.description ?? "").toLowerCase().includes(search.toLowerCase())
-	)
+	const categories = data?.items ?? [];
+	const total = data?.total ?? 0;
+	const totalPages = data?.totalPages ?? 1;
 
 	return (
 		<div className="space-y-6">
@@ -128,12 +147,8 @@ export default function CategoriesPage() {
 								<Input
 									value={formData.name}
 									onChange={(e) => {
-										const name = e.target.value
-										setFormData({
-											...formData,
-											name,
-											slug: generateSlug(name),
-										})
+										const name = e.target.value;
+										setFormData({ ...formData, name, slug: generateSlug(name) });
 									}}
 									placeholder="Ex: Psychologie"
 									className="bg-slate-800 border-slate-700"
@@ -154,7 +169,9 @@ export default function CategoriesPage() {
 								<Label>Description</Label>
 								<Textarea
 									value={formData.description}
-									onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+									onChange={(e) =>
+										setFormData({ ...formData, description: e.target.value })
+									}
 									placeholder="Description courte..."
 									className="bg-slate-800 border-slate-700"
 								/>
@@ -163,13 +180,20 @@ export default function CategoriesPage() {
 								<Label>URL Image / Emoji</Label>
 								<Input
 									value={formData.imageUrl}
-									onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+									onChange={(e) =>
+										setFormData({ ...formData, imageUrl: e.target.value })
+									}
 									placeholder="🧠 ou https://..."
 									className="bg-slate-800 border-slate-700"
 								/>
 							</div>
 							<DialogFooter>
-								<Button type="button" variant="outline" onClick={() => setCreateOpen(false)} className="border-slate-700">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setCreateOpen(false)}
+									className="border-slate-700"
+								>
 									Annuler
 								</Button>
 								<Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
@@ -194,13 +218,38 @@ export default function CategoriesPage() {
 
 			{/* Table */}
 			<CardUI className="bg-slate-900 border-slate-800">
-				<CardHeader>
-					<CardTitle className="text-white">Toutes les catégories ({filteredCategories.length})</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between">
+					<CardTitle className="text-white">
+						Toutes les catégories ({total})
+					</CardTitle>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="border-slate-700"
+						>
+							<ChevronLeft className="h-4 w-4" />
+						</Button>
+						<span className="text-slate-400 text-sm">
+							{page} / {totalPages}
+						</span>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page >= totalPages}
+							className="border-slate-700"
+						>
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
 				</CardHeader>
 				<CardContent>
 					{loading ? (
 						<p className="text-slate-500">Chargement...</p>
-					) : filteredCategories.length === 0 ? (
+					) : categories.length === 0 ? (
 						<p className="text-slate-500">Aucune catégorie trouvée.</p>
 					) : (
 						<Table>
@@ -214,7 +263,7 @@ export default function CategoriesPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filteredCategories.map((cat) => (
+								{categories.map((cat) => (
 									<TableRow key={cat.id} className="border-slate-800">
 										<TableCell className="text-2xl">
 											{cat.imageUrl?.startsWith("http") ? "📁" : cat.imageUrl ?? "📁"}
@@ -228,9 +277,7 @@ export default function CategoriesPage() {
 										<TableCell className="text-slate-400 max-w-xs truncate">
 											{cat.description ?? "—"}
 										</TableCell>
-										<TableCell className="text-slate-400">
-											{cat.sortOrder}
-										</TableCell>
+										<TableCell className="text-slate-400">{cat.sortOrder}</TableCell>
 										<TableCell className="text-right">
 											<Button
 												variant="ghost"
@@ -256,5 +303,5 @@ export default function CategoriesPage() {
 				</CardContent>
 			</CardUI>
 		</div>
-	)
+	);
 }

@@ -1,18 +1,25 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useAuth } from "@/lib/auth-context"
-import { Deck, decksApi, categoriesApi, Category, CreateDeckRequest } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/lib/auth-context";
+import {
+	Deck,
+	decksApi,
+	categoriesApi,
+	Category,
+	CreateDeckRequest,
+	PaginatedResponse,
+} from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
 	Card as CardUI,
 	CardContent,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -20,7 +27,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
 	Dialog,
 	DialogContent,
@@ -29,25 +36,34 @@ import {
 	DialogTitle,
 	DialogTrigger,
 	DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Trash2, Edit, Search } from "lucide-react"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+	Plus,
+	Trash2,
+	Edit,
+	Search,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
+import { toast } from "sonner";
 
 export default function DecksPage() {
-	const { token } = useAuth()
-	const [decks, setDecks] = useState<Deck[]>([])
-	const [categories, setCategories] = useState<Category[]>([])
-	const [loading, setLoading] = useState(true)
-	const [search, setSearch] = useState("")
-	const [createOpen, setCreateOpen] = useState(false)
+	const { token } = useAuth();
+	const [data, setData] = useState<PaginatedResponse<Deck> | null>(null);
+	const [categories, setCategories] = useState<Category[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [search, setSearch] = useState("");
+	const [page, setPage] = useState(1);
+	const limit = 20;
+	const [createOpen, setCreateOpen] = useState(false);
 	const [formData, setFormData] = useState<CreateDeckRequest>({
 		name: "",
 		slug: "",
@@ -55,33 +71,40 @@ export default function DecksPage() {
 		imageUrl: "",
 		categoryId: undefined,
 		isActive: true,
-	})
+	});
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
+		if (!token) return;
+		setLoading(true);
 		try {
-			const [decksData, categoriesData] = await Promise.all([
-				decksApi.getAll(),
-				categoriesApi.getAll(),
-			])
-			setDecks(decksData)
-			setCategories(categoriesData)
+			const [decksResponse, categoriesData] = await Promise.all([
+				decksApi.getAllAdmin(token, page, limit, search),
+				categoriesApi.getAllPublic(),
+			]);
+			setData(decksResponse);
+			setCategories(categoriesData);
 		} catch (error) {
-			console.error("Failed to fetch:", error)
+			console.error("Failed to fetch:", error);
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}
+	}, [token, page, search]);
 
 	useEffect(() => {
-		fetchData()
-	}, [])
+		fetchData();
+	}, [fetchData]);
+
+	useEffect(() => {
+		const timer = setTimeout(() => setPage(1), 300);
+		return () => clearTimeout(timer);
+	}, [search]);
 
 	const handleCreate = async (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 		try {
-			await decksApi.create(formData, token!)
-			toast.success("Deck créé avec succès !")
-			setCreateOpen(false)
+			await decksApi.create(formData, token!);
+			toast.success("Deck créé avec succès !");
+			setCreateOpen(false);
 			setFormData({
 				name: "",
 				slug: "",
@@ -89,23 +112,23 @@ export default function DecksPage() {
 				imageUrl: "",
 				categoryId: undefined,
 				isActive: true,
-			})
-			fetchData()
+			});
+			fetchData();
 		} catch (error) {
-			toast.error((error as Error).message ?? "Erreur lors de la création")
+			toast.error((error as Error).message ?? "Erreur lors de la création");
 		}
-	}
+	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm("Êtes-vous sûr de vouloir supprimer ce deck ?")) return
+		if (!confirm("Êtes-vous sûr de vouloir supprimer ce deck ?")) return;
 		try {
-			await decksApi.delete(id, token!)
-			toast.success("Deck supprimé")
-			fetchData()
+			await decksApi.delete(id, token!);
+			toast.success("Deck supprimé");
+			fetchData();
 		} catch (error) {
-			toast.error((error as Error).message ?? "Erreur lors de la suppression")
+			toast.error((error as Error).message ?? "Erreur lors de la suppression");
 		}
-	}
+	};
 
 	const generateSlug = (name: string) => {
 		return name
@@ -113,14 +136,12 @@ export default function DecksPage() {
 			.normalize("NFD")
 			.replace(/[\u0300-\u036f]/g, "")
 			.replace(/[^a-z0-9]+/g, "-")
-			.replace(/(^-|-$)/g, "")
-	}
+			.replace(/(^-|-$)/g, "");
+	};
 
-	const filteredDecks = decks.filter(
-		(deck) =>
-			deck.name.toLowerCase().includes(search.toLowerCase()) ||
-			deck.description.toLowerCase().includes(search.toLowerCase())
-	)
+	const decks = data?.items ?? [];
+	const total = data?.total ?? 0;
+	const totalPages = data?.totalPages ?? 1;
 
 	return (
 		<div className="space-y-6">
@@ -146,16 +167,12 @@ export default function DecksPage() {
 						</DialogHeader>
 						<form onSubmit={handleCreate} className="space-y-4">
 							<div className="space-y-2">
-								<Label>Nom</Label>
+								<Label className="text-slate-200">Nom</Label>
 								<Input
 									value={formData.name}
 									onChange={(e) => {
-										const name = e.target.value
-										setFormData({
-											...formData,
-											name,
-											slug: generateSlug(name),
-										})
+										const name = e.target.value;
+										setFormData({ ...formData, name, slug: generateSlug(name) });
 									}}
 									placeholder="Ex: Biais Cognitifs"
 									className="bg-slate-800 border-slate-700"
@@ -163,7 +180,7 @@ export default function DecksPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label>Slug</Label>
+								<Label className="text-slate-200">Slug</Label>
 								<Input
 									value={formData.slug}
 									onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
@@ -173,10 +190,12 @@ export default function DecksPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label>Description</Label>
+								<Label className="text-slate-200">Description</Label>
 								<Textarea
 									value={formData.description}
-									onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+									onChange={(e) =>
+										setFormData({ ...formData, description: e.target.value })
+									}
 									placeholder="Description courte du deck..."
 									className="bg-slate-800 border-slate-700"
 									required
@@ -184,24 +203,31 @@ export default function DecksPage() {
 							</div>
 							<div className="grid grid-cols-2 gap-4">
 								<div className="space-y-2">
-									<Label>URL Image</Label>
+									<Label className="text-slate-200">URL Image</Label>
 									<Input
 										value={formData.imageUrl}
-										onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+										onChange={(e) =>
+											setFormData({ ...formData, imageUrl: e.target.value })
+										}
 										placeholder="https://..."
 										className="bg-slate-800 border-slate-700"
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label>Catégorie</Label>
+									<Label className="text-slate-200">Catégorie</Label>
 									<Select
 										value={formData.categoryId ?? "none"}
-										onValueChange={(v) => setFormData({ ...formData, categoryId: v === "none" ? undefined : v })}
+										onValueChange={(v) =>
+											setFormData({
+												...formData,
+												categoryId: v === "none" ? undefined : v,
+											})
+										}
 									>
-										<SelectTrigger className="bg-slate-800 border-slate-700">
+										<SelectTrigger className="bg-slate-800 border-slate-700 text-slate-200">
 											<SelectValue placeholder="Aucune catégorie" />
 										</SelectTrigger>
-										<SelectContent className="bg-slate-800 border-slate-700">
+										<SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
 											<SelectItem value="none">Aucune catégorie</SelectItem>
 											{categories.map((cat) => (
 												<SelectItem key={cat.id} value={cat.id}>
@@ -213,7 +239,12 @@ export default function DecksPage() {
 								</div>
 							</div>
 							<DialogFooter>
-								<Button type="button" variant="outline" onClick={() => setCreateOpen(false)} className="border-slate-700">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setCreateOpen(false)}
+									className="border-slate-700"
+								>
 									Annuler
 								</Button>
 								<Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
@@ -238,13 +269,36 @@ export default function DecksPage() {
 
 			{/* Table */}
 			<CardUI className="bg-slate-900 border-slate-800">
-				<CardHeader>
-					<CardTitle className="text-white">Tous les decks ({filteredDecks.length})</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between">
+					<CardTitle className="text-white">Tous les decks ({total})</CardTitle>
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="border-slate-700"
+						>
+							<ChevronLeft className="h-4 w-4" />
+						</Button>
+						<span className="text-slate-400 text-sm">
+							{page} / {totalPages}
+						</span>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page >= totalPages}
+							className="border-slate-700"
+						>
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
 				</CardHeader>
 				<CardContent>
 					{loading ? (
 						<p className="text-slate-500">Chargement...</p>
-					) : filteredDecks.length === 0 ? (
+					) : decks.length === 0 ? (
 						<p className="text-slate-500">Aucun deck trouvé.</p>
 					) : (
 						<Table>
@@ -258,7 +312,7 @@ export default function DecksPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filteredDecks.map((deck) => (
+								{decks.map((deck) => (
 									<TableRow key={deck.id} className="border-slate-800">
 										<TableCell>
 											<div>
@@ -267,11 +321,11 @@ export default function DecksPage() {
 											</div>
 										</TableCell>
 										<TableCell className="text-slate-400">
-											{categories.find((c) => c.id === deck.categoryId)?.name ?? "—"}
+											{deck.category?.name ??
+												categories.find((c) => c.id === deck.categoryId)?.name ??
+												"—"}
 										</TableCell>
-										<TableCell className="text-slate-400">
-											{deck.cardCount}
-										</TableCell>
+										<TableCell className="text-slate-400">{deck.cardCount}</TableCell>
 										<TableCell>
 											<Badge
 												variant={deck.isActive ? "default" : "secondary"}
@@ -305,5 +359,5 @@ export default function DecksPage() {
 				</CardContent>
 			</CardUI>
 		</div>
-	)
+	);
 }

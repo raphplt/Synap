@@ -82,6 +82,64 @@ export class SeedService {
 		return { created: true, email: adminEmail };
 	}
 
+	/**
+	 * Import the Atlas v1.0 structure (20 categories, 200 decks)
+	 */
+	async seedAtlas(): Promise<{ categories: number; decks: number }> {
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		const atlasData = require("../../common/data/atlas-v1.json");
+
+		let totalCategories = 0;
+		let totalDecks = 0;
+
+		for (const catData of atlasData.categories) {
+			// Create or find category
+			let category = await this.categoryRepository.findOne({
+				where: { slug: catData.slug },
+			});
+
+			if (!category) {
+				category = this.categoryRepository.create({
+					name: catData.name,
+					slug: catData.slug,
+					description: catData.description,
+					imageUrl: catData.imageUrl,
+					sortOrder: totalCategories,
+				});
+				await this.categoryRepository.save(category);
+				totalCategories++;
+				this.logger.log(`Created category: ${category.name}`);
+			}
+
+			// Create decks
+			for (const deckData of catData.decks) {
+				const existingDeck = await this.deckRepository.findOne({
+					where: { slug: deckData.slug },
+				});
+
+				if (!existingDeck) {
+					const deck = this.deckRepository.create({
+						name: deckData.name,
+						slug: deckData.slug,
+						description: deckData.description,
+						imageUrl: catData.imageUrl, // Use category emoji as placeholder
+						categoryId: category.id,
+						cardCount: 0,
+						sortOrder: totalDecks,
+						isActive: true,
+					});
+					await this.deckRepository.save(deck);
+					totalDecks++;
+				}
+			}
+		}
+
+		this.logger.log(
+			`Atlas seeding complete: ${totalCategories} categories, ${totalDecks} decks`
+		);
+		return { categories: totalCategories, decks: totalDecks };
+	}
+
 	async seedGoldDataset(): Promise<{
 		categories: number;
 		decks: number;

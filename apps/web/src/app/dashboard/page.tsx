@@ -1,50 +1,88 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/lib/auth-context"
-import { decksApi, categoriesApi, seedApi, Deck, Category } from "@/lib/api"
-import { Users, CreditCard, Layers, FolderTree, Sparkles } from "lucide-react"
+import {
+	decksApi,
+	categoriesApi,
+	cardsApi,
+	usersApi,
+	seedApi,
+} from "@/lib/api";
+import {
+	Users,
+	CreditCard,
+	Layers,
+	FolderTree,
+	Sparkles,
+	Map,
+} from "lucide-react";
 import { toast } from "sonner"
+
+interface DashboardStats {
+	users: number;
+	cards: number;
+	decks: number;
+	categories: number;
+}
 
 export default function DashboardPage() {
 	const { token } = useAuth()
-	const [stats, setStats] = useState({ decks: 0, categories: 0 })
+	const [stats, setStats] = useState<DashboardStats>({
+		users: 0,
+		cards: 0,
+		decks: 0,
+		categories: 0,
+	});
 	const [loading, setLoading] = useState(true)
 	const [seeding, setSeeding] = useState(false)
+	const [seedingAtlas, setSeedingAtlas] = useState(false);
 
-	useEffect(() => {
-		const fetchStats = async () => {
+	const fetchStats = useCallback(async () => {
+		if (!token) return;
+		try {
+			// Fetch all paginated endpoints to get totals
+			const [usersRes, cardsRes, decksRes, categoriesRes] = await Promise.all([
+				usersApi.getAll(token, 1, 1), // Just get total count
+				cardsApi.getAll(token, 1, 1),
+				decksApi.getAllAdmin(token, 1, 1),
+				categoriesApi.getAll(token, 1, 1),
+			]);
+			setStats({
+				users: usersRes.total,
+				cards: cardsRes.total,
+				decks: decksRes.total,
+				categories: categoriesRes.total,
+			});
+		} catch (error) {
+			console.error("Failed to fetch stats:", error);
+			// Fallback: try public endpoints for decks
 			try {
-				const [decks, categories] = await Promise.all([
-					decksApi.getAll(),
-					categoriesApi.getAll()
-				])
-				setStats({
+				const decks = await decksApi.getAll();
+				const categories = await categoriesApi.getAllPublic();
+				setStats((prev) => ({
+					...prev,
 					decks: decks.length,
 					categories: categories.length,
-				})
-			} catch (error) {
-				console.error("Failed to fetch stats:", error)
-			} finally {
-				setLoading(false)
-			}
+				}));
+			} catch {}
+		} finally {
+			setLoading(false);
 		}
-		fetchStats()
-	}, [token])
+	}, [token]);
+
+	useEffect(() => {
+		fetchStats();
+	}, [fetchStats]);
 
 	const handleSeedGold = async () => {
 		setSeeding(true)
 		try {
 			const result = await seedApi.seedGold()
 			toast.success(`Seeding terminé ! ${result.categories} catégories, ${result.decks} decks, ${result.cards} cartes créées.`)
-			// Refresh stats
-			const [decks, categories] = await Promise.all([
-				decksApi.getAll(),
-				categoriesApi.getAll()
-			])
-			setStats({ decks: decks.length, categories: categories.length })
+			fetchStats();
 		} catch (error) {
 			toast.error((error as Error).message ?? "Erreur lors du seeding")
 		} finally {
@@ -52,12 +90,42 @@ export default function DashboardPage() {
 		}
 	}
 
+	const handleSeedAtlas = async () => {
+		setSeedingAtlas(true);
+		try {
+			const result = await seedApi.seedAtlas();
+			toast.success(
+				`Atlas importé ! ${result.categories} catégories, ${result.decks} decks créés.`
+			);
+			fetchStats();
+		} catch (error) {
+			toast.error((error as Error).message ?? "Erreur lors de l'import Atlas");
+		} finally {
+			setSeedingAtlas(false);
+		}
+	};
+
 	const statCards = [
-		{ title: "Utilisateurs", value: "—", icon: Users, color: "text-blue-500" },
-		{ title: "Cartes", value: "—", icon: CreditCard, color: "text-emerald-500" },
+		{
+			title: "Utilisateurs",
+			value: stats.users,
+			icon: Users,
+			color: "text-blue-500",
+		},
+		{
+			title: "Cartes",
+			value: stats.cards,
+			icon: CreditCard,
+			color: "text-emerald-500",
+		},
 		{ title: "Decks", value: stats.decks, icon: Layers, color: "text-amber-500" },
-		{ title: "Catégories", value: stats.categories, icon: FolderTree, color: "text-purple-500" },
-	]
+		{
+			title: "Catégories",
+			value: stats.categories,
+			icon: FolderTree,
+			color: "text-purple-500",
+		},
+	];
 
 	return (
 		<div className="space-y-8">
@@ -90,7 +158,9 @@ export default function DashboardPage() {
 			<Card className="bg-slate-900 border-slate-800">
 				<CardHeader>
 					<CardTitle className="text-white">Actions rapides</CardTitle>
-					<CardDescription>Opérations courantes d&apos;administration</CardDescription>
+					<CardDescription>
+						Opérations courantes d&apos;administration
+					</CardDescription>
 				</CardHeader>
 				<CardContent className="flex flex-wrap gap-3">
 					<Button
@@ -100,6 +170,14 @@ export default function DashboardPage() {
 					>
 						<Sparkles className="h-4 w-4 mr-2" />
 						{seeding ? "Seeding..." : "Seed Dataset Gold"}
+					</Button>
+					<Button
+						onClick={handleSeedAtlas}
+						disabled={seedingAtlas}
+						className="bg-emerald-600 hover:bg-emerald-700"
+					>
+						<Map className="h-4 w-4 mr-2" />
+						{seedingAtlas ? "Import..." : "Import Atlas v1.0"}
 					</Button>
 					<Button variant="outline" className="border-slate-700 hover:bg-slate-800">
 						Exporter les données
@@ -121,5 +199,5 @@ export default function DashboardPage() {
 				</CardContent>
 			</Card>
 		</div>
-	)
+	);
 }

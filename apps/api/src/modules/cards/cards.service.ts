@@ -4,27 +4,70 @@ import { type CreateCardInput, type FeedResponseDto } from "@memex/shared";
 import { Repository } from "typeorm";
 import { Card } from "./card.entity";
 
+export interface PaginatedResult<T> {
+	items: T[];
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
+}
+
 @Injectable()
 export class CardsService {
-	constructor (
+	constructor(
 		@InjectRepository(Card)
-		private readonly cardsRepository: Repository<Card>,
+		private readonly cardsRepository: Repository<Card>
 	) {}
 
-	async findBySource (
+	async findAllPaginated(
+		page: number = 1,
+		limit: number = 20,
+		search?: string
+	): Promise<PaginatedResult<Card>> {
+		const safePage = Math.max(1, page);
+		const safeLimit = Math.min(100, Math.max(1, limit));
+		const skip = (safePage - 1) * safeLimit;
+
+		const queryBuilder = this.cardsRepository.createQueryBuilder("card");
+
+		if (search && search.trim()) {
+			queryBuilder.where(
+				"card.title ILIKE :search OR card.summary ILIKE :search",
+				{ search: `%${search.trim()}%` }
+			);
+		}
+
+		queryBuilder.orderBy("card.createdAt", "DESC").skip(skip).take(safeLimit);
+
+		const [items, total] = await queryBuilder.getManyAndCount();
+
+		return {
+			items,
+			total,
+			page: safePage,
+			limit: safeLimit,
+			totalPages: Math.ceil(total / safeLimit),
+		};
+	}
+
+	async findById(id: string): Promise<Card | null> {
+		return await this.cardsRepository.findOne({ where: { id } });
+	}
+
+	async findBySource(
 		sourceType: string,
-		sourceId: string,
+		sourceId: string
 	): Promise<Card | null> {
 		return await this.cardsRepository.findOne({
 			where: { sourceType, sourceId },
 		});
 	}
 
-	async countCards (): Promise<number> {
+	async countCards(): Promise<number> {
 		return await this.cardsRepository.count();
 	}
 
-	async upsertCard (payload: CreateCardInput): Promise<Card> {
+	async upsertCard(payload: CreateCardInput): Promise<Card> {
 		const hasSourceKey =
 			payload.sourceType != null &&
 			payload.sourceType.length > 0 &&
@@ -33,13 +76,13 @@ export class CardsService {
 
 		const existing = hasSourceKey
 			? await this.cardsRepository.findOne({
-				where: {
-					sourceType: payload.sourceType!,
-					sourceId: payload.sourceId!,
-				},
+					where: {
+						sourceType: payload.sourceType!,
+						sourceId: payload.sourceId!,
+					},
 			  })
 			: await this.cardsRepository.findOne({
-				where: { sourceLink: payload.sourceLink },
+					where: { sourceLink: payload.sourceLink },
 			  });
 
 		if (existing != null) {
@@ -51,7 +94,29 @@ export class CardsService {
 		return await this.cardsRepository.save(created);
 	}
 
-	async rateCard (id: string, rating: number): Promise<Card> {
+	async create(data: Partial<Card>): Promise<Card> {
+		const card = this.cardsRepository.create(data);
+		return await this.cardsRepository.save(card);
+	}
+
+	async update(id: string, data: Partial<Card>): Promise<Card> {
+		const card = await this.findById(id);
+		if (!card) {
+			throw new Error(`Card ${id} not found`);
+		}
+		Object.assign(card, data);
+		return await this.cardsRepository.save(card);
+	}
+
+	async delete(id: string): Promise<void> {
+		const card = await this.findById(id);
+		if (!card) {
+			throw new Error(`Card ${id} not found`);
+		}
+		await this.cardsRepository.remove(card);
+	}
+
+	async rateCard(id: string, rating: number): Promise<Card> {
 		const card = await this.cardsRepository.findOneBy({ id });
 		if (card == null) {
 			throw new Error(`Card ${id} not found`);
@@ -60,13 +125,10 @@ export class CardsService {
 		return await this.cardsRepository.save(card);
 	}
 
-	async getFeed (cursor = 0, take = 10): Promise<FeedResponseDto> {
+	async getFeed(cursor = 0, take = 10): Promise<FeedResponseDto> {
 		const safeTake = Math.min(100, Math.max(1, take));
 		const safeCursor = Math.max(0, cursor);
 
-		// Sorting by userRating DESC first (so rated items appear top/bottom),
-		// then popularityScore DESC (most popular),
-		// then DATE DESC
 		const items = await this.cardsRepository
 			.createQueryBuilder("card")
 			.orderBy("card.userRating", "DESC")

@@ -1,19 +1,25 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useAuth } from "@/lib/auth-context"
-import { Card, cardsApi, decksApi, Deck, CreateCardRequest } from "@/lib/api"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/lib/auth-context";
+import {
+	Card,
+	cardsApi,
+	decksApi,
+	Deck,
+	CreateCardRequest,
+	PaginatedResponse,
+} from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
 	Card as CardUI,
 	CardContent,
-	CardDescription,
 	CardHeader,
 	CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
 	Table,
 	TableBody,
@@ -21,7 +27,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from "@/components/ui/table"
+} from "@/components/ui/table";
 import {
 	Dialog,
 	DialogContent,
@@ -30,25 +36,34 @@ import {
 	DialogTitle,
 	DialogTrigger,
 	DialogFooter,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
 	Select,
 	SelectContent,
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
-import { Plus, Trash2, Edit, Search } from "lucide-react"
-import { toast } from "sonner"
+} from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import {
+	Plus,
+	Trash2,
+	Edit,
+	Search,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
+import { toast } from "sonner";
 
 export default function CardsPage() {
-	const { token } = useAuth()
-	const [cards, setCards] = useState<Card[]>([])
-	const [decks, setDecks] = useState<Deck[]>([])
-	const [loading, setLoading] = useState(true)
-	const [search, setSearch] = useState("")
-	const [createOpen, setCreateOpen] = useState(false)
+	const { token } = useAuth();
+	const [data, setData] = useState<PaginatedResponse<Card> | null>(null);
+	const [decks, setDecks] = useState<Deck[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [search, setSearch] = useState("");
+	const [page, setPage] = useState(1);
+	const limit = 20;
+	const [createOpen, setCreateOpen] = useState(false);
 	const [formData, setFormData] = useState<CreateCardRequest>({
 		title: "",
 		summary: "",
@@ -58,38 +73,47 @@ export default function CardsPage() {
 		origin: "CURATED",
 		qualityScore: 90,
 		deckId: undefined,
-	})
+	});
 
-	const fetchData = async () => {
+	const fetchData = useCallback(async () => {
+		if (!token) return;
+		setLoading(true);
 		try {
-			const [cardsData, decksData] = await Promise.all([
-				cardsApi.getAll(token!),
+			const [cardsResponse, decksData] = await Promise.all([
+				cardsApi.getAll(token, page, limit, search),
 				decksApi.getAll(),
-			])
-			setCards(cardsData)
-			setDecks(decksData)
+			]);
+			setData(cardsResponse);
+			setDecks(decksData);
 		} catch (error) {
-			console.error("Failed to fetch:", error)
-			// Fallback: fetch only decks if cards endpoint doesn't exist yet
+			console.error("Failed to fetch:", error);
 			try {
-				const decksData = await decksApi.getAll()
-				setDecks(decksData)
+				const decksData = await decksApi.getAll();
+				setDecks(decksData);
 			} catch {}
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}
+	}, [token, page, search]);
 
 	useEffect(() => {
-		if (token) fetchData()
-	}, [token])
+		fetchData();
+	}, [fetchData]);
+
+	// Debounce search
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setPage(1);
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [search]);
 
 	const handleCreate = async (e: React.FormEvent) => {
-		e.preventDefault()
+		e.preventDefault();
 		try {
-			await cardsApi.create(formData, token!)
-			toast.success("Carte créée avec succès !")
-			setCreateOpen(false)
+			await cardsApi.create(formData, token!);
+			toast.success("Carte créée avec succès !");
+			setCreateOpen(false);
 			setFormData({
 				title: "",
 				summary: "",
@@ -99,29 +123,27 @@ export default function CardsPage() {
 				origin: "CURATED",
 				qualityScore: 90,
 				deckId: undefined,
-			})
-			fetchData()
+			});
+			fetchData();
 		} catch (error) {
-			toast.error((error as Error).message ?? "Erreur lors de la création")
+			toast.error((error as Error).message ?? "Erreur lors de la création");
 		}
-	}
+	};
 
 	const handleDelete = async (id: string) => {
-		if (!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return
+		if (!confirm("Êtes-vous sûr de vouloir supprimer cette carte ?")) return;
 		try {
-			await cardsApi.delete(id, token!)
-			toast.success("Carte supprimée")
-			fetchData()
+			await cardsApi.delete(id, token!);
+			toast.success("Carte supprimée");
+			fetchData();
 		} catch (error) {
-			toast.error((error as Error).message ?? "Erreur lors de la suppression")
+			toast.error((error as Error).message ?? "Erreur lors de la suppression");
 		}
-	}
+	};
 
-	const filteredCards = cards.filter(
-		(card) =>
-			card.title.toLowerCase().includes(search.toLowerCase()) ||
-			card.summary.toLowerCase().includes(search.toLowerCase())
-	)
+	const cards = data?.items ?? [];
+	const total = data?.total ?? 0;
+	const totalPages = data?.totalPages ?? 1;
 
 	return (
 		<div className="space-y-6">
@@ -147,7 +169,7 @@ export default function CardsPage() {
 						</DialogHeader>
 						<form onSubmit={handleCreate} className="space-y-4">
 							<div className="space-y-2">
-								<Label>Titre</Label>
+								<Label className="text-slate-200">Titre</Label>
 								<Input
 									value={formData.title}
 									onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -157,7 +179,7 @@ export default function CardsPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label>Résumé (Face A)</Label>
+								<Label className="text-slate-200">Résumé (Face A)</Label>
 								<Input
 									value={formData.summary}
 									onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
@@ -167,7 +189,7 @@ export default function CardsPage() {
 								/>
 							</div>
 							<div className="space-y-2">
-								<Label>Contenu (Face B)</Label>
+								<Label className="text-slate-200">Contenu (Face B)</Label>
 								<Textarea
 									value={formData.content}
 									onChange={(e) => setFormData({ ...formData, content: e.target.value })}
@@ -178,24 +200,28 @@ export default function CardsPage() {
 							</div>
 							<div className="grid grid-cols-2 gap-4">
 								<div className="space-y-2">
-									<Label>URL Image</Label>
+									<Label className="text-slate-200">URL Image</Label>
 									<Input
 										value={formData.mediaUrl}
-										onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
+										onChange={(e) =>
+											setFormData({ ...formData, mediaUrl: e.target.value })
+										}
 										placeholder="https://..."
 										className="bg-slate-800 border-slate-700"
 									/>
 								</div>
 								<div className="space-y-2">
-									<Label>Deck</Label>
+									<Label className="text-slate-200">Deck</Label>
 									<Select
 										value={formData.deckId ?? "none"}
-										onValueChange={(v) => setFormData({ ...formData, deckId: v === "none" ? undefined : v })}
+										onValueChange={(v) =>
+											setFormData({ ...formData, deckId: v === "none" ? undefined : v })
+										}
 									>
-										<SelectTrigger className="bg-slate-800 border-slate-700">
+										<SelectTrigger className="bg-slate-800 border-slate-700 text-slate-200">
 											<SelectValue placeholder="Aucun deck" />
 										</SelectTrigger>
-										<SelectContent className="bg-slate-800 border-slate-700">
+										<SelectContent className="bg-slate-800 border-slate-700 text-slate-200">
 											<SelectItem value="none">Aucun deck</SelectItem>
 											{decks.map((deck) => (
 												<SelectItem key={deck.id} value={deck.id}>
@@ -207,7 +233,12 @@ export default function CardsPage() {
 								</div>
 							</div>
 							<DialogFooter>
-								<Button type="button" variant="outline" onClick={() => setCreateOpen(false)} className="border-slate-700">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={() => setCreateOpen(false)}
+									className="border-slate-700"
+								>
 									Annuler
 								</Button>
 								<Button type="submit" className="bg-emerald-600 hover:bg-emerald-700">
@@ -232,14 +263,41 @@ export default function CardsPage() {
 
 			{/* Table */}
 			<CardUI className="bg-slate-900 border-slate-800">
-				<CardHeader>
-					<CardTitle className="text-white">Toutes les cartes ({filteredCards.length})</CardTitle>
+				<CardHeader className="flex flex-row items-center justify-between">
+					<CardTitle className="text-white">Toutes les cartes ({total})</CardTitle>
+					{/* Pagination */}
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="border-slate-700"
+						>
+							<ChevronLeft className="h-4 w-4" />
+						</Button>
+						<span className="text-slate-400 text-sm">
+							{page} / {totalPages}
+						</span>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page >= totalPages}
+							className="border-slate-700"
+						>
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
 				</CardHeader>
 				<CardContent>
 					{loading ? (
 						<p className="text-slate-500">Chargement...</p>
-					) : filteredCards.length === 0 ? (
-						<p className="text-slate-500">Aucune carte trouvée. Utilisez le bouton &quot;Seed Dataset Gold&quot; sur le dashboard pour initialiser des données.</p>
+					) : cards.length === 0 ? (
+						<p className="text-slate-500">
+							Aucune carte trouvée. Utilisez le bouton &quot;Seed Dataset Gold&quot;
+							sur le dashboard pour initialiser des données.
+						</p>
 					) : (
 						<Table>
 							<TableHeader>
@@ -252,13 +310,11 @@ export default function CardsPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filteredCards.slice(0, 50).map((card) => (
+								{cards.map((card) => (
 									<TableRow key={card.id} className="border-slate-800">
-										<TableCell className="text-white font-medium">
-											{card.title}
-										</TableCell>
+										<TableCell className="text-white font-medium">{card.title}</TableCell>
 										<TableCell>
-											<Badge variant="outline" className="border-slate-700">
+											<Badge variant="outline" className="border-slate-700 text-slate-400">
 												{card.origin}
 											</Badge>
 										</TableCell>
@@ -293,5 +349,5 @@ export default function CardsPage() {
 				</CardContent>
 			</CardUI>
 		</div>
-	)
+	);
 }

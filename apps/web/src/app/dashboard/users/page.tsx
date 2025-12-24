@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/auth-context"
-import { User, usersApi } from "@/lib/api"
+import { User, usersApi, PaginatedResponse } from "@/lib/api";
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -21,32 +21,49 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Trash2, Search, Mail, Flame } from "lucide-react"
+import {
+	Trash2,
+	Search,
+	Mail,
+	Flame,
+	ChevronLeft,
+	ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner"
 
 export default function UsersPage() {
 	const { token } = useAuth()
-	const [users, setUsers] = useState<User[]>([])
+	const [data, setData] = useState<PaginatedResponse<User> | null>(null);
 	const [loading, setLoading] = useState(true)
 	const [search, setSearch] = useState("")
+	const [page, setPage] = useState(1);
+	const limit = 20;
 
-	const fetchData = async () => {
-		if (!token) return
+	const fetchData = useCallback(async () => {
+		if (!token) return;
+		setLoading(true);
 		try {
-			const usersData = await usersApi.getAll(token)
-			setUsers(usersData)
+			const response = await usersApi.getAll(token, page, limit, search);
+			setData(response);
 		} catch (error) {
-			console.error("Failed to fetch users:", error)
-			// Endpoint might not exist yet
-			toast.error("Endpoint /users non disponible. Implémentez-le dans l'API.")
+			console.error("Failed to fetch users:", error);
+			toast.error("Erreur lors du chargement des utilisateurs");
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}
+	}, [token, page, search]);
 
 	useEffect(() => {
-		fetchData()
-	}, [token])
+		fetchData();
+	}, [fetchData]);
+
+	// Debounce search
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setPage(1); // Reset to page 1 on search
+		}, 300);
+		return () => clearTimeout(timer);
+	}, [search]);
 
 	const handleDelete = async (id: string) => {
 		if (!confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) return
@@ -59,11 +76,9 @@ export default function UsersPage() {
 		}
 	}
 
-	const filteredUsers = users.filter(
-		(user) =>
-			user.username.toLowerCase().includes(search.toLowerCase()) ||
-			user.email.toLowerCase().includes(search.toLowerCase())
-	)
+	const users = data?.items ?? [];
+	const total = data?.total ?? 0;
+	const totalPages = data?.totalPages ?? 1;
 
 	return (
 		<div className="space-y-6">
@@ -88,20 +103,41 @@ export default function UsersPage() {
 
 			{/* Table */}
 			<CardUI className="bg-slate-900 border-slate-800">
-				<CardHeader>
+				<CardHeader className="flex flex-row items-center justify-between">
 					<CardTitle className="text-white">
-						Tous les utilisateurs ({filteredUsers.length})
+						Tous les utilisateurs ({total})
 					</CardTitle>
+					{/* Pagination */}
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							disabled={page === 1}
+							className="border-slate-700"
+						>
+							<ChevronLeft className="h-4 w-4" />
+						</Button>
+						<span className="text-slate-400 text-sm">
+							{page} / {totalPages}
+						</span>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							disabled={page >= totalPages}
+							className="border-slate-700"
+						>
+							<ChevronRight className="h-4 w-4" />
+						</Button>
+					</div>
 				</CardHeader>
 				<CardContent>
 					{loading ? (
 						<p className="text-slate-500">Chargement...</p>
-					) : filteredUsers.length === 0 ? (
+					) : users.length === 0 ? (
 						<div className="text-center py-8">
 							<p className="text-slate-500 mb-2">Aucun utilisateur trouvé.</p>
-							<p className="text-slate-600 text-sm">
-								L&apos;endpoint GET /users doit être implémenté dans l&apos;API.
-							</p>
 						</div>
 					) : (
 						<Table>
@@ -116,7 +152,7 @@ export default function UsersPage() {
 								</TableRow>
 							</TableHeader>
 							<TableBody>
-								{filteredUsers.map((user) => (
+								{users.map((user) => (
 									<TableRow key={user.id} className="border-slate-800">
 										<TableCell>
 											<div className="flex items-center gap-3">
@@ -177,5 +213,5 @@ export default function UsersPage() {
 				</CardContent>
 			</CardUI>
 		</div>
-	)
+	);
 }

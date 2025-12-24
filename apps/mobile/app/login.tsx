@@ -25,10 +25,8 @@ export default function LoginScreen() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	// Redirect if already authenticated
 	useEffect(() => {
 		if (isAuthenticated) {
-			console.log("[Login] Already authenticated, redirecting to tabs");
 			router.replace("/(tabs)" as Href);
 		}
 	}, [isAuthenticated, router]);

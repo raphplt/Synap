@@ -11,10 +11,8 @@ export default function LandingScreen() {
 	const router = useRouter();
 	const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
-	// Redirect if already authenticated
 	useEffect(() => {
 		if (isAuthenticated) {
-			console.log("[Landing] Already authenticated, redirecting to tabs");
 			router.replace("/(tabs)" as Href);
 		}
 	}, [isAuthenticated, router]);
@@ -26,33 +24,26 @@ export default function LandingScreen() {
 				colors={["#073B4C", "#0A5266", "#073B4C"]}
 				className="flex-1 items-center justify-center px-8"
 			>
-				{/* Hero Section */}
 				<View className="items-center mb-16">
-					{/* Brain Icon Placeholder - Replace with Lottie animation */}
 					<Image
 						source={require("../assets/icon.png")}
 						className="w-32 h-32 rounded-full bg-white/20 m-4"
 					/>
 
-					{/* Logo */}
 					<Text className="text-4xl font-bold text-white tracking-tight mb-4">
 						SYNAP
 					</Text>
 
-					{/* Tagline */}
 					<Text className="text-xl text-synap-emerald font-semibold text-center mb-2">
 						{t("landing.tagline")}
 					</Text>
 
-					{/* Subtitle */}
 					<Text className="text-base text-text-secondary text-center">
 						{t("landing.subtitle")}
 					</Text>
 				</View>
 
-				{/* CTA Buttons */}
 				<View className="w-full gap-4">
-					{/* Primary CTA */}
 					<Pressable
 						className="bg-synap-pink py-4 px-8 rounded-lg active:bg-synap-pink-dark"
 						onPress={() => router.push("/signup" as Href)}

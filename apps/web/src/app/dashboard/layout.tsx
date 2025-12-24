@@ -42,11 +42,14 @@ function Sidebar({ mobile = false, onClose }: { mobile?: boolean; onClose?: () =
 	return (
 		<div className="flex h-full flex-col bg-slate-900 border-r border-slate-800">
 			{/* Logo */}
-			<div className="flex h-16 items-center gap-2 px-6 border-b border-slate-800">
+			<Link
+				href="/dashboard"
+				className="flex h-16 items-center gap-2 px-6 border-b border-slate-800"
+			>
 				<Brain className="h-8 w-8 text-emerald-500" />
 				<span className="text-xl font-bold text-white">SYNAP</span>
 				<span className="text-xs text-slate-500 ml-1">Admin</span>
-			</div>
+			</Link>
 
 			{/* Navigation */}
 			<ScrollArea className="flex-1 px-3 py-4">
@@ -93,7 +96,7 @@ function Sidebar({ mobile = false, onClose }: { mobile?: boolean; onClose?: () =
 				</Button>
 			</div>
 		</div>
-	)
+	);
 }
 
 export default function DashboardLayout({

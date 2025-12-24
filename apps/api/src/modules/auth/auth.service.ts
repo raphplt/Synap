@@ -3,15 +3,15 @@ import { JwtService } from "@nestjs/jwt";
 import * as argon2 from "argon2";
 import { UserService } from "../users/user.service";
 import { User } from "../users/user.entity";
+import { ResponseMapper } from "../../common/mappers/response.mapper";
+import {
+	AuthResponseDto,
+	UserResponseDto,
+} from "../../common/dto/response.dto";
 
 export interface JwtPayload {
 	sub: string;
 	email: string;
-}
-
-export interface AuthResponse {
-	accessToken: string;
-	user: Omit<User, "passwordHash">;
 }
 
 @Injectable()
@@ -26,7 +26,7 @@ export class AuthService {
 		username: string;
 		password: string;
 		interests?: string[];
-	}): Promise<AuthResponse> {
+	}): Promise<AuthResponseDto> {
 		// Hash password with Argon2
 		const passwordHash = await argon2.hash(data.password);
 
@@ -41,16 +41,13 @@ export class AuthService {
 		// Generate JWT
 		const accessToken = this.generateToken(user);
 
-		// Return without passwordHash
-		const { passwordHash: _, ...userWithoutPassword } = user;
-
 		return {
 			accessToken,
-			user: userWithoutPassword,
+			user: ResponseMapper.toUserDto(user),
 		};
 	}
 
-	async login(email: string, password: string): Promise<AuthResponse> {
+	async login(email: string, password: string): Promise<AuthResponseDto> {
 		// Find user by email
 		const user = await this.userService.findByEmail(email);
 		if (!user) {
@@ -69,17 +66,19 @@ export class AuthService {
 		// Generate JWT
 		const accessToken = this.generateToken(user);
 
-		// Return without passwordHash
-		const { passwordHash: _, ...userWithoutPassword } = user;
-
 		return {
 			accessToken,
-			user: userWithoutPassword,
+			user: ResponseMapper.toUserDto(user),
 		};
 	}
 
 	async validateUser(userId: string): Promise<User | null> {
 		return await this.userService.findById(userId);
+	}
+
+	async validateUserDto(userId: string): Promise<UserResponseDto | null> {
+		const user = await this.userService.findById(userId);
+		return user ? ResponseMapper.toUserDto(user) : null;
 	}
 
 	private generateToken(user: User): string {
@@ -90,3 +89,4 @@ export class AuthService {
 		return this.jwtService.sign(payload);
 	}
 }
+

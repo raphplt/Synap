@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import "react-native-reanimated";
-import "../src/lib/i18n"; // Initialize i18n
+import "../src/lib/i18n";
 import { Stack } from "expo-router";
 import {
 	QueryClient,
@@ -11,7 +11,6 @@ import { PropsWithChildren, useEffect } from "react";
 import { AppState, AppStateStatus, Platform } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { verifyInstallation } from "nativewind";
 import { useAuthStore } from "../src/stores/useAuthStore";
 
 const queryClient = new QueryClient({
@@ -40,22 +39,11 @@ export default function RootLayout() {
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 
 	useEffect(() => {
-		if (__DEV__) {
-			try {
-				verifyInstallation();
-			} catch (error) {
-				console.error("NativeWind setup error:", error);
-			}
-		}
-
-		// Initialize auth state from SecureStore
 		initialize();
-
 		const subscription = AppState.addEventListener("change", onAppStateChange);
 		return () => subscription.remove();
 	}, [initialize]);
 
-	// Don't render navigation until auth is initialized
 	if (!isInitialized) {
 		return null;
 	}

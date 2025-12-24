@@ -8,113 +8,57 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useAuthStore } from "../../src/stores/useAuthStore";
+import { useRouter } from "expo-router";
 import { getApiBaseUrl } from "../../src/lib/api";
 
-interface DeckStats {
+interface Category {
 	id: string;
 	name: string;
 	slug: string;
-	description: string;
-	imageUrl: string;
-	categoryName?: string | null;
-	totalCards: number;
-	masteredCards: number;
-	goldCards: number;
-	progressPercent: number;
+	description?: string | null;
+	imageUrl?: string | null;
+	sortOrder: number;
 }
 
-async function fetchAtlas(token: string): Promise<DeckStats[]> {
-	const response = await fetch(`${getApiBaseUrl()}/atlas`, {
-		headers: { Authorization: `Bearer ${token}` },
-	});
-	if (!response.ok) throw new Error("Failed to fetch atlas");
+async function fetchCategories(): Promise<Category[]> {
+	const response = await fetch(`${getApiBaseUrl()}/decks/categories`);
+	if (!response.ok) throw new Error("Failed to fetch categories");
 	return response.json();
 }
 
-function ProgressRing({
-	percent,
-	size = 60,
+function CategoryCard({
+	category,
+	onPress,
 }: {
-	percent: number;
-	size?: number;
+	category: Category;
+	onPress: () => void;
 }) {
-	const strokeWidth = 4;
-
-	return (
-		<View style={{ width: size, height: size }}>
-			<View className="absolute inset-0 items-center justify-center">
-				<Text className="text-white text-sm font-bold">{percent}%</Text>
-			</View>
-			<View style={{ transform: [{ rotate: "-90deg" }] }}>
-				{/* Background circle */}
-				<View
-					className="absolute rounded-full border-synap-teal-light"
-					style={{
-						width: size,
-						height: size,
-						borderWidth: strokeWidth,
-					}}
-				/>
-				{/* Progress circle */}
-				<View
-					className="rounded-full"
-					style={{
-						width: size,
-						height: size,
-						borderWidth: strokeWidth,
-						borderColor: percent >= 100 ? "#FFD166" : "#06D6A0",
-						borderLeftColor: "transparent",
-						borderBottomColor:
-							percent > 25 ? (percent >= 100 ? "#FFD166" : "#06D6A0") : "transparent",
-						borderRightColor:
-							percent > 50 ? (percent >= 100 ? "#FFD166" : "#06D6A0") : "transparent",
-						borderTopColor:
-							percent > 75 ? (percent >= 100 ? "#FFD166" : "#06D6A0") : "transparent",
-					}}
-				/>
-			</View>
-		</View>
-	);
-}
-
-function DeckCard({ deck }: { deck: DeckStats }) {
-	const { t } = useTranslation();
-	const isGold = deck.progressPercent >= 100;
+	// Use emoji if imageUrl is an emoji, otherwise default icon
+	const icon =
+		category.imageUrl && !category.imageUrl.startsWith("http")
+			? category.imageUrl
+			: "📚";
 
 	return (
 		<Pressable
-			className={`bg-synap-teal-medium rounded-xl p-4 border ${
-				isGold ? "border-synap-gold" : "border-synap-teal-light"
-			}`}
+			className="bg-synap-teal-medium rounded-xl p-4 border border-synap-teal-light active:bg-synap-teal-light"
+			onPress={onPress}
 		>
-			{/* Header */}
-			<View className="flex-row items-center justify-between mb-3">
-				<View className="flex-1 mr-3">
-					<Text className="text-white font-semibold text-base" numberOfLines={1}>
-						{deck.name}
+			<View className="flex-row items-center">
+				<View className="w-12 h-12 rounded-xl bg-synap-teal-dark items-center justify-center mr-4">
+					<Text className="text-2xl">{icon}</Text>
+				</View>
+				<View className="flex-1">
+					<Text className="text-white font-semibold text-lg" numberOfLines={1}>
+						{category.name}
 					</Text>
-					{deck.categoryName && (
-						<Text className="text-text-tertiary text-xs">{deck.categoryName}</Text>
+					{category.description && (
+						<Text className="text-text-secondary text-sm" numberOfLines={2}>
+							{category.description}
+						</Text>
 					)}
 				</View>
-				<ProgressRing percent={deck.progressPercent} />
-			</View>
-
-			{/* Stats */}
-			<View className="flex-row justify-between">
-				<View>
-					<Text className="text-text-secondary text-xs">
-						{deck.masteredCards}/{deck.totalCards} {t("atlas.mastered")}
-					</Text>
-				</View>
-				{deck.goldCards > 0 && (
-					<View className="flex-row items-center">
-						<Text className="text-synap-gold text-xs">
-							⭐ {deck.goldCards} {t("atlas.gold")}
-						</Text>
-					</View>
-				)}
+				<Text className="text-text-tertiary text-xl">›</Text>
 			</View>
 		</Pressable>
 	);
@@ -122,25 +66,32 @@ function DeckCard({ deck }: { deck: DeckStats }) {
 
 export default function AtlasScreen() {
 	const { t } = useTranslation();
-	const token = useAuthStore((state) => state.token);
+	const router = useRouter();
 
 	const {
-		data: decks,
+		data: categories,
 		isLoading,
 		error,
 	} = useQuery({
-		queryKey: ["atlas", token],
-		queryFn: () => fetchAtlas(token!),
-		enabled: !!token,
+		queryKey: ["categories"],
+		queryFn: fetchCategories,
 	});
 
+	const handleCategoryPress = (category: Category) => {
+		router.push(`/atlas/${category.slug}`);
+	};
+
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#073B4C" }}>
+		<SafeAreaView
+			style={{ flex: 1, backgroundColor: "#073B4C" }}
+			className="pb-20"
+		>
 			<View className="flex-1 p-4">
-				{/* Header */}
 				<View className="mb-6">
 					<Text className="text-white text-2xl font-bold">{t("atlas.title")}</Text>
-					<Text className="text-text-secondary">{t("atlas.myProgress")}</Text>
+					<Text className="text-text-secondary">
+						{t("atlas.subtitle", "Explore les thèmes de connaissance")}
+					</Text>
 				</View>
 
 				{/* Content */}
@@ -152,26 +103,29 @@ export default function AtlasScreen() {
 					<View className="flex-1 items-center justify-center">
 						<Text className="text-synap-pink mb-4">{t("common.error")}</Text>
 						<Text className="text-text-secondary text-center">
-							Aucun deck disponible pour le moment.
+							Impossible de charger les catégories.
 						</Text>
 					</View>
-				) : decks && decks.length > 0 ? (
+				) : categories && categories.length > 0 ? (
 					<ScrollView showsVerticalScrollIndicator={false}>
-						<View className="gap-4">
-							{decks.map((deck) => (
-								<DeckCard key={deck.id} deck={deck} />
+						<View className="gap-3">
+							{categories.map((category) => (
+								<CategoryCard
+									key={category.id}
+									category={category}
+									onPress={() => handleCategoryPress(category)}
+								/>
 							))}
 						</View>
 					</ScrollView>
 				) : (
 					<View className="flex-1 items-center justify-center">
-						<Text className="text-4xl mb-4">📚</Text>
+						<Text className="text-4xl mb-4">�️</Text>
 						<Text className="text-white text-lg font-semibold mb-2">
-							Aucune collection
+							Aucune catégorie
 						</Text>
 						<Text className="text-text-secondary text-center">
-							Les collections apparaîtront ici une fois que tu auras commencé à
-							explorer.
+							Les catégories apparaîtront ici une fois les données importées.
 						</Text>
 					</View>
 				)}

@@ -224,7 +224,11 @@ export class AtlasController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAtlas(@Request() req: { user: { id: string } }) {
-		return await this.decksService.getAtlasStats(req.user.id);
+	async getAtlas(
+		@Request() req: { user: { id: string } },
+		@Query("category") categorySlug?: string
+	) {
+		return await this.decksService.getAtlasStats(req.user.id, categorySlug);
 	}
 }
+

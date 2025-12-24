@@ -12,6 +12,7 @@ import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { CreateUserDto, LoginDto } from "./dto/auth.dto";
 import { Public } from "./decorators/public.decorator";
+import { ResponseMapper } from "../../common/mappers/response.mapper";
 
 @Controller("auth")
 export class AuthController {
@@ -42,8 +43,7 @@ export class AuthController {
 		if (!user) {
 			return null;
 		}
-
-		const { passwordHash, ...userWithoutPassword } = user;
-		return userWithoutPassword;
+		return ResponseMapper.toUserDto(user);
 	}
 }
+

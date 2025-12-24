@@ -207,12 +207,23 @@ export class DecksService {
 		});
 	}
 
-	async getAtlasStats(userId: string): Promise<DeckStats[]> {
-		const decks = await this.deckRepository.find({
-			where: { isActive: true },
-			relations: ["category", "cards"],
-			order: { sortOrder: "ASC" },
-		});
+	async getAtlasStats(
+		userId: string,
+		categorySlug?: string
+	): Promise<DeckStats[]> {
+		const queryBuilder = this.deckRepository
+			.createQueryBuilder("deck")
+			.leftJoinAndSelect("deck.category", "category")
+			.leftJoinAndSelect("deck.cards", "cards")
+			.where("deck.isActive = :isActive", { isActive: true })
+			.orderBy("deck.sortOrder", "ASC");
+
+		// Filter by category if provided
+		if (categorySlug) {
+			queryBuilder.andWhere("category.slug = :categorySlug", { categorySlug });
+		}
+
+		const decks = await queryBuilder.getMany();
 
 		const stats: DeckStats[] = [];
 

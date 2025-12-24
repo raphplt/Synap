@@ -10,10 +10,10 @@
 - [x] **Internationalisation (i18n) Stricte**
   - [x] Installer `i18next` + `react-i18next` sur le mobile.
   - [x] Créer la structure `locales/fr.json` et `locales/en.json`.
-  - [ ] **Action :** Extraire *toutes* les strings hardcodées du POC actuel (Titres, boutons, erreurs) vers les fichiers JSON.
-- [/] **Standardisation API/DTO**
+  - [x] **Action :** Extraire *toutes* les strings hardcodées du POC actuel (Titres, boutons, erreurs) vers les fichiers JSON.
+- [x] **Standardisation API/DTO**
   - [x] Vérifier que chaque endpoint utilise un DTO validé par `class-validator`.
-  - [ ] Refactoriser les contrôleurs : Interdire le retour d'entités TypeORM brutes (Mapper systématique `Entity -> ResponseDTO`).
+  - [x] Refactoriser les contrôleurs : Interdire le retour d'entités TypeORM brutes (Mapper systématique `Entity -> ResponseDTO`).
 
 ---
 

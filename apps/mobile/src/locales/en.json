@@ -1,0 +1,110 @@
+{
+	"common": {
+		"loading": "Loading...",
+		"error": "An error occurred",
+		"retry": "Retry",
+		"cancel": "Cancel",
+		"confirm": "Confirm",
+		"save": "Save",
+		"delete": "Delete",
+		"back": "Back",
+		"next": "Next",
+		"done": "Done"
+	},
+	"auth": {
+		"login": "Log in",
+		"signup": "Sign up",
+		"logout": "Log out",
+		"email": "Email",
+		"password": "Password",
+		"username": "Username",
+		"forgotPassword": "Forgot password?",
+		"noAccount": "Don't have an account?",
+		"hasAccount": "Already have an account?",
+		"invalidCredentials": "Invalid email or password",
+		"emailExists": "This email is already in use",
+		"usernameExists": "This username is already taken"
+	},
+	"landing": {
+		"tagline": "The scroll that makes you smarter",
+		"subtitle": "Transform your screen time into cognitive capital",
+		"getStarted": "Get Started",
+		"alreadyMember": "I already have an account"
+	},
+	"onboarding": {
+		"welcome": "Welcome to SYNAP",
+		"pickInterests": "Pick your interests",
+		"pickInterestsSubtitle": "Select at least 3 topics to personalize your feed",
+		"dailyGoal": "Your daily goal",
+		"dailyGoalSubtitle": "How much time do you want to spend each day?",
+		"minutes5": "5 min",
+		"minutes15": "15 min",
+		"minutes30": "30 min",
+		"letsGo": "Let's go!"
+	},
+	"feed": {
+		"loading": "Loading feed",
+		"error": "Unable to load cards",
+		"empty": "No cards available",
+		"swipeUp": "Swipe to discover",
+		"tapToFlip": "Tap to flip"
+	},
+	"srs": {
+		"again": "Again",
+		"hard": "Hard",
+		"good": "Good",
+		"easy": "Easy",
+		"dueCards": "Cards due",
+		"learned": "Learned",
+		"mastered": "Mastered",
+		"gold": "Gold"
+	},
+	"atlas": {
+		"title": "The Atlas",
+		"myProgress": "My Cognitive Capital",
+		"decks": "Collections",
+		"cards": "cards",
+		"mastered": "mastered",
+		"gold": "gold",
+		"locked": "Locked",
+		"inProgress": "In Progress",
+		"completed": "Completed"
+	},
+	"profile": {
+		"title": "My Profile",
+		"stats": "Statistics",
+		"streak": "Streak",
+		"days": "days",
+		"xp": "XP",
+		"accuracy": "Accuracy",
+		"settings": "Settings",
+		"activity": "Activity"
+	},
+	"settings": {
+		"title": "Settings",
+		"account": "Account",
+		"notifications": "Notifications",
+		"accessibility": "Accessibility",
+		"dailyReminder": "Daily reminder",
+		"srsDue": "Review alerts",
+		"fontSize": "Font size",
+		"darkMode": "Dark mode",
+		"language": "Language",
+		"deleteAccount": "Delete my account",
+		"exportData": "Export my data"
+	},
+	"interests": {
+		"history": "History",
+		"philosophy": "Philosophy",
+		"science": "Science",
+		"tech": "Technology",
+		"psychology": "Psychology",
+		"economics": "Economics",
+		"art": "Art",
+		"literature": "Literature",
+		"politics": "Politics",
+		"biases": "Cognitive Biases",
+		"space": "Space",
+		"nature": "Nature"
+	}
+}

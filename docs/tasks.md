@@ -32,11 +32,11 @@
 ### Mobile (Expo)
 - [ ] **État Global (Session)**
   - [ ] Créer un store Zustand `useAuthStore` (token, user, actions login/logout).
-  - [ ] Persistance du Token : Implémenter `expo-secure-store` (Ne jamais utiliser AsyncStorage pour les tokens).
-- [ ] **Écrans d'Auth**
-  - [ ] **Landing :** Écran d'accueil "Non connecté" (Vidéo/Image d'ambiance + Boutons CTA).
-  - [ ] **Login / Signup :** Formulaires simples (Email/Pass) avec validation Zod.
-  - [ ] **Onboarding :** Écran de sélection de 3 thèmes favoris (détermine le seed initial du feed).
+  - [ ] Persistance du Token : Implémenter `expo-secure-store`.
+- [ ] **Écrans d'Auth (Design System V2)**
+  - [ ] **Landing :** Écran d'accueil "Cinématique" (Vidéo/Lottie + CTA).
+  - [ ] **Login / Signup :** Refonte des formulaires (Dark mode, Input minimalistes).
+  - [ ] **Onboarding :** Écran de sélection de thèmes (Tags sélectionnables).
 
 ---
 
@@ -54,47 +54,51 @@
     - *Format cible :* `data/curated/biais-cognitifs.json` (ex: "Les 50 Biais Cognitifs").
 - [ ] **Seeding Initial**
   - [ ] Préparer un dataset "Gold" de ~200 cartes manuelles/vérifiées (JSON) pour le lancement Bêta.
+  - [ ] **Système de Séries** : Le but est d'avoir des "séries" de cartes, avec des thèmes globaux (exemple : histoire -> theme, "18eme siècle" -> sub-theme, qui contient 50 cartes. si on a toutes les cartes d'un sub-theme, on peut les marquer comme "gold".)
+  - [ ] **XP :** Il faut que le joueur puisse gagner de l'expérience, et avoir un "niveau" général , et des niveaux par theme, et un "streak" de jours consécutifs.
 
 ---
 
-## 🧠 4. ALGORITHME & FEED (Le Cerveau)
-*Implémentation de la promesse "Smart Feed".*
+## 🧠 4. ALGORITHME & LOGIQUE MÉTIER
+*Le "cerveau" invisible de l'application.*
 
 ### Backend
 - [ ] **Algorithme SRS (Spaced Repetition)**
   - [ ] Implémenter la logique SuperMemo-2 (SM2) ou FSRS simplifié dans un `SrsService`.
   - [ ] Calcul du `nextReviewDate` basé sur le feedback utilisateur (Easy/Good/Hard/Again).
-  - [ ] **Logique "Gold" :** Incrémenter un compteur de succès consécutifs. Au 5ème succès sans erreur, passer la carte au statut `GOLD`.
+  - [ ] **Logique "Gold" :** Compteur de succès consécutifs. Au 5ème succès -> Statut `GOLD`.
 - [ ] **Endpoint `/atlas`**
-  - [ ] Retourner les stats par Deck (Nombre de cartes, progression %, cartes Gold).
+  - [ ] Aggregation : Retourner les stats par Deck (Total cartes, % progression, nb cartes Gold).
 - [ ] **Endpoint `/feed` Intelligent**
   - [ ] **Feed Mixer (Règle 70/20/10) :**
-    - 70% **New** : Cartes jamais vues (filtrées par intérêts user).
-    - 20% **Review** : Cartes dont `nextReviewDate < NOW`.
-    - 10% **Challenge** : Quiz sur des cartes "Learning".
-  - [ ] **Anti-doublon :** Exclure (via Redis ou Query SQL complexe) les cartes vues < 24h (hors Review).
-
-### Mobile
-- [ ] **Interactions Carte**
-  - [ ] Tracking du temps de lecture ("View" validée uniquement si > 3s).
-  - [ ] **Actions SRS :** Après le flip, afficher les boutons d'auto-évaluation (ex: "Oublié" vs "Retenu") qui appellent l'API SRS.
+    - 70% **New** / 20% **Review** / 10% **Challenge**.
+  - [ ] **Anti-doublon :** Exclusion stricte des cartes récentes.
 
 ---
 
-## 🎮 5. GAMIFICATION & ENGAGEMENT
-*Rendre l'apprentissage addictif.*
+## 🎨 5. FRONTEND REBOOT (UI/UX COMPLET)
+*Refonte totale de l'interface mobile selon la nouvelle D.A. (Dark Mode / Electric Cyan / Immersif).*
 
-### Mobile (UI)
-- [ ] **Jauge de Progression**
-  - [ ] Barre d'XP fluide en haut du feed.
-  - [ ] Animation + Haptic Feedback à chaque carte validée/lue.
-- [ ] **Streak (Série)**
-  - [ ] Indicateur visuel "Flamme/Connexion" dans le header.
-  - [ ] Logique locale : Si `lastActivity` = hier, Streak +1. Si avant-hier, Streak reset.
-- [ ] **Profil Joueur & Atlas**
-  - [ ] Créer page Profil : Afficher Stats simples ("Cartes maîtrisées", "Série actuelle", "Niveau Cerveau").
-  - [ ] **Écran Atlas :** Grille de decks avec progression et badges.
-  - [ ] **Détail Deck :** Vue en grille des cartes avec distinction visuelle Gold/Fragile.
+- [ ] **Design System (NativeWind)**
+  - [ ] Configurer les tokens couleurs : `bg-synap-charcoal`, `text-synap-cyan`, `border-synap-gold`.
+  - [ ] Configurer les typos : Inter (Body) & Geist (Headers).
+  - [ ] **Tab Bar Custom :** Créer une barre de navigation flottante (blur effect) avec icônes actives/inactives.
+
+- [ ] **Page 1 : Smart Feed (Home)**
+  - [ ] **Layout :** Refaire `FeedList` en plein écran (supprimer les marges).
+  - [ ] **HUD :** Overlay minimaliste pour les actions (Like, Share, XP gain).
+  - [ ] **Interactions :** Gestures avancées (Tap to flip, Long press to pause).
+  - [ ] **SRS Feedback :** Pop-up fluide après le flip ("Oublié" vs "Retenu").
+
+- [ ] **Page 2 : L'Atlas (Collections)**
+  - [ ] **Layout Grille :** Affichage des "Decks" (Thématiques) façon album.
+  - [ ] **Visualisation :** Jauge de complétion circulaire par deck.
+  - [ ] **Effets :** Bordure dorée/brillante pour les Decks "Mastered" (100% Gold).
+
+- [ ] **Page 3 : Brain Profile (Gamification)**
+  - [ ] **Avatar :** Intégration du visuel "Cerveau" (SVG/Lottie) qui change d'état selon le niveau.
+  - [ ] **Dashboard :** Stats clés (KRu, Streak) stylisées.
+  - [ ] **Heatmap :** Grille d'activité (Contribution graph) façon GitHub.
 
 ---
 
@@ -105,6 +109,6 @@
 - [ ] **CI/CD**
   - [ ] Pipeline GitHub Actions : Lint + Build + Test (Jest sur l'algo SRS).
   - [ ] **EAS Build :** Configurer `eas.json` pour générer les APK/IPA de preview.
-- [ ] **Analytics (Indispensable Bêta)**
-  - [ ] Installer **PostHog** (ou Amplitude).
+- [ ] **Analytics**
+  - [ ] Installer **PostHog**.
   - [ ] Tracker événements clés : `SIGNUP`, `CARD_VIEW`, `CARD_FLIP`, `QUIZ_COMPLETE`.

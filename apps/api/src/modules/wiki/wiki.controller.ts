@@ -15,13 +15,13 @@ class IngestRequestDto {
 	@IsString()
 	@IsNotEmpty()
 	@MinLength(2)
-	title!: string;
+		title!: string;
 }
 
 class IngestBatchRequestDto {
 	@IsArray()
 	@IsString({ each: true })
-	titles!: string[];
+		titles!: string[];
 }
 
 class IngestRandomRequestDto {
@@ -29,41 +29,41 @@ class IngestRandomRequestDto {
 	@IsInt()
 	@Min(1)
 	@Max(50)
-	count?: number;
+		count?: number;
 }
 
 @Controller("wiki")
 export class WikiController {
-	constructor(private readonly wikiService: WikiIngestService) {}
+	constructor (private readonly wikiService: WikiIngestService) {}
 
 	@Post("ingest")
 	@HttpCode(HttpStatus.CREATED)
-	async ingestOne(@Body() body: IngestRequestDto) {
+	async ingestOne (@Body() body: IngestRequestDto) {
 		return await this.wikiService.ingestTitle(body.title);
 	}
 
 	@Post("ingest/batch")
 	@HttpCode(HttpStatus.CREATED)
-	async ingestBatch(@Body() body: IngestBatchRequestDto) {
+	async ingestBatch (@Body() body: IngestBatchRequestDto) {
 		return await this.wikiService.ingestTitles(body.titles);
 	}
 
 	@Post("ingest/random")
 	@HttpCode(HttpStatus.CREATED)
-	async ingestRandom(@Body() body: IngestRandomRequestDto) {
+	async ingestRandom (@Body() body: IngestRandomRequestDto) {
 		const count = body.count ?? 10;
 		return await this.wikiService.ingestRandom(count);
 	}
 
 	@Post("ingest/top")
 	@HttpCode(HttpStatus.CREATED)
-	async ingestTop() {
+	async ingestTop () {
 		return await this.wikiService.ingestTopPageviews(100);
 	}
 
 	@Post("ingest/featured")
 	@HttpCode(HttpStatus.CREATED)
-	async ingestFeatured() {
+	async ingestFeatured () {
 		return await this.wikiService.ingestFeatured();
 	}
 }

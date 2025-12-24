@@ -6,25 +6,25 @@ import { Card } from "./card.entity";
 
 @Injectable()
 export class CardsService {
-	constructor(
+	constructor (
 		@InjectRepository(Card)
-		private readonly cardsRepository: Repository<Card>
+		private readonly cardsRepository: Repository<Card>,
 	) {}
 
-	async findBySource(
+	async findBySource (
 		sourceType: string,
-		sourceId: string
+		sourceId: string,
 	): Promise<Card | null> {
 		return await this.cardsRepository.findOne({
 			where: { sourceType, sourceId },
 		});
 	}
 
-	async countCards(): Promise<number> {
+	async countCards (): Promise<number> {
 		return await this.cardsRepository.count();
 	}
 
-	async upsertCard(payload: CreateCardInput): Promise<Card> {
+	async upsertCard (payload: CreateCardInput): Promise<Card> {
 		const hasSourceKey =
 			payload.sourceType != null &&
 			payload.sourceType.length > 0 &&
@@ -33,13 +33,13 @@ export class CardsService {
 
 		const existing = hasSourceKey
 			? await this.cardsRepository.findOne({
-					where: {
-						sourceType: payload.sourceType!,
-						sourceId: payload.sourceId!,
-					},
+				where: {
+					sourceType: payload.sourceType!,
+					sourceId: payload.sourceId!,
+				},
 			  })
 			: await this.cardsRepository.findOne({
-					where: { sourceLink: payload.sourceLink },
+				where: { sourceLink: payload.sourceLink },
 			  });
 
 		if (existing != null) {
@@ -51,7 +51,7 @@ export class CardsService {
 		return await this.cardsRepository.save(created);
 	}
 
-	async rateCard(id: string, rating: number): Promise<Card> {
+	async rateCard (id: string, rating: number): Promise<Card> {
 		const card = await this.cardsRepository.findOneBy({ id });
 		if (card == null) {
 			throw new Error(`Card ${id} not found`);
@@ -60,7 +60,7 @@ export class CardsService {
 		return await this.cardsRepository.save(card);
 	}
 
-	async getFeed(cursor = 0, take = 10): Promise<FeedResponseDto> {
+	async getFeed (cursor = 0, take = 10): Promise<FeedResponseDto> {
 		const safeTake = Math.min(100, Math.max(1, take));
 		const safeCursor = Math.max(0, cursor);
 

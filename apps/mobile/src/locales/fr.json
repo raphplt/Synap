@@ -1,0 +1,110 @@
+{
+	"common": {
+		"loading": "Chargement...",
+		"error": "Une erreur est survenue",
+		"retry": "Réessayer",
+		"cancel": "Annuler",
+		"confirm": "Confirmer",
+		"save": "Enregistrer",
+		"delete": "Supprimer",
+		"back": "Retour",
+		"next": "Suivant",
+		"done": "Terminé"
+	},
+	"auth": {
+		"login": "Se connecter",
+		"signup": "Créer un compte",
+		"logout": "Se déconnecter",
+		"email": "Email",
+		"password": "Mot de passe",
+		"username": "Nom d'utilisateur",
+		"forgotPassword": "Mot de passe oublié ?",
+		"noAccount": "Pas encore de compte ?",
+		"hasAccount": "Déjà un compte ?",
+		"invalidCredentials": "Email ou mot de passe incorrect",
+		"emailExists": "Cet email est déjà utilisé",
+		"usernameExists": "Ce nom d'utilisateur est déjà pris"
+	},
+	"landing": {
+		"tagline": "Le scroll qui rend intelligent",
+		"subtitle": "Transforme ton temps d'écran en capital cognitif",
+		"getStarted": "Commencer",
+		"alreadyMember": "J'ai déjà un compte"
+	},
+	"onboarding": {
+		"welcome": "Bienvenue sur SYNAP",
+		"pickInterests": "Choisis tes centres d'intérêt",
+		"pickInterestsSubtitle": "Sélectionne au moins 3 thèmes pour personnaliser ton feed",
+		"dailyGoal": "Ton objectif quotidien",
+		"dailyGoalSubtitle": "Combien de temps veux-tu consacrer chaque jour ?",
+		"minutes5": "5 min",
+		"minutes15": "15 min",
+		"minutes30": "30 min",
+		"letsGo": "C'est parti !"
+	},
+	"feed": {
+		"loading": "Chargement du feed",
+		"error": "Impossible de charger les cartes",
+		"empty": "Aucune carte disponible",
+		"swipeUp": "Swipe pour découvrir",
+		"tapToFlip": "Touche pour retourner"
+	},
+	"srs": {
+		"again": "Oublié",
+		"hard": "Difficile",
+		"good": "Bien",
+		"easy": "Facile",
+		"dueCards": "Cartes à revoir",
+		"learned": "Apprise",
+		"mastered": "Maîtrisée",
+		"gold": "Gold"
+	},
+	"atlas": {
+		"title": "L'Atlas",
+		"myProgress": "Mon Capital Cognitif",
+		"decks": "Collections",
+		"cards": "cartes",
+		"mastered": "maîtrisées",
+		"gold": "gold",
+		"locked": "Verrouillé",
+		"inProgress": "En cours",
+		"completed": "Terminé"
+	},
+	"profile": {
+		"title": "Mon Profil",
+		"stats": "Statistiques",
+		"streak": "Série",
+		"days": "jours",
+		"xp": "XP",
+		"accuracy": "Précision",
+		"settings": "Paramètres",
+		"activity": "Activité"
+	},
+	"settings": {
+		"title": "Paramètres",
+		"account": "Compte",
+		"notifications": "Notifications",
+		"accessibility": "Accessibilité",
+		"dailyReminder": "Rappel quotidien",
+		"srsDue": "Alertes révisions",
+		"fontSize": "Taille de police",
+		"darkMode": "Mode sombre",
+		"language": "Langue",
+		"deleteAccount": "Supprimer mon compte",
+		"exportData": "Exporter mes données"
+	},
+	"interests": {
+		"history": "Histoire",
+		"philosophy": "Philosophie",
+		"science": "Sciences",
+		"tech": "Technologie",
+		"psychology": "Psychologie",
+		"economics": "Économie",
+		"art": "Art",
+		"literature": "Littérature",
+		"politics": "Politique",
+		"biases": "Biais cognitifs",
+		"space": "Espace",
+		"nature": "Nature"
+	}
+}

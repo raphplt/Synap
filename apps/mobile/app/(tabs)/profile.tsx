@@ -1,35 +1,59 @@
-import { View, Text, Pressable, ScrollView } from "react-native";
+import {
+	View,
+	Text,
+	Pressable,
+	ScrollView,
+	ActivityIndicator,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter, Href } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Image } from "expo-image";
+import { useQuery } from "@tanstack/react-query";
 import { useAuthStore } from "../../src/stores/useAuthStore";
+import { getApiBaseUrl } from "../../src/lib/api";
 
-// Generate activity data for the last 12 weeks
-const generateActivityData = (streak: number) => {
-	const data: { date: string; count: number }[] = [];
-	const today = new Date();
+interface XpStats {
+	global: {
+		xp: number;
+		level: number;
+		xpForNextLevel: number;
+		progress: number;
+	};
+	streak: {
+		current: number;
+		multiplier: number;
+	};
+	byCategory: Array<{
+		categoryId: string;
+		categoryName: string;
+		xp: number;
+		level: number;
+		cardsCompleted: number;
+		cardsGold: number;
+	}>;
+}
 
-	for (let i = 83; i >= 0; i--) {
-		const date = new Date(today);
-		date.setDate(date.getDate() - i);
+interface HeatmapData {
+	date: string;
+	count: number;
+}
 
-		// Simulate some activity pattern based on streak
-		let count = 0;
-		if (i < streak) {
-			count = Math.floor(Math.random() * 4) + 1;
-		} else if (Math.random() > 0.6) {
-			count = Math.floor(Math.random() * 3);
-		}
+async function fetchXpStats(token: string): Promise<XpStats> {
+	const response = await fetch(`${getApiBaseUrl()}/gamification/stats`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+	if (!response.ok) throw new Error("Failed to fetch XP stats");
+	return response.json();
+}
 
-		data.push({
-			date: date.toISOString().split("T")[0],
-			count,
-		});
-	}
-
-	return data;
-};
+async function fetchHeatmap(token: string): Promise<HeatmapData[]> {
+	const response = await fetch(`${getApiBaseUrl()}/gamification/heatmap`, {
+		headers: { Authorization: `Bearer ${token}` },
+	});
+	if (!response.ok) throw new Error("Failed to fetch heatmap");
+	return response.json();
+}
 
 const getActivityColor = (count: number): string => {
 	if (count === 0) return "#0A5266";
@@ -39,12 +63,25 @@ const getActivityColor = (count: number): string => {
 	return "#06D6A0";
 };
 
-function ActivityHeatmap({ streak }: { streak: number }) {
-	const activityData = generateActivityData(streak);
-	const weeks: { date: string; count: number }[][] = [];
+function ActivityHeatmap({ data }: { data: HeatmapData[] }) {
+	// Fill in missing days for last 12 weeks
+	const filledData: HeatmapData[] = [];
+	const today = new Date();
+	const dataMap = new Map(data.map((d) => [d.date, d.count]));
 
-	for (let i = 0; i < activityData.length; i += 7) {
-		weeks.push(activityData.slice(i, i + 7));
+	for (let i = 83; i >= 0; i--) {
+		const date = new Date(today);
+		date.setDate(date.getDate() - i);
+		const dateStr = date.toISOString().split("T")[0];
+		filledData.push({
+			date: dateStr,
+			count: dataMap.get(dateStr) ?? 0,
+		});
+	}
+
+	const weeks: HeatmapData[][] = [];
+	for (let i = 0; i < filledData.length; i += 7) {
+		weeks.push(filledData.slice(i, i + 7));
 	}
 
 	return (
@@ -82,10 +119,12 @@ function StatCard({
 	label,
 	value,
 	color,
+	subtitle,
 }: {
 	label: string;
 	value: string | number;
 	color: string;
+	subtitle?: string;
 }) {
 	return (
 		<View className="flex-1 bg-synap-teal-medium rounded-xl p-4 border border-synap-teal-light items-center">
@@ -93,26 +132,65 @@ function StatCard({
 				{value}
 			</Text>
 			<Text className="text-text-secondary text-sm mt-1">{label}</Text>
+			{subtitle && <Text className="text-text-tertiary text-xs">{subtitle}</Text>}
 		</View>
 	);
+}
+
+function getLevelColor(level: number): string {
+	if (level >= 31) return "#FFD166"; // Gold - Expert
+	if (level >= 16) return "#06D6A0"; // Emerald - Connaisseur
+	if (level >= 6) return "#118AB2"; // Blue - Apprenti
+	return "#A0AEC0"; // Gray - Débutant
+}
+
+function getLevelTitle(level: number): string {
+	if (level >= 31) return "Expert";
+	if (level >= 16) return "Connaisseur";
+	if (level >= 6) return "Apprenti";
+	return "Débutant";
 }
 
 export default function ProfileScreen() {
 	const { t } = useTranslation();
 	const router = useRouter();
 	const user = useAuthStore((state) => state.user);
+	const token = useAuthStore((state) => state.token);
 	const logout = useAuthStore((state) => state.logout);
+
+	const { data: xpStats, isLoading: xpLoading } = useQuery({
+		queryKey: ["xp-stats", token],
+		queryFn: () => fetchXpStats(token!),
+		enabled: !!token,
+	});
+
+	const { data: heatmapData } = useQuery({
+		queryKey: ["heatmap", token],
+		queryFn: () => fetchHeatmap(token!),
+		enabled: !!token,
+	});
 
 	const handleLogout = async () => {
 		await logout();
 		router.replace("/landing" as Href);
 	};
 
-	// Calculate level from XP (simple formula: level = floor(sqrt(xp/100)) + 1)
-	const xp = user?.xp ?? 0;
-	const level = Math.floor(Math.sqrt(xp / 100)) + 1;
-	const xpForNextLevel = Math.pow(level, 2) * 100;
-	const xpProgress = (xp / xpForNextLevel) * 100;
+	// Use API data or fallback to user data
+	const xp = xpStats?.global.xp ?? user?.xp ?? 0;
+	const level = xpStats?.global.level ?? Math.floor(Math.sqrt(xp / 100)) + 1;
+	const xpForNextLevel =
+		xpStats?.global.xpForNextLevel ?? Math.pow(level, 2) * 100;
+	const xpProgress = xpStats?.global.progress ?? 0;
+	const streak = xpStats?.streak.current ?? user?.streak ?? 0;
+	const multiplier = xpStats?.streak.multiplier ?? 1;
+
+	// Calculate total cards from category progress
+	const totalCards =
+		xpStats?.byCategory.reduce((sum, c) => sum + c.cardsCompleted, 0) ?? 0;
+	const goldCards =
+		xpStats?.byCategory.reduce((sum, c) => sum + c.cardsGold, 0) ?? 0;
+
+	const levelColor = getLevelColor(level);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: "#073B4C" }}>
@@ -126,7 +204,10 @@ export default function ProfileScreen() {
 					{/* User Card */}
 					<View className="bg-synap-teal-medium rounded-2xl p-6 border border-synap-teal-light mb-6">
 						<View className="flex-row items-center mb-4">
-							<View className="h-20 w-20 rounded-full bg-synap-teal border-2 border-synap-emerald items-center justify-center overflow-hidden mr-4">
+							<View
+								className="h-20 w-20 rounded-full border-2 items-center justify-center overflow-hidden mr-4"
+								style={{ borderColor: levelColor, backgroundColor: "#073B4C" }}
+							>
 								{user?.avatarUrl ? (
 									<Image
 										source={{ uri: user.avatarUrl }}
@@ -141,48 +222,101 @@ export default function ProfileScreen() {
 									{user?.username ?? "Synaper"}
 								</Text>
 								<Text className="text-text-secondary text-sm mb-2">{user?.email}</Text>
-								<View className="flex-row items-center">
-									<View className="bg-synap-gold/20 px-3 py-1 rounded-full">
-										<Text className="text-synap-gold font-semibold text-sm">
+								<View className="flex-row items-center gap-2">
+									<View
+										className="px-3 py-1 rounded-full"
+										style={{ backgroundColor: `${levelColor}20` }}
+									>
+										<Text style={{ color: levelColor }} className="font-semibold text-sm">
 											Niveau {level}
 										</Text>
 									</View>
+									<Text className="text-text-tertiary text-xs">
+										{getLevelTitle(level)}
+									</Text>
 								</View>
 							</View>
 						</View>
 
 						{/* XP Progress Bar */}
-						<View className="mb-2">
-							<View className="flex-row justify-between mb-1">
-								<Text className="text-text-secondary text-xs">Expérience</Text>
-								<Text className="text-text-secondary text-xs">
-									{xp} / {xpForNextLevel} XP
-								</Text>
+						{xpLoading ? (
+							<ActivityIndicator color="#06D6A0" size="small" />
+						) : (
+							<View className="mb-2">
+								<View className="flex-row justify-between mb-1">
+									<Text className="text-text-secondary text-xs">Expérience</Text>
+									<Text className="text-text-secondary text-xs">
+										{xp.toLocaleString()} / {xpForNextLevel.toLocaleString()} XP
+									</Text>
+								</View>
+								<View className="h-2 bg-synap-teal rounded-full overflow-hidden">
+									<View
+										className="h-full rounded-full"
+										style={{
+											width: `${Math.min(xpProgress * 100, 100)}%`,
+											backgroundColor: levelColor,
+										}}
+									/>
+								</View>
 							</View>
-							<View className="h-2 bg-synap-teal rounded-full overflow-hidden">
-								<View
-									className="h-full bg-synap-gold rounded-full"
-									style={{ width: `${Math.min(xpProgress, 100)}%` }}
-								/>
-							</View>
-						</View>
+						)}
 					</View>
 
 					{/* Stats Row */}
 					<View className="flex-row gap-3 mb-6">
 						<StatCard
 							label={t("profile.streak")}
-							value={`${user?.streak ?? 0}j`}
+							value={`${streak}j`}
 							color="#06D6A0"
+							subtitle={multiplier > 1 ? `×${multiplier.toFixed(1)}` : undefined}
 						/>
-						<StatCard label={t("profile.xp")} value={xp} color="#FFD166" />
-						<StatCard label="Cartes" value="42" color="#118AB2" />
+						<StatCard
+							label={t("profile.xp")}
+							value={xp.toLocaleString()}
+							color="#FFD166"
+						/>
+						<StatCard
+							label="Cartes"
+							value={totalCards}
+							color="#118AB2"
+							subtitle={goldCards > 0 ? `${goldCards} ⭐` : undefined}
+						/>
 					</View>
 
 					{/* Activity Heatmap */}
 					<View className="mb-6">
-						<ActivityHeatmap streak={user?.streak ?? 0} />
+						<ActivityHeatmap data={heatmapData ?? []} />
 					</View>
+
+					{/* Category Progress */}
+					{xpStats?.byCategory && xpStats.byCategory.length > 0 && (
+						<View className="mb-6">
+							<Text className="text-white font-semibold mb-3">
+								Progression par thème
+							</Text>
+							<View className="gap-2">
+								{xpStats.byCategory.map((cat) => (
+									<View
+										key={cat.categoryId}
+										className="bg-synap-teal-medium rounded-xl p-3 border border-synap-teal-light flex-row items-center"
+									>
+										<View className="flex-1">
+											<Text className="text-white font-medium">{cat.categoryName}</Text>
+											<Text className="text-text-tertiary text-xs">
+												Niveau {cat.level} • {cat.cardsCompleted} cartes
+											</Text>
+										</View>
+										<View className="items-end">
+											<Text className="text-synap-gold font-bold">{cat.xp} XP</Text>
+											{cat.cardsGold > 0 && (
+												<Text className="text-synap-gold text-xs">⭐ {cat.cardsGold}</Text>
+											)}
+										</View>
+									</View>
+								))}
+							</View>
+						</View>
+					)}
 
 					{/* Interests */}
 					{user?.interests && user.interests.length > 0 && (

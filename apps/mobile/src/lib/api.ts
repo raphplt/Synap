@@ -194,6 +194,39 @@ export async function getProgress(
 	return response.json();
 }
 
+// Gamification API
+export type XpEventType =
+	| "CARD_VIEW"
+	| "CARD_RETAINED"
+	| "CARD_FORGOT"
+	| "CARD_GOLD"
+	| "QUIZ_SUCCESS"
+	| "DECK_COMPLETE";
+
+export async function awardXp(
+	reason: XpEventType,
+	cardId?: string,
+	token?: string,
+	baseUrl = getApiBaseUrl()
+): Promise<{ xpAwarded: number; newTotal: number; levelUp: boolean }> {
+	if (!token) throw new Error("No token provided");
+	
+	const response = await fetch(`${baseUrl}/gamification/action`, {
+		method: "POST",
+		headers: {
+			"content-type": "application/json",
+			Authorization: `Bearer ${token}`,
+		},
+		body: JSON.stringify({ reason, cardId }),
+	});
+
+	if (!response.ok) {
+		throw new Error(`HTTP ${response.status}`);
+	}
+
+	return response.json();
+}
+
 // Decks API
 export async function getDecks(baseUrl = getApiBaseUrl()): Promise<unknown[]> {
 	const response = await fetch(`${baseUrl}/decks`);

@@ -101,6 +101,24 @@ export function CardItem({
 		[card.content, card.summary]
 	);
 
+	// Generate a gradient based on card title for text-only cards
+	const getTextOnlyGradient = useMemo(() => {
+		// Hash the title to get consistent colors
+		let hash = 0;
+		for (let i = 0; i < card.title.length; i++) {
+			hash = card.title.charCodeAt(i) + ((hash << 5) - hash);
+		}
+		const hue = Math.abs(hash) % 360;
+		return [
+			`hsla(${hue}, 70%, 20%, 1)`,
+			`hsla(${(hue + 40) % 360}, 60%, 15%, 1)`,
+		];
+	}, [card.title]);
+
+	const hasImage = card.mediaUrl && card.mediaUrl.length > 0;
+	const [imageError, setImageError] = useState(false);
+	const showTextOnly = !hasImage || imageError;
+
 	return (
 		<View style={{ height }} className="bg-synap-teal">
 			{/* Front face */}
@@ -108,43 +126,84 @@ export function CardItem({
 				style={[frontAnimatedStyle, { position: "absolute", inset: 0 }]}
 			>
 				<Pressable style={{ flex: 1 }} onPress={toggle}>
-					<Image
-						source={{ uri: card.mediaUrl }}
-						style={{ position: "absolute", inset: 0 }}
-						contentFit="cover"
-						transition={500}
-						cachePolicy="memory-disk"
-					/>
-					<Gradient
-						colors={["rgba(7,59,76,0.1)", "rgba(7,59,76,0.9)"]}
-						locations={[0.2, 1]}
-						style={{
-							flex: 1,
-							padding: 24,
-							paddingTop: Math.max(24, insets.top),
-							paddingBottom: Math.max(100, insets.bottom + 80),
-							justifyContent: "flex-end",
-						}}
-					>
-						<View className="flex-row items-center mb-4">
-							<View className="h-2 w-12 rounded-full bg-synap-gold mr-3" />
-							<Text className="text-text-secondary text-xs uppercase tracking-widest">
-								SYNAP
+					{showTextOnly ? (
+						// Text-only fallback with gradient background
+						<Gradient
+							colors={getTextOnlyGradient as [string, string]}
+							start={{ x: 0, y: 0 }}
+							end={{ x: 1, y: 1 }}
+							style={{
+								flex: 1,
+								padding: 24,
+								paddingTop: Math.max(24, insets.top),
+								paddingBottom: Math.max(100, insets.bottom + 80),
+								justifyContent: "center",
+							}}
+						>
+							{/* Abstract decoration */}
+							<View className="absolute top-12 right-8 w-32 h-32 rounded-full bg-white/5" />
+							<View className="absolute bottom-40 left-8 w-24 h-24 rounded-full bg-white/5" />
+
+							<View className="flex-row items-center mb-6">
+								<View className="h-2 w-12 rounded-full bg-synap-gold mr-3" />
+								<Text className="text-text-secondary text-xs uppercase tracking-widest">
+									SYNAP
+								</Text>
+							</View>
+							<Text className="text-white text-4xl font-bold mb-6 leading-tight">
+								{card.title}
 							</Text>
-						</View>
-						<Text className="text-white text-3xl font-semibold mb-3">
-							{card.title}
-						</Text>
-						<Text className="text-text-secondary text-base leading-6">
-							{card.summary}
-						</Text>
-						<View className="mt-6 flex-row items-center">
-							<View className="h-2 w-2 rounded-full bg-synap-emerald mr-2" />
-							<Text className="text-xs text-text-secondary">
-								Touche pour retourner
-							</Text>
-						</View>
-					</Gradient>
+							<Text className="text-white/80 text-lg leading-7">{card.summary}</Text>
+							<View className="mt-8 flex-row items-center">
+								<View className="h-2 w-2 rounded-full bg-synap-emerald mr-2" />
+								<Text className="text-xs text-text-secondary">
+									Touche pour retourner
+								</Text>
+							</View>
+						</Gradient>
+					) : (
+						// Normal card with image
+						<>
+							<Image
+								source={{ uri: card.mediaUrl }}
+								style={{ position: "absolute", inset: 0 }}
+								contentFit="cover"
+								transition={500}
+								cachePolicy="memory-disk"
+								onError={() => setImageError(true)}
+							/>
+							<Gradient
+								colors={["rgba(7,59,76,0.1)", "rgba(7,59,76,0.9)"]}
+								locations={[0.2, 1]}
+								style={{
+									flex: 1,
+									padding: 24,
+									paddingTop: Math.max(24, insets.top),
+									paddingBottom: Math.max(100, insets.bottom + 80),
+									justifyContent: "flex-end",
+								}}
+							>
+								<View className="flex-row items-center mb-4">
+									<View className="h-2 w-12 rounded-full bg-synap-gold mr-3" />
+									<Text className="text-text-secondary text-xs uppercase tracking-widest">
+										SYNAP
+									</Text>
+								</View>
+								<Text className="text-white text-3xl font-semibold mb-3">
+									{card.title}
+								</Text>
+								<Text className="text-text-secondary text-base leading-6">
+									{card.summary}
+								</Text>
+								<View className="mt-6 flex-row items-center">
+									<View className="h-2 w-2 rounded-full bg-synap-emerald mr-2" />
+									<Text className="text-xs text-text-secondary">
+										Touche pour retourner
+									</Text>
+								</View>
+							</Gradient>
+						</>
+					)}
 				</Pressable>
 			</Animated.View>
 

@@ -49,7 +49,6 @@ export class Card {
 	@Column({ type: "varchar", length: 255, nullable: true })
 	sourceId?: string | null;
 
-	// New fields for Data Engine
 	@Column({ type: "varchar", length: 32, default: "WIKIPEDIA" })
 	origin!: CardOrigin;
 
@@ -65,6 +64,12 @@ export class Card {
 	@ManyToOne(() => Deck, (deck) => deck.cards, { nullable: true })
 	@JoinColumn({ name: "deckId" })
 	deck?: Deck | null;
+
+	@Column({ type: "jsonb", nullable: true })
+	quizAnswers?: string[] | null;
+
+	@Column({ type: "int", nullable: true })
+	quizCorrectIndex?: number | null;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
 	createdAt!: Date;

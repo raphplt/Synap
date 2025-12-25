@@ -3,17 +3,17 @@ version: "3.9"
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: memex-postgres
+    container_name: synap-postgres
     restart: unless-stopped
     environment:
-      POSTGRES_USER: memex
-      POSTGRES_PASSWORD: memex
-      POSTGRES_DB: memex
+      POSTGRES_USER: synap
+      POSTGRES_PASSWORD: synap
+      POSTGRES_DB: synap
     ports:
       - "5432:5432"
     volumes:
-      - memex-db-data:/var/lib/postgresql/data
+      - synap-db-data:/var/lib/postgresql/data
 
 volumes:
-  memex-db-data:
+  synap-db-data:
     driver: local

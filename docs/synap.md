@@ -966,8 +966,8 @@ L'architecture repose sur un Monorepo pour partager les types entre le Back et l
 * **Package Manager :** npm (Workspaces).  
 * **Langage :** TypeScript 5.x (Mode Strict).  
 * **Shared Packages :**  
-  * @memex/shared : Contient les DTOs, les Enums, et les interfaces Typescript (Single Source of Truth).  
-  * @memex/config : Configurations ESLint et TSConfig partagées.
+  * @synap/shared : Contient les DTOs, les Enums, et les interfaces Typescript (Single Source of Truth).  
+  * @synap/config : Configurations ESLint et TSConfig partagées.
 
 ### **📱 Frontend (Mobile)**
 
@@ -1005,7 +1005,7 @@ Pour garantir un code irréprochable et maintenable par un développeur seul.
 
 ### **B. Typage & DTOs**
 
-* Tout échange de données API doit passer par un DTO défini dans @memex/shared.  
+* Tout échange de données API doit passer par un DTO défini dans @synap/shared.  
 * **Pas de any**. Jamais. Utiliser unknown si nécessaire avec des Type Guards.  
 * Les entités de base de données ne doivent jamais être exposées directement au contrôleur. Mapper Entité \-\> DTO.
 

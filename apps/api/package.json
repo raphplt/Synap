@@ -1,5 +1,5 @@
 {
-  "name": "@memex/api",
+  "name": "@synap/api",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -12,7 +12,7 @@
     "ingest": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/scripts/ingest.ts"
   },
   "dependencies": {
-    "@memex/shared": "0.1.0",
+    "@synap/shared": "0.1.0",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.0.0",
     "@nestjs/core": "^10.0.0",

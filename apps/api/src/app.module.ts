@@ -27,7 +27,7 @@ import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 		TypeOrmModule.forRoot({
 			type: "postgres",
 			url:
-				process.env.DATABASE_URL ?? "postgresql://memex:memex@localhost:5432/memex",
+				process.env.DATABASE_URL ?? "postgresql://synap:synap@localhost:5432/synap",
 			entities: [Card, User, UserCardInteraction, Deck, Category],
 			synchronize: true,
 			autoLoadEntities: true,

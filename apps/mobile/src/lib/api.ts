@@ -2,7 +2,7 @@ import {
 	FeedResponseDto,
 	LoginResponseDto,
 	UserResponseDto,
-} from "@memex/shared";
+} from "@synap/shared";
 import Constants from "expo-constants";
 import { Platform } from "react-native";
 

@@ -1,5 +1,5 @@
 {
-  "name": "@memex/mobile",
+  "name": "@synap/mobile",
   "version": "0.1.0",
   "private": true,
   "main": "index.js",
@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@memex/shared": "0.1.0",
+    "@synap/shared": "0.1.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@shopify/flash-list": "2.0.2",
     "@tanstack/react-query": "^5.39.0",

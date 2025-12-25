@@ -13,7 +13,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "../src/stores/useAuthStore";
 import { getCategories, updateUserInterests, Category } from "../src/lib/api";
 
-// Map category slugs to emojis for visual appeal
 const CATEGORY_EMOJIS: Record<string, string> = {
 	histoire: "📜",
 	philosophie: "🤔",
@@ -50,7 +49,6 @@ export default function OnboardingScreen() {
 
 	const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
 
-	// Fetch categories from API
 	const { data: categories, isLoading: isLoadingCategories } = useQuery({
 		queryKey: ["categories"],
 		queryFn: () => getCategories(),
@@ -65,13 +63,11 @@ export default function OnboardingScreen() {
 			return updateUserInterests(user.id, interests, token);
 		},
 		onSuccess: (updatedUser) => {
-			// Update local store with new user data
 			setUser(updatedUser);
 			router.replace("/(tabs)" as Href);
 		},
 		onError: (error) => {
 			console.error("Failed to save interests:", error);
-			// Still navigate even if save fails - can retry later
 			router.replace("/(tabs)" as Href);
 		},
 	});
@@ -93,7 +89,6 @@ export default function OnboardingScreen() {
 		<View className="flex-1 bg-synap-teal">
 			<StatusBar style="light" />
 			<ScrollView className="flex-1 px-6 pt-16">
-				{/* Header */}
 				<View className="items-center mb-8">
 					<Text className="text-2xl font-bold text-white mb-2">
 						{t("onboarding.welcome")}
@@ -101,7 +96,6 @@ export default function OnboardingScreen() {
 					</Text>
 				</View>
 
-				{/* Interest Picker */}
 				<View className="mb-8">
 					<Text className="text-xl font-semibold text-white mb-2">
 						{t("onboarding.pickInterests")}
@@ -110,7 +104,6 @@ export default function OnboardingScreen() {
 						{t("onboarding.pickInterestsSubtitle")}
 					</Text>
 
-					{/* Category Grid */}
 					{isLoadingCategories ? (
 						<View className="items-center justify-center py-12">
 							<ActivityIndicator color="#06D6A0" size="large" />
@@ -144,7 +137,6 @@ export default function OnboardingScreen() {
 					)}
 				</View>
 
-				{/* Selection count */}
 				<View className="items-center mb-8">
 					<Text className="text-text-secondary">
 						{selectedInterests.length}/3 minimum
@@ -152,7 +144,6 @@ export default function OnboardingScreen() {
 				</View>
 			</ScrollView>
 
-			{/* Bottom CTA */}
 			<View className="px-6 pb-8 pt-4">
 				<Pressable
 					className={`py-4 rounded-lg ${

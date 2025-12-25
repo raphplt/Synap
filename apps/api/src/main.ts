@@ -15,7 +15,7 @@ async function bootstrap (): Promise<void> {
 
 	const port = process.env.PORT ?? 3000;
 	await app.listen(port);
-	console.log(`🚀 MEMEX API ready on http://localhost:${port}`);
+	console.log(`🚀 SYNAP API ready on http://localhost:${port}`);
 }
 
 bootstrap().catch((error) => {

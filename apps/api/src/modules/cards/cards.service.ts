@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { type CreateCardInput, type FeedResponseDto } from "@memex/shared";
+import { type CreateCardInput, type FeedResponseDto } from "@synap/shared";
 import { Repository } from "typeorm";
 import { Card } from "./card.entity";
 

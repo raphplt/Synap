@@ -1,4 +1,4 @@
-import { CardBase } from "@memex/shared";
+import { CardBase } from "@synap/shared";
 import { Image } from "expo-image";
 import { LinearGradient, LinearGradientProps } from "expo-linear-gradient";
 import React, { useCallback, useMemo, useState } from "react";

@@ -71,7 +71,7 @@ export class WikiIngestService {
 	constructor (private readonly cardsService: CardsService) {}
 
 	private getUserAgent (): string {
-		return process.env.WIKI_USER_AGENT ?? "MEMEX/0.1 (contact: dev@memex.local)";
+		return process.env.WIKI_USER_AGENT ?? "SYNAP/0.1 (contact: dev@synap.local)";
 	}
 
 	private getMinDelayMs (): number {

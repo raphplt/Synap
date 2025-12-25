@@ -10,10 +10,8 @@
     ],
     "baseUrl": ".",
     "paths": {
-      "@memex/shared/*": [
-        "../../packages/shared/src/*"
-      ]
-    }
+					"@synap/shared/*": ["../../packages/shared/src/*"]
+				}
   },
   "include": [
     ".expo/types/**/*.ts",

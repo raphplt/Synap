@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import * as SecureStore from "expo-secure-store"
-import type { UserResponseDto, LoginResponseDto } from "@memex/shared"
+import type { UserResponseDto, LoginResponseDto } from "@synap/shared";
 
 const TOKEN_KEY = "synap_auth_token"
 const USER_KEY = "synap_user"

@@ -1,4 +1,4 @@
-import { CardBase } from "@memex/shared";
+import { CardBase } from "@synap/shared";
 import { FlashList } from "@shopify/flash-list";
 import React from "react";
 import { ActivityIndicator, RefreshControl, View } from "react-native";

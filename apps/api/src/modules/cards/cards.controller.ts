@@ -21,22 +21,22 @@ class RateCardDto {
 	@IsInt()
 	@Min(-1)
 	@Max(1)
-	rating!: number;
+		rating!: number;
 }
 
 @Controller("cards")
 export class CardsController {
-	constructor(private readonly cardsService: CardsService) {}
+	constructor (private readonly cardsService: CardsService) {}
 
 	/**
 	 * Get all cards (paginated, for admin)
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAll(
-		@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+	async getAll (
+	@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
 		@Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
-		@Query("search") search?: string
+		@Query("search") search?: string,
 	) {
 		return await this.cardsService.findAllPaginated(page, limit, search);
 	}
@@ -46,7 +46,7 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get(":id")
-	async getById(@Param("id") id: string) {
+	async getById (@Param("id") id: string) {
 		return await this.cardsService.findById(id);
 	}
 
@@ -55,18 +55,18 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async create(
-		@Body()
+	async create (
+	@Body()
 		body: {
-			title: string;
-			summary: string;
-			content: string;
-			mediaUrl?: string;
-			sourceLink?: string;
-			origin?: string;
-			qualityScore?: number;
-			deckId?: string;
-		}
+			title: string
+			summary: string
+			content: string
+			mediaUrl?: string
+			sourceLink?: string
+			origin?: string
+			qualityScore?: number
+			deckId?: string
+		},
 	) {
 		return await this.cardsService.create({
 			title: body.title,
@@ -85,17 +85,17 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
-	async update(
-		@Param("id") id: string,
+	async update (
+	@Param("id") id: string,
 		@Body()
 		body: Partial<{
-			title: string;
-			summary: string;
-			content: string;
-			mediaUrl: string;
-			qualityScore: number;
-			deckId: string;
-		}>
+			title: string
+			summary: string
+			content: string
+			mediaUrl: string
+			qualityScore: number
+			deckId: string
+		}>,
 	) {
 		return await this.cardsService.update(id, body);
 	}
@@ -105,7 +105,7 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Delete(":id")
-	async delete(@Param("id") id: string) {
+	async delete (@Param("id") id: string) {
 		await this.cardsService.delete(id);
 		return { success: true };
 	}
@@ -115,7 +115,7 @@ export class CardsController {
 	 */
 	@Patch(":id/rate")
 	@HttpCode(HttpStatus.OK)
-	async rate(@Param("id") id: string, @Body() body: RateCardDto) {
+	async rate (@Param("id") id: string, @Body() body: RateCardDto) {
 		return await this.cardsService.rateCard(id, body.rating);
 	}
 }

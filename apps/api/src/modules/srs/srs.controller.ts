@@ -1,42 +1,42 @@
-import { Controller, Post, Body, Get, Request, UseGuards } from "@nestjs/common"
-import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard"
-import { SrsService, SrsRating } from "./srs.service"
+import { Controller, Post, Body, Get, Request, UseGuards } from "@nestjs/common";
+import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
+import { SrsService, SrsRating } from "./srs.service";
 import { GamificationService } from "../gamification/gamification.service";
 import { IsString, IsIn, IsOptional } from "class-validator";
 
 class ReviewCardDto {
 	@IsString()
-	cardId!: string;
+		cardId!: string;
 
 	@IsIn(["AGAIN", "HARD", "GOOD", "EASY"])
-	rating!: SrsRating;
+		rating!: SrsRating;
 
 	@IsOptional()
 	@IsString()
-	deckId?: string;
+		deckId?: string;
 
 	@IsOptional()
 	@IsString()
-	categoryId?: string;
+		categoryId?: string;
 }
 
 @Controller("srs")
 @UseGuards(JwtAuthGuard)
 export class SrsController {
-	constructor(
+	constructor (
 		private readonly srsService: SrsService,
-		private readonly gamificationService: GamificationService
+		private readonly gamificationService: GamificationService,
 	) {}
 
 	@Post("review")
-	async reviewCard(
-		@Request() req: { user: { id: string } },
-		@Body() dto: ReviewCardDto
+	async reviewCard (
+	@Request() req: { user: { id: string } },
+		@Body() dto: ReviewCardDto,
 	) {
 		const interaction = await this.srsService.processReview(
 			req.user.id,
 			dto.cardId,
-			dto.rating
+			dto.rating,
 		);
 
 		// Update streak on activity
@@ -55,14 +55,14 @@ export class SrsController {
 			xpResult = await this.gamificationService.awardXp(
 				req.user.id,
 				"CARD_FORGOT",
-				metadata
+				metadata,
 			);
 		} else {
 			// Retained (GOOD or EASY)
 			xpResult = await this.gamificationService.awardXp(
 				req.user.id,
 				"CARD_RETAINED",
-				metadata
+				metadata,
 			);
 
 			// Check if card became GOLD
@@ -78,18 +78,17 @@ export class SrsController {
 	}
 
 	@Get("due")
-	async getCardsDue(@Request() req: { user: { id: string } }) {
+	async getCardsDue (@Request() req: { user: { id: string } }) {
 		return await this.srsService.getCardsDueForReview(req.user.id);
 	}
 
 	@Get("learning")
-	async getLearningCards(@Request() req: { user: { id: string } }) {
+	async getLearningCards (@Request() req: { user: { id: string } }) {
 		return await this.srsService.getLearningCards(req.user.id);
 	}
 
 	@Get("progress")
-	async getProgress(@Request() req: { user: { id: string } }) {
+	async getProgress (@Request() req: { user: { id: string } }) {
 		return await this.srsService.getUserProgress(req.user.id);
 	}
 }
-

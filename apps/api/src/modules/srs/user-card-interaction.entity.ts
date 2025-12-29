@@ -7,11 +7,11 @@ import {
 	ManyToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
-} from "typeorm"
-import { User } from "../users/user.entity"
-import { Card } from "../cards/card.entity"
+} from "typeorm";
+import { User } from "../users/user.entity";
+import { Card } from "../cards/card.entity";
 
-export type CardStatus = "NEW" | "LEARNING" | "REVIEW" | "MASTERED" | "GOLD"
+export type CardStatus = "NEW" | "LEARNING" | "REVIEW" | "MASTERED" | "GOLD";
 
 @Entity({ name: "user_card_interactions" })
 @Index(["userId", "cardId"], { unique: true })
@@ -19,47 +19,47 @@ export type CardStatus = "NEW" | "LEARNING" | "REVIEW" | "MASTERED" | "GOLD"
 @Index(["userId", "status"])
 export class UserCardInteraction {
 	@PrimaryGeneratedColumn("uuid")
-		id!: string
+		id!: string;
 
 	@Column({ type: "uuid" })
-		userId!: string
+		userId!: string;
 
 	@ManyToOne(() => User)
 	@JoinColumn({ name: "userId" })
-		user?: User
+		user?: User;
 
 	@Column({ type: "uuid" })
-		cardId!: string
+		cardId!: string;
 
 	@ManyToOne(() => Card)
 	@JoinColumn({ name: "cardId" })
-		card?: Card
+		card?: Card;
 
 	@Column({ type: "varchar", length: 20, default: "NEW" })
-		status!: CardStatus
+		status!: CardStatus;
 
 	// SM-2 algorithm fields
 	@Column({ type: "decimal", precision: 4, scale: 2, default: 2.5 })
-		easeFactor!: number
+		easeFactor!: number;
 
 	@Column({ type: "int", default: 0 })
-		interval!: number // in days
+		interval!: number; // in days
 
 	@Column({ type: "int", default: 0 })
-		repetitions!: number
+		repetitions!: number;
 
 	@Column({ type: "int", default: 0 })
-		consecutiveSuccesses!: number
+		consecutiveSuccesses!: number;
 
 	@Column({ type: "timestamp with time zone", nullable: true })
-		nextReviewDate?: Date | null
+		nextReviewDate?: Date | null;
 
 	@Column({ type: "timestamp with time zone", nullable: true })
-		lastReviewedAt?: Date | null
+		lastReviewedAt?: Date | null;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-		createdAt!: Date
+		createdAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-		updatedAt!: Date
+		updatedAt!: Date;
 }

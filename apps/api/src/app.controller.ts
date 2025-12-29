@@ -5,13 +5,13 @@ import { Public } from "./modules/auth/decorators/public.decorator";
 export class AppController {
 	@Public()
 	@Get()
-	getHello(): string {
+	getHello (): string {
 		return "Hello World!";
 	}
 
 	@Public()
 	@Get("health")
-	getHealth(): { status: string } {
+	getHealth (): { status: string } {
 		return { status: "ok" };
 	}
 }

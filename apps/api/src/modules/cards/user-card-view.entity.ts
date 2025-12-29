@@ -7,36 +7,36 @@ import {
 	ManyToOne,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
-} from "typeorm"
-import { User } from "../users/user.entity"
-import { Card } from "./card.entity"
+} from "typeorm";
+import { User } from "../users/user.entity";
+import { Card } from "./card.entity";
 
 @Entity({ name: "user_card_views" })
 @Index(["userId", "cardId"], { unique: true })
 export class UserCardView {
 	@PrimaryGeneratedColumn("uuid")
-	id!: string
+		id!: string;
 
 	@Column({ type: "uuid" })
-	userId!: string
+		userId!: string;
 
 	@Column({ type: "uuid" })
-	cardId!: string
+		cardId!: string;
 
 	@ManyToOne(() => User, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "userId" })
-	user!: User
+		user!: User;
 
 	@ManyToOne(() => Card, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "cardId" })
-	card!: Card
+		card!: Card;
 
 	@Column({ type: "int", default: 1 })
-	viewCount!: number
+		viewCount!: number;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-	firstSeenAt!: Date
+		firstSeenAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-	lastSeenAt!: Date
+		lastSeenAt!: Date;
 }

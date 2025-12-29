@@ -9,28 +9,28 @@ import {
 
 export class CreateUserDto {
 	@IsEmail()
-	email!: string;
+		email!: string;
 
 	@IsString()
 	@MinLength(3)
 	@MaxLength(50)
-	username!: string;
+		username!: string;
 
 	@IsString()
 	@MinLength(8)
 	@MaxLength(100)
-	password!: string;
+		password!: string;
 
 	@IsOptional()
 	@IsArray()
 	@IsString({ each: true })
-	interests?: string[];
+		interests?: string[];
 }
 
 export class LoginDto {
 	@IsEmail()
-	email!: string;
+		email!: string;
 
 	@IsString()
-	password!: string;
+		password!: string;
 }

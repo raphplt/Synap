@@ -24,29 +24,29 @@ export type XpEventType =
 @Index(["userId", "createdAt"])
 export class XpEvent {
 	@PrimaryGeneratedColumn("uuid")
-	id!: string;
+		id!: string;
 
 	@Column({ type: "uuid" })
-	userId!: string;
+		userId!: string;
 
 	@ManyToOne(() => User, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "userId" })
-	user!: User;
+		user!: User;
 
 	@Column({ type: "int" })
-	amount!: number;
+		amount!: number;
 
 	@Column({ type: "varchar", length: 32 })
-	reason!: XpEventType;
+		reason!: XpEventType;
 
 	@Column({ type: "jsonb", nullable: true })
-	metadata?: {
-		cardId?: string;
-		deckId?: string;
-		categoryId?: string;
-		streakDay?: number;
+		metadata?: {
+		cardId?: string
+		deckId?: string
+		categoryId?: string
+		streakDay?: number
 	} | null;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-	createdAt!: Date;
+		createdAt!: Date;
 }

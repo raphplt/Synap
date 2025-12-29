@@ -12,35 +12,35 @@ import {
 @Index(["username"], { unique: true })
 export class User {
 	@PrimaryGeneratedColumn("uuid")
-	id!: string;
+		id!: string;
 
 	@Column({ type: "varchar", length: 255 })
-	email!: string;
+		email!: string;
 
 	@Column({ type: "varchar", length: 50 })
-	username!: string;
+		username!: string;
 
 	@Column({ type: "text" })
-	passwordHash!: string;
+		passwordHash!: string;
 
 	@Column({ type: "varchar", length: 500, nullable: true })
-	avatarUrl?: string | null;
+		avatarUrl?: string | null;
 
 	@Column({ type: "int", default: 0 })
-	xp!: number;
+		xp!: number;
 
 	@Column({ type: "int", default: 0 })
-	streak!: number;
+		streak!: number;
 
 	@Column({ type: "timestamp with time zone", nullable: true })
-	lastActivityAt?: Date | null;
+		lastActivityAt?: Date | null;
 
 	@Column({ type: "jsonb", default: [] })
-	interests!: string[];
+		interests!: string[];
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-	createdAt!: Date;
+		createdAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-	updatedAt!: Date;
+		updatedAt!: Date;
 }

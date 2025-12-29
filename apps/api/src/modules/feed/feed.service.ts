@@ -6,7 +6,7 @@ import { UserCardInteraction } from "../srs/user-card-interaction.entity";
 import { WikiIngestService } from "../wiki/wiki.service";
 
 interface FeedCard extends Card {
-	interaction?: UserCardInteraction | null;
+	interaction?: UserCardInteraction | null
 }
 
 @Injectable()
@@ -14,26 +14,26 @@ export class FeedService {
 	private readonly logger = new Logger(FeedService.name);
 	private filling = false;
 
-	constructor(
+	constructor (
 		@InjectRepository(Card)
 		private readonly cardRepository: Repository<Card>,
 		@InjectRepository(UserCardInteraction)
 		private readonly interactionRepository: Repository<UserCardInteraction>,
-		private readonly wikiService: WikiIngestService
+		private readonly wikiService: WikiIngestService,
 	) {}
 
-	private getBufferMin(): number {
+	private getBufferMin (): number {
 		const value = Number(process.env.SYNAP_FEED_BUFFER_MIN ?? 200);
 		return Number.isFinite(value) ? Math.max(0, value) : 200;
 	}
 
-	private getFillBatchSize(): number {
+	private getFillBatchSize (): number {
 		const value = Number(process.env.SYNAP_FEED_FILL_BATCH ?? 50);
 		const clamped = Number.isFinite(value) ? value : 50;
 		return Math.min(100, Math.max(1, clamped));
 	}
 
-	private async ensureBuffer(): Promise<void> {
+	private async ensureBuffer (): Promise<void> {
 		if (this.filling) return;
 
 		const min = this.getBufferMin();
@@ -46,7 +46,7 @@ export class FeedService {
 
 			// Use TOP articles and FEATURED instead of random
 			this.logger.log(
-				`Buffer Wiki: ${count}/${min} -> ingest top articles + featured`
+				`Buffer Wiki: ${count}/${min} -> ingest top articles + featured`,
 			);
 
 			// First ingest featured articles (high quality)
@@ -66,9 +66,9 @@ export class FeedService {
 	 * Get personalized feed for authenticated user
 	 * Rule: 70% New / 20% Review / 10% Challenge
 	 */
-	async getPersonalizedFeed(
+	async getPersonalizedFeed (
 		userId: string,
-		take: number = 10
+		take: number = 10,
 	): Promise<FeedCard[]> {
 		void this.ensureBuffer();
 
@@ -131,7 +131,7 @@ export class FeedService {
 		}
 
 		this.logger.log(
-			`Feed for ${userId}: ${newCards.length} new, ${reviewCards.length} review, ${challengeCards.length} challenge`
+			`Feed for ${userId}: ${newCards.length} new, ${reviewCards.length} review, ${challengeCards.length} challenge`,
 		);
 
 		return feed.slice(0, take);
@@ -140,7 +140,7 @@ export class FeedService {
 	/**
 	 * Get anonymous feed (for non-authenticated users)
 	 */
-	async getAnonymousFeed(cursor: number, take: number) {
+	async getAnonymousFeed (cursor: number, take: number) {
 		void this.ensureBuffer();
 
 		const cards = await this.cardRepository.find({

@@ -369,7 +369,7 @@ Les concepts transversaux doivent rester intégrés aux decks existants, pas dev
 - Le Jeu de Plateau (`jeu-plateau`)
 - Énigmes & Casse-têtes (`enigmes-casse-tetes`)
 - Culture Internet (`culture-internet`)
-- Science-Fiction au Cinéma (`sf-cinema`)
+- Personnages cultes (`personnages-cultes`)
 
 ### 18. Musique & Son (`musique-son`)
 

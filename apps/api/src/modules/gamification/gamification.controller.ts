@@ -8,27 +8,27 @@ import {
 } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { GamificationService } from "./gamification.service";
-import { XpEventType } from "./xp-event.entity";
+import { type XpEventType } from "./xp-event.entity";
 
 interface AwardXpDto {
-	reason: XpEventType;
-	cardId?: string;
-	deckId?: string;
-	categoryId?: string;
+	reason: XpEventType
+	cardId?: string
+	deckId?: string
+	categoryId?: string
 }
 
 @Controller("gamification")
 export class GamificationController {
-	constructor(private readonly gamificationService: GamificationService) {}
+	constructor (private readonly gamificationService: GamificationService) {}
 
 	/**
 	 * Award XP for an action
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post("action")
-	async awardXp(
-		@Request() req: { user: { id: string } },
-		@Body() body: AwardXpDto
+	async awardXp (
+	@Request() req: { user: { id: string } },
+		@Body() body: AwardXpDto,
 	) {
 		// Update streak on any activity
 		await this.gamificationService.updateStreak(req.user.id);
@@ -41,7 +41,7 @@ export class GamificationController {
 				cardId: body.cardId,
 				deckId: body.deckId,
 				categoryId: body.categoryId,
-			}
+			},
 		);
 
 		return result;
@@ -52,7 +52,7 @@ export class GamificationController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get("stats")
-	async getStats(@Request() req: { user: { id: string } }) {
+	async getStats (@Request() req: { user: { id: string } }) {
 		return await this.gamificationService.getXpStats(req.user.id);
 	}
 
@@ -61,7 +61,7 @@ export class GamificationController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get("heatmap")
-	async getHeatmap(@Request() req: { user: { id: string } }) {
+	async getHeatmap (@Request() req: { user: { id: string } }) {
 		return await this.gamificationService.getActivityHeatmap(req.user.id);
 	}
 }

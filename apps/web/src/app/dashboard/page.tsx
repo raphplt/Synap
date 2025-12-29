@@ -91,19 +91,19 @@ export default function DashboardPage() {
 	}
 
 	const handleSeedAtlas = async () => {
-		setSeedingAtlas(true);
+		setSeedingAtlas(true)
 		try {
-			const result = await seedApi.seedAtlas();
+			const result = await seedApi.seedAtlasFull()
 			toast.success(
-				`Atlas importé ! ${result.categories} catégories, ${result.decks} decks créés.`
-			);
-			fetchStats();
+				`Atlas importé ! ${result.categories} catégories, ${result.decks} decks, ${result.cards} cartes créés.`
+			)
+			fetchStats()
 		} catch (error) {
-			toast.error((error as Error).message ?? "Erreur lors de l'import Atlas");
+			toast.error((error as Error).message ?? "Erreur lors de l'import Atlas")
 		} finally {
-			setSeedingAtlas(false);
+			setSeedingAtlas(false)
 		}
-	};
+	}
 
 	const statCards = [
 		{
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 			icon: FolderTree,
 			color: "text-purple-500",
 		},
-	];
+	]
 
 	return (
 		<div className="space-y-8">
@@ -177,7 +177,7 @@ export default function DashboardPage() {
 						className="bg-emerald-600 hover:bg-emerald-700"
 					>
 						<Map className="h-4 w-4 mr-2" />
-						{seedingAtlas ? "Import..." : "Import Atlas v1.0"}
+						{seedingAtlas ? "Import..." : "Import Atlas Complet"}
 					</Button>
 					<Button variant="outline" className="border-slate-700 hover:bg-slate-800">
 						Exporter les données
@@ -199,5 +199,5 @@ export default function DashboardPage() {
 				</CardContent>
 			</Card>
 		</div>
-	);
+	)
 }

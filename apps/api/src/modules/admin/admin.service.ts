@@ -11,28 +11,28 @@ import { UserCategoryProgress } from "../gamification/user-category-progress.ent
 
 @Injectable()
 export class AdminService {
-	constructor(
+	constructor (
 		@InjectRepository(Card)
-		private cardRepository: Repository<Card>,
+		private readonly cardRepository: Repository<Card>,
 		@InjectRepository(Deck)
-		private deckRepository: Repository<Deck>,
+		private readonly deckRepository: Repository<Deck>,
 		@InjectRepository(Category)
-		private categoryRepository: Repository<Category>,
+		private readonly categoryRepository: Repository<Category>,
 		@InjectRepository(User)
-		private userRepository: Repository<User>,
+		private readonly userRepository: Repository<User>,
 		@InjectRepository(UserCardInteraction)
-		private interactionRepository: Repository<UserCardInteraction>,
+		private readonly interactionRepository: Repository<UserCardInteraction>,
 		@InjectRepository(XpEvent)
-		private xpEventRepository: Repository<XpEvent>,
+		private readonly xpEventRepository: Repository<XpEvent>,
 		@InjectRepository(UserCategoryProgress)
-		private categoryProgressRepository: Repository<UserCategoryProgress>,
-		private dataSource: DataSource
+		private readonly categoryProgressRepository: Repository<UserCategoryProgress>,
+		private readonly dataSource: DataSource,
 	) {}
 
 	/**
 	 * Delete all cards from the database
 	 */
-	async clearAllCards(): Promise<{ deleted: number }> {
+	async clearAllCards (): Promise<{ deleted: number }> {
 		// First delete all interactions (foreign key constraint)
 		await this.interactionRepository.delete({});
 
@@ -45,13 +45,13 @@ export class AdminService {
 	/**
 	 * Reset the entire database, keeping admin users
 	 */
-	async resetDatabase(adminEmail: string): Promise<{
-		cardsDeleted: number;
-		decksDeleted: number;
-		categoriesDeleted: number;
-		usersDeleted: number;
-		interactionsDeleted: number;
-		xpEventsDeleted: number;
+	async resetDatabase (adminEmail: string): Promise<{
+		cardsDeleted: number
+		decksDeleted: number
+		categoriesDeleted: number
+		usersDeleted: number
+		interactionsDeleted: number
+		xpEventsDeleted: number
 	}> {
 		// Get the admin user to preserve
 		const adminUser = await this.userRepository.findOne({
@@ -81,7 +81,7 @@ export class AdminService {
 			// 3. Delete all card interactions
 			const interactionResult = await queryRunner.manager.delete(
 				UserCardInteraction,
-				{}
+				{},
 			);
 
 			// 4. Delete all cards
@@ -108,7 +108,7 @@ export class AdminService {
 					xp: 0,
 					streak: 0,
 					interests: [],
-				}
+				},
 			);
 
 			await queryRunner.commitTransaction();

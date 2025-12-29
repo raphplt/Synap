@@ -305,7 +305,11 @@
         { "name": "Le Jeu de Plateau", "slug": "jeu-plateau", "description": "Stratégie et social" },
         { "name": "Énigmes & Casse-têtes", "slug": "enigmes-casse-tetes", "description": "Logique ludique" },
         { "name": "Culture Internet", "slug": "culture-internet", "description": "Memes, YouTube, influence" },
-        { "name": "Science-Fiction au Cinéma", "slug": "sf-cinema", "description": "D'Odyssée à Interstellar" }
+        {
+          "name": "Personnages cultes",
+          "slug": "personnages-cultes",
+          "description": "Histoire des icônes"
+        }
       ]
     },
     {

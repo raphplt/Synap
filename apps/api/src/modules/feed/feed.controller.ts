@@ -16,17 +16,17 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller()
 export class FeedController {
-	constructor(
+	constructor (
 		private readonly feedService: FeedService,
-		private readonly cardViewsService: CardViewsService
+		private readonly cardViewsService: CardViewsService,
 	) {}
 
 	@Public()
 	@Get("feed")
-	async getFeed(
-		@Request() req: { user?: { id: string } },
+	async getFeed (
+	@Request() req: { user?: { id: string } },
 		@Query("cursor", new DefaultValuePipe(0), ParseIntPipe) cursor: number,
-		@Query("take", new DefaultValuePipe(10), ParseIntPipe) take: number
+		@Query("take", new DefaultValuePipe(10), ParseIntPipe) take: number,
 	) {
 		// If user is authenticated, return personalized feed
 		if (req.user?.id) {
@@ -40,9 +40,9 @@ export class FeedController {
 
 	@UseGuards(JwtAuthGuard)
 	@Get("feed/personalized")
-	async getPersonalizedFeed(
-		@Request() req: { user: { id: string } },
-		@Query("take", new DefaultValuePipe(10), ParseIntPipe) take: number
+	async getPersonalizedFeed (
+	@Request() req: { user: { id: string } },
+		@Query("take", new DefaultValuePipe(10), ParseIntPipe) take: number,
 	) {
 		const items = await this.feedService.getPersonalizedFeed(req.user.id, take);
 		return { items, nextCursor: null };
@@ -50,9 +50,9 @@ export class FeedController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post("feed/mark-seen")
-	async markCardAsSeen(
-		@Request() req: { user: { id: string } },
-		@Body() body: { cardId: string }
+	async markCardAsSeen (
+	@Request() req: { user: { id: string } },
+		@Body() body: { cardId: string },
 	) {
 		const view = await this.cardViewsService.markAsSeen(req.user.id, body.cardId);
 		return { success: true, viewCount: view.viewCount };
@@ -60,9 +60,9 @@ export class FeedController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post("feed/mark-seen-batch")
-	async markCardsAsSeenBatch(
-		@Request() req: { user: { id: string } },
-		@Body() body: { cardIds: string[] }
+	async markCardsAsSeenBatch (
+	@Request() req: { user: { id: string } },
+		@Body() body: { cardIds: string[] },
 	) {
 		await this.cardViewsService.markMultipleAsSeen(req.user.id, body.cardIds);
 		return { success: true, count: body.cardIds.length };

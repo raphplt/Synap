@@ -12,7 +12,7 @@ import { AdminService } from "./admin.service";
 @Controller("admin")
 @UseGuards(JwtAuthGuard)
 export class AdminController {
-	constructor(private readonly adminService: AdminService) {}
+	constructor (private readonly adminService: AdminService) {}
 
 	/**
 	 * DELETE /admin/cards
@@ -20,7 +20,7 @@ export class AdminController {
 	 */
 	@Delete("cards")
 	@HttpCode(HttpStatus.OK)
-	async clearAllCards() {
+	async clearAllCards () {
 		const result = await this.adminService.clearAllCards();
 		return {
 			success: true,
@@ -35,7 +35,7 @@ export class AdminController {
 	 */
 	@Delete("reset")
 	@HttpCode(HttpStatus.OK)
-	async resetDatabase(@Request() req: { user: { email: string } }) {
+	async resetDatabase (@Request() req: { user: { email: string } }) {
 		const result = await this.adminService.resetDatabase(req.user.email);
 		return {
 			success: true,

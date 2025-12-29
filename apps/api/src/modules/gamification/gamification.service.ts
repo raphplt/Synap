@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
-import { XpEvent, XpEventType } from "./xp-event.entity";
+import { XpEvent, type XpEventType } from "./xp-event.entity";
 import { UserCategoryProgress } from "./user-category-progress.entity";
 import { User } from "../users/user.entity";
 
@@ -20,55 +20,55 @@ export const XP_VALUES: Record<XpEventType, number> = {
 
 export interface XpStats {
 	global: {
-		xp: number;
-		level: number;
-		xpForNextLevel: number;
-		progress: number;
-	};
+		xp: number
+		level: number
+		xpForNextLevel: number
+		progress: number
+	}
 	streak: {
-		current: number;
-		multiplier: number;
-	};
+		current: number
+		multiplier: number
+	}
 	byCategory: Array<{
-		categoryId: string;
-		categoryName: string;
-		xp: number;
-		level: number;
-		cardsCompleted: number;
-		cardsGold: number;
-	}>;
+		categoryId: string
+		categoryName: string
+		xp: number
+		level: number
+		cardsCompleted: number
+		cardsGold: number
+	}>
 }
 
 @Injectable()
 export class GamificationService {
-	constructor(
+	constructor (
 		@InjectRepository(XpEvent)
 		private readonly xpEventRepository: Repository<XpEvent>,
 		@InjectRepository(UserCategoryProgress)
 		private readonly progressRepository: Repository<UserCategoryProgress>,
 		@InjectRepository(User)
-		private readonly userRepository: Repository<User>
+		private readonly userRepository: Repository<User>,
 	) {}
 
 	/**
 	 * Calculate level from XP using exponential formula
 	 * Level 1: 0 XP, Level 2: 100 XP, Level 10: ~6500 XP, Level 50: ~125000 XP
 	 */
-	calculateLevel(xp: number): number {
+	calculateLevel (xp: number): number {
 		return Math.floor(Math.pow(xp / 100, 0.5)) + 1;
 	}
 
 	/**
 	 * Calculate XP required for a specific level
 	 */
-	xpForLevel(level: number): number {
+	xpForLevel (level: number): number {
 		return Math.pow(level - 1, 2) * 100;
 	}
 
 	/**
 	 * Get streak multiplier (increases rewards for consistency)
 	 */
-	getStreakMultiplier(streak: number): number {
+	getStreakMultiplier (streak: number): number {
 		if (streak <= 1) return 1.0;
 		if (streak <= 7) return 1 + streak * 0.1; // 1.1 to 1.7
 		if (streak <= 30) return 1.7 + (streak - 7) * 0.05; // 1.7 to 2.85
@@ -78,16 +78,16 @@ export class GamificationService {
 	/**
 	 * Award XP to a user
 	 */
-	async awardXp(
+	async awardXp (
 		userId: string,
 		reason: XpEventType,
-		metadata?: { cardId?: string; deckId?: string; categoryId?: string }
-	): Promise<{ xpAwarded: number; newTotal: number; levelUp: boolean }> {
+		metadata?: { cardId?: string, deckId?: string, categoryId?: string },
+	): Promise<{ xpAwarded: number, newTotal: number, levelUp: boolean }> {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
 		if (!user) throw new Error("User not found");
 
 		// Base XP amount
-		let baseXp = XP_VALUES[reason] ?? 0;
+		const baseXp = XP_VALUES[reason] ?? 0;
 
 		// Apply streak multiplier for relevant actions
 		const streakActions: XpEventType[] = [
@@ -132,11 +132,11 @@ export class GamificationService {
 	/**
 	 * Update user's category-specific progress
 	 */
-	private async updateCategoryProgress(
+	private async updateCategoryProgress (
 		userId: string,
 		categoryId: string,
 		xpGain: number,
-		reason: XpEventType
+		reason: XpEventType,
 	): Promise<void> {
 		let progress = await this.progressRepository.findOne({
 			where: { userId, categoryId },
@@ -170,7 +170,7 @@ export class GamificationService {
 	/**
 	 * Update streak for a user (called on daily activity)
 	 */
-	async updateStreak(userId: string): Promise<{ streak: number; bonus: number }> {
+	async updateStreak (userId: string): Promise<{ streak: number, bonus: number }> {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
 		if (!user) throw new Error("User not found");
 
@@ -178,9 +178,9 @@ export class GamificationService {
 		const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 		const lastActivity = user.lastActivityAt
 			? new Date(
-					user.lastActivityAt.getFullYear(),
-					user.lastActivityAt.getMonth(),
-					user.lastActivityAt.getDate()
+				user.lastActivityAt.getFullYear(),
+				user.lastActivityAt.getMonth(),
+				user.lastActivityAt.getDate(),
 			  )
 			: null;
 
@@ -192,7 +192,7 @@ export class GamificationService {
 			newStreak = 1;
 		} else {
 			const daysDiff = Math.floor(
-				(today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)
+				(today.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24),
 			);
 
 			if (daysDiff === 0) {
@@ -228,14 +228,15 @@ export class GamificationService {
 	/**
 	 * Get complete XP stats for a user
 	 */
-	async getXpStats(userId: string): Promise<XpStats> {
+	async getXpStats (userId: string): Promise<XpStats> {
 		const user = await this.userRepository.findOne({ where: { id: userId } });
-		if (!user)
+		if (!user) {
 			return {
 				global: { xp: 0, level: 1, xpForNextLevel: 100, progress: 0 },
 				streak: { current: 0, multiplier: 1 },
 				byCategory: [],
 			};
+		}
 
 		const level = this.calculateLevel(user.xp);
 		const currentLevelXp = this.xpForLevel(level);
@@ -272,9 +273,9 @@ export class GamificationService {
 	/**
 	 * Get activity history for heatmap (last 365 days)
 	 */
-	async getActivityHeatmap(
-		userId: string
-	): Promise<Array<{ date: string; count: number }>> {
+	async getActivityHeatmap (
+		userId: string,
+	): Promise<Array<{ date: string, count: number }>> {
 		const oneYearAgo = new Date();
 		oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 

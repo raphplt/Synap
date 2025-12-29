@@ -1,9 +1,9 @@
-import { Module } from "@nestjs/common"
-import { TypeOrmModule } from "@nestjs/typeorm"
-import { Deck } from "./deck.entity"
-import { Category } from "./category.entity"
+import { Module } from "@nestjs/common";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { Deck } from "./deck.entity";
+import { Category } from "./category.entity";
 import { UserCardInteraction } from "../srs/user-card-interaction.entity";
-import { DecksService } from "./decks.service"
+import { DecksService } from "./decks.service";
 import {
 	DecksController,
 	AtlasController,

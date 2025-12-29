@@ -15,37 +15,37 @@ import { Category } from "../decks/category.entity";
 @Index(["userId", "categoryId"], { unique: true })
 export class UserCategoryProgress {
 	@PrimaryGeneratedColumn("uuid")
-	id!: string;
+		id!: string;
 
 	@Column({ type: "uuid" })
-	userId!: string;
+		userId!: string;
 
 	@ManyToOne(() => User, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "userId" })
-	user!: User;
+		user!: User;
 
 	@Column({ type: "uuid" })
-	categoryId!: string;
+		categoryId!: string;
 
 	@ManyToOne(() => Category, { onDelete: "CASCADE" })
 	@JoinColumn({ name: "categoryId" })
-	category!: Category;
+		category!: Category;
 
 	@Column({ type: "int", default: 0 })
-	xp!: number;
+		xp!: number;
 
 	@Column({ type: "int", default: 1 })
-	level!: number;
+		level!: number;
 
 	@Column({ type: "int", default: 0 })
-	cardsCompleted!: number;
+		cardsCompleted!: number;
 
 	@Column({ type: "int", default: 0 })
-	cardsGold!: number;
+		cardsGold!: number;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-	createdAt!: Date;
+		createdAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-	updatedAt!: Date;
+		updatedAt!: Date;
 }

@@ -238,11 +238,18 @@ export const seedApi = {
 		fetchApi<{ categories: number; decks: number }>("/seed/atlas", {
 			method: "POST",
 		}),
+	seedAtlasFull: () =>
+		fetchApi<{ categories: number; decks: number; cards: number }>(
+			"/seed/atlas-full",
+			{
+				method: "POST",
+			}
+		),
 	seedAdmin: () =>
 		fetchApi<{ created: boolean; email: string }>("/seed/admin", {
 			method: "POST",
 		}),
-};
+}
 
 // Stats  
 export interface DashboardStats {

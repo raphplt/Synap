@@ -3,22 +3,22 @@
  * Ensures sensitive fields are never exposed and response format is consistent
  */
 
-import { User } from "../../modules/users/user.entity"
-import { Card } from "../../modules/cards/card.entity"
-import { Deck } from "../../modules/decks/deck.entity"
-import { Category } from "../../modules/decks/category.entity"
+import { type User } from "../../modules/users/user.entity";
+import { type Card } from "../../modules/cards/card.entity";
+import { type Deck } from "../../modules/decks/deck.entity";
+import { type Category } from "../../modules/decks/category.entity";
 import {
-	UserResponseDto,
-	CardResponseDto,
-	DeckResponseDto,
-	CategoryResponseDto,
-} from "../dto/response.dto"
+	type UserResponseDto,
+	type CardResponseDto,
+	type DeckResponseDto,
+	type CategoryResponseDto,
+} from "../dto/response.dto";
 
 export class ResponseMapper {
 	/**
 	 * Map User entity to UserResponseDto (excludes passwordHash)
 	 */
-	static toUserDto(user: User): UserResponseDto {
+	static toUserDto (user: User): UserResponseDto {
 		return {
 			id: user.id,
 			email: user.email,
@@ -30,13 +30,13 @@ export class ResponseMapper {
 			lastActivityAt: user.lastActivityAt,
 			createdAt: user.createdAt,
 			updatedAt: user.updatedAt,
-		}
+		};
 	}
 
 	/**
 	 * Map Card entity to CardResponseDto
 	 */
-	static toCardDto(card: Card): CardResponseDto {
+	static toCardDto (card: Card): CardResponseDto {
 		return {
 			id: card.id,
 			title: card.title,
@@ -50,13 +50,13 @@ export class ResponseMapper {
 			deckId: card.deckId,
 			createdAt: card.createdAt,
 			updatedAt: card.updatedAt,
-		}
+		};
 	}
 
 	/**
 	 * Map Category entity to CategoryResponseDto
 	 */
-	static toCategoryDto(category: Category): CategoryResponseDto {
+	static toCategoryDto (category: Category): CategoryResponseDto {
 		return {
 			id: category.id,
 			name: category.name,
@@ -66,13 +66,13 @@ export class ResponseMapper {
 			sortOrder: category.sortOrder,
 			createdAt: category.createdAt,
 			updatedAt: category.updatedAt,
-		}
+		};
 	}
 
 	/**
 	 * Map Deck entity to DeckResponseDto
 	 */
-	static toDeckDto(deck: Deck): DeckResponseDto {
+	static toDeckDto (deck: Deck): DeckResponseDto {
 		return {
 			id: deck.id,
 			name: deck.name,
@@ -86,25 +86,25 @@ export class ResponseMapper {
 			isActive: deck.isActive,
 			createdAt: deck.createdAt,
 			updatedAt: deck.updatedAt,
-		}
+		};
 	}
 
 	/**
 	 * Map array of entities
 	 */
-	static toUserDtoList(users: User[]): UserResponseDto[] {
-		return users.map((u) => this.toUserDto(u))
+	static toUserDtoList (users: User[]): UserResponseDto[] {
+		return users.map((u) => this.toUserDto(u));
 	}
 
-	static toCardDtoList(cards: Card[]): CardResponseDto[] {
-		return cards.map((c) => this.toCardDto(c))
+	static toCardDtoList (cards: Card[]): CardResponseDto[] {
+		return cards.map((c) => this.toCardDto(c));
 	}
 
-	static toDeckDtoList(decks: Deck[]): DeckResponseDto[] {
-		return decks.map((d) => this.toDeckDto(d))
+	static toDeckDtoList (decks: Deck[]): DeckResponseDto[] {
+		return decks.map((d) => this.toDeckDto(d));
 	}
 
-	static toCategoryDtoList(categories: Category[]): CategoryResponseDto[] {
-		return categories.map((c) => this.toCategoryDto(c))
+	static toCategoryDtoList (categories: Category[]): CategoryResponseDto[] {
+		return categories.map((c) => this.toCategoryDto(c));
 	}
 }

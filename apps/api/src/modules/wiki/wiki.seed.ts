@@ -21,7 +21,7 @@ export class WikiSeedService implements OnModuleInit {
 
 			const seedCount = Math.min(
 				50,
-				Math.max(1, Number(process.env.SYNAP_SEED_COUNT ?? 20))
+				Math.max(1, Number(process.env.SYNAP_SEED_COUNT ?? 20)),
 			);
 			this.logger.log(`DB vide: seed automatique via Wikipédia (random x${seedCount})…`);
 			await this.wikiService.ingestRandom(seedCount);

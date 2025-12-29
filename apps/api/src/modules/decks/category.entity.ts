@@ -5,32 +5,32 @@ import {
 	Index,
 	PrimaryGeneratedColumn,
 	UpdateDateColumn,
-} from "typeorm"
+} from "typeorm";
 
 @Entity({ name: "categories" })
 @Index(["slug"], { unique: true })
 export class Category {
 	@PrimaryGeneratedColumn("uuid")
-		id!: string
+		id!: string;
 
 	@Column({ type: "varchar", length: 100 })
-		name!: string
+		name!: string;
 
 	@Column({ type: "varchar", length: 100 })
-		slug!: string
+		slug!: string;
 
 	@Column({ type: "text", nullable: true })
-		description?: string | null
+		description?: string | null;
 
 	@Column({ type: "varchar", length: 500, nullable: true })
-		imageUrl?: string | null
+		imageUrl?: string | null;
 
 	@Column({ type: "int", default: 0 })
-		sortOrder!: number
+		sortOrder!: number;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-		createdAt!: Date
+		createdAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-		updatedAt!: Date
+		updatedAt!: Date;
 }

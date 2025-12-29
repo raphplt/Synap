@@ -1,40 +1,42 @@
-import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import * as argon2 from "argon2";
-import { Card, CardOrigin } from "../cards/card.entity";
+import * as fs from "fs";
+import { Injectable, Logger } from "@nestjs/common";
+import * as path from "path";
+import { Card, type CardOrigin } from "../cards/card.entity";
 import { Deck } from "../decks/deck.entity";
 import { Category } from "../decks/category.entity";
 import { User } from "../users/user.entity";
 
 interface CuratedCard {
-	title: string;
-	summary: string;
-	content: string;
-	mediaUrl?: string;
+	title: string
+	summary: string
+	content: string
+	mediaUrl?: string
 }
 
 interface CuratedDeck {
-	name: string;
-	slug: string;
-	description: string;
-	imageUrl: string;
-	cards: CuratedCard[];
+	name: string
+	slug: string
+	description: string
+	imageUrl: string
+	cards: CuratedCard[]
 }
 
 interface CuratedCategory {
-	name: string;
-	slug: string;
-	description: string;
-	imageUrl: string;
-	decks: CuratedDeck[];
+	name: string
+	slug: string
+	description: string
+	imageUrl: string
+	decks: CuratedDeck[]
 }
 
 @Injectable()
 export class SeedService {
 	private readonly logger = new Logger(SeedService.name);
 
-	constructor(
+	constructor (
 		@InjectRepository(Card)
 		private readonly cardRepository: Repository<Card>,
 		@InjectRepository(Deck)
@@ -42,14 +44,14 @@ export class SeedService {
 		@InjectRepository(Category)
 		private readonly categoryRepository: Repository<Category>,
 		@InjectRepository(User)
-		private readonly userRepository: Repository<User>
+		private readonly userRepository: Repository<User>,
 	) {}
 
 	/**
 	 * Create an admin user if it doesn't exist
 	 * Default credentials: admin@synap.app / admin123
 	 */
-	async seedAdminUser(): Promise<{ created: boolean; email: string }> {
+	async seedAdminUser (): Promise<{ created: boolean, email: string }> {
 		const adminEmail = "admin@synap.app";
 		const adminPassword = "admin123";
 		const adminUsername = "admin";
@@ -76,7 +78,7 @@ export class SeedService {
 
 		await this.userRepository.save(admin);
 		this.logger.log(
-			`Created admin user: ${adminEmail} (password: ${adminPassword})`
+			`Created admin user: ${adminEmail} (password: ${adminPassword})`,
 		);
 
 		return { created: true, email: adminEmail };
@@ -85,7 +87,7 @@ export class SeedService {
 	/**
 	 * Import the Atlas v1.0 structure (20 categories, 200 decks)
 	 */
-	async seedAtlas(): Promise<{ categories: number; decks: number }> {
+	async seedAtlas (): Promise<{ categories: number, decks: number }> {
 		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		const atlasData = require("../../common/data/atlas-v1.json");
 
@@ -135,15 +137,153 @@ export class SeedService {
 		}
 
 		this.logger.log(
-			`Atlas seeding complete: ${totalCategories} categories, ${totalDecks} decks`
+			`Atlas seeding complete: ${totalCategories} categories, ${totalDecks} decks`,
 		);
 		return { categories: totalCategories, decks: totalDecks };
 	}
 
-	async seedGoldDataset(): Promise<{
-		categories: number;
-		decks: number;
-		cards: number;
+	/**
+	 * Import the Atlas v1.0 structure AND cards from JSON files
+	 */
+	async seedAtlasFull (): Promise<{
+		categories: number
+		decks: number
+		cards: number
+	}> {
+		const atlasPath = path.join(
+			process.cwd(),
+			"src",
+			"common",
+			"data",
+			"atlas-v1.json",
+		);
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
+		const atlasData = require(atlasPath);
+
+		let totalCategories = 0;
+		let totalDecks = 0;
+		let totalCards = 0;
+
+		const cardsBasePath = path.join(
+			process.cwd(),
+			"src",
+			"common",
+			"data",
+			"cards",
+		);
+
+		for (const catData of atlasData.categories) {
+			// Create or find category
+			let category = await this.categoryRepository.findOne({
+				where: { slug: catData.slug },
+			});
+
+			if (!category) {
+				category = this.categoryRepository.create({
+					name: catData.name,
+					slug: catData.slug,
+					description: catData.description,
+					imageUrl: catData.imageUrl,
+					sortOrder: totalCategories,
+				});
+				await this.categoryRepository.save(category);
+				totalCategories++;
+				this.logger.log(`Created category: ${category.name}`);
+			}
+
+			// Create decks
+			for (const deckData of catData.decks) {
+				let deck = await this.deckRepository.findOne({
+					where: { slug: deckData.slug },
+				});
+
+				if (!deck) {
+					deck = this.deckRepository.create({
+						name: deckData.name,
+						slug: deckData.slug,
+						description: deckData.description,
+						imageUrl: catData.imageUrl, // Use category emoji as placeholder if no image
+						categoryId: category.id,
+						cardCount: 0,
+						sortOrder: totalDecks,
+						isActive: true,
+					});
+					await this.deckRepository.save(deck);
+					totalDecks++;
+					this.logger.log(`Created deck: ${deck.name}`);
+				}
+
+				// Import Cards
+				const deckFilePath = path.join(
+					cardsBasePath,
+					catData.slug,
+					`${deckData.slug}.json`,
+				);
+
+				if (fs.existsSync(deckFilePath)) {
+					try {
+						const deckContent = JSON.parse(fs.readFileSync(deckFilePath, "utf-8"));
+
+						if (
+							deckContent?.cards &&
+							Array.isArray(deckContent.cards)
+						) {
+							let cardIndex = 0;
+							for (const cardData of deckContent.cards) {
+								const externalId = `atlas-${deck.slug}-${cardIndex}`;
+
+								// Find by externalId OR sourceLink to avoid duplicates
+								const existingCard = await this.cardRepository.findOne({
+									where: [{ externalId }, { sourceLink: cardData.sourceLink }],
+								});
+
+								if (!existingCard) {
+									const card = this.cardRepository.create({
+										title: cardData.title,
+										summary: cardData.summary,
+										content: cardData.content,
+										mediaUrl: cardData.mediaUrl ?? "",
+										sourceLink:
+											cardData.sourceLink ?? `synap://atlas/${deck.slug}/${cardIndex}`,
+										sourceAttribution: cardData.sourceAttribution,
+										sourceType: "CURATED",
+										sourceId: externalId,
+										origin: "CURATED" as CardOrigin,
+										externalId,
+										qualityScore: 90,
+										deckId: deck.id,
+										quizAnswers: cardData.quizAnswers,
+										quizCorrectIndex: cardData.quizCorrectIndex,
+									});
+									await this.cardRepository.save(card);
+									totalCards++;
+								}
+								cardIndex++;
+							}
+						}
+					} catch (err) {
+						this.logger.error(`Failed to parse cards for deck ${deck.slug}: ${err}`);
+					}
+				}
+
+				// Update card count
+				const cardCount = await this.cardRepository.count({
+					where: { deckId: deck.id },
+				});
+				await this.deckRepository.update(deck.id, { cardCount });
+			}
+		}
+
+		this.logger.log(
+			`Atlas Full seeding complete: ${totalCategories} categories, ${totalDecks} decks, ${totalCards} cards`,
+		);
+		return { categories: totalCategories, decks: totalDecks, cards: totalCards };
+	}
+
+	async seedGoldDataset (): Promise<{
+		categories: number
+		decks: number
+		cards: number
 	}> {
 		const data = this.getGoldDataset();
 
@@ -229,12 +369,12 @@ export class SeedService {
 		}
 
 		this.logger.log(
-			`Seeding complete: ${totalCategories} categories, ${totalDecks} decks, ${totalCards} cards`
+			`Seeding complete: ${totalCategories} categories, ${totalDecks} decks, ${totalCards} cards`,
 		);
 		return { categories: totalCategories, decks: totalDecks, cards: totalCards };
 	}
 
-	private getGoldDataset(): CuratedCategory[] {
+	private getGoldDataset (): CuratedCategory[] {
 		return [
 			{
 				name: "Psychologie",

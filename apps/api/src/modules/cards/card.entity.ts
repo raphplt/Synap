@@ -17,63 +17,63 @@ export type CardOrigin = "WIKIPEDIA" | "CURATED" | "AI_GENERATED";
 @Index(["sourceType", "sourceId"], { unique: true })
 export class Card {
 	@PrimaryGeneratedColumn("uuid")
-	id!: string;
+		id!: string;
 
 	@Column({ type: "varchar", length: 255 })
-	title!: string;
+		title!: string;
 
 	@Column({ type: "text" })
-	summary!: string;
+		summary!: string;
 
 	@Column({ type: "text" })
-	content!: string;
+		content!: string;
 
 	@Column({ type: "text" })
-	mediaUrl!: string;
+		mediaUrl!: string;
 
 	@Column({ type: "text" })
-	sourceLink!: string;
+		sourceLink!: string;
 
 	@Column({ type: "varchar", length: 255, nullable: true })
-	sourceAttribution?: string | null;
+		sourceAttribution?: string | null;
 
 	@Column({ type: "varchar", length: 64, nullable: true })
-	sourceType?: string | null;
+		sourceType?: string | null;
 
 	@Column({ type: "int", default: 0 })
-	popularityScore!: number;
+		popularityScore!: number;
 
 	@Column({ type: "int", default: 0 })
-	userRating!: number;
+		userRating!: number;
 
 	@Column({ type: "varchar", length: 255, nullable: true })
-	sourceId?: string | null;
+		sourceId?: string | null;
 
 	@Column({ type: "varchar", length: 32, default: "WIKIPEDIA" })
-	origin!: CardOrigin;
+		origin!: CardOrigin;
 
 	@Column({ type: "varchar", length: 255, nullable: true })
-	externalId?: string | null;
+		externalId?: string | null;
 
 	@Column({ type: "int", default: 50 })
-	qualityScore!: number;
+		qualityScore!: number;
 
 	@Column({ type: "uuid", nullable: true })
-	deckId?: string | null;
+		deckId?: string | null;
 
 	@ManyToOne(() => Deck, (deck) => deck.cards, { nullable: true })
 	@JoinColumn({ name: "deckId" })
-	deck?: Deck | null;
+		deck?: Deck | null;
 
 	@Column({ type: "jsonb", nullable: true })
-	quizAnswers?: string[] | null;
+		quizAnswers?: string[] | null;
 
 	@Column({ type: "int", nullable: true })
-	quizCorrectIndex?: number | null;
+		quizCorrectIndex?: number | null;
 
 	@CreateDateColumn({ type: "timestamp with time zone" })
-	createdAt!: Date;
+		createdAt!: Date;
 
 	@UpdateDateColumn({ type: "timestamp with time zone" })
-	updatedAt!: Date;
+		updatedAt!: Date;
 }

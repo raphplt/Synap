@@ -18,17 +18,17 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 @Controller("decks")
 export class DecksController {
-	constructor(private readonly decksService: DecksService) {}
+	constructor (private readonly decksService: DecksService) {}
 
 	/**
 	 * Get all decks (paginated for admin)
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get("admin")
-	async getAllPaginated(
-		@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+	async getAllPaginated (
+	@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
 		@Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
-		@Query("search") search?: string
+		@Query("search") search?: string,
 	) {
 		return await this.decksService.findAllDecksPaginated(page, limit, search);
 	}
@@ -38,7 +38,7 @@ export class DecksController {
 	 */
 	@Public()
 	@Get()
-	async getAllDecks() {
+	async getAllDecks () {
 		return await this.decksService.findAllDecks();
 	}
 
@@ -47,7 +47,7 @@ export class DecksController {
 	 */
 	@Public()
 	@Get("categories")
-	async getAllCategories() {
+	async getAllCategories () {
 		return await this.decksService.findAllCategories();
 	}
 
@@ -56,15 +56,15 @@ export class DecksController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get("categories/admin")
-	async getAllCategoriesPaginated(
-		@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+	async getAllCategoriesPaginated (
+	@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
 		@Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
-		@Query("search") search?: string
+		@Query("search") search?: string,
 	) {
 		return await this.decksService.findAllCategoriesPaginated(
 			page,
 			limit,
-			search
+			search,
 		);
 	}
 
@@ -73,16 +73,16 @@ export class DecksController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async createDeck(
-		@Body()
+	async createDeck (
+	@Body()
 		body: {
-			name: string;
-			slug: string;
-			description: string;
-			imageUrl?: string;
-			categoryId?: string;
-			isActive?: boolean;
-		}
+			name: string
+			slug: string
+			description: string
+			imageUrl?: string
+			categoryId?: string
+			isActive?: boolean
+		},
 	) {
 		return await this.decksService.createDeck({
 			name: body.name,
@@ -101,17 +101,17 @@ export class DecksController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
-	async updateDeck(
-		@Param("id") id: string,
+	async updateDeck (
+	@Param("id") id: string,
 		@Body()
 		body: Partial<{
-			name: string;
-			slug: string;
-			description: string;
-			imageUrl: string;
-			categoryId: string;
-			isActive: boolean;
-		}>
+			name: string
+			slug: string
+			description: string
+			imageUrl: string
+			categoryId: string
+			isActive: boolean
+		}>,
 	) {
 		return await this.decksService.updateDeck(id, body);
 	}
@@ -121,7 +121,7 @@ export class DecksController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Delete(":id")
-	async deleteDeck(@Param("id") id: string) {
+	async deleteDeck (@Param("id") id: string) {
 		await this.decksService.deleteDeck(id);
 		return { success: true };
 	}
@@ -131,7 +131,7 @@ export class DecksController {
 	 */
 	@Public()
 	@Get(":slug")
-	async getDeckBySlug(@Param("slug") slug: string) {
+	async getDeckBySlug (@Param("slug") slug: string) {
 		return await this.decksService.findDeckBySlug(slug);
 	}
 
@@ -140,29 +140,29 @@ export class DecksController {
 	 */
 	@Public()
 	@Get("category/:categoryId")
-	async getDecksByCategory(@Param("categoryId") categoryId: string) {
+	async getDecksByCategory (@Param("categoryId") categoryId: string) {
 		return await this.decksService.getDecksByCategory(categoryId);
 	}
 }
 
 @Controller("categories")
 export class CategoriesController {
-	constructor(private readonly decksService: DecksService) {}
+	constructor (private readonly decksService: DecksService) {}
 
 	/**
 	 * Get all categories (paginated for admin)
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAllPaginated(
-		@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+	async getAllPaginated (
+	@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
 		@Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
-		@Query("search") search?: string
+		@Query("search") search?: string,
 	) {
 		return await this.decksService.findAllCategoriesPaginated(
 			page,
 			limit,
-			search
+			search,
 		);
 	}
 
@@ -171,14 +171,14 @@ export class CategoriesController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async createCategory(
-		@Body()
+	async createCategory (
+	@Body()
 		body: {
-			name: string;
-			slug: string;
-			description?: string;
-			imageUrl?: string;
-		}
+			name: string
+			slug: string
+			description?: string
+			imageUrl?: string
+		},
 	) {
 		return await this.decksService.createCategory({
 			name: body.name,
@@ -194,15 +194,15 @@ export class CategoriesController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
-	async updateCategory(
-		@Param("id") id: string,
+	async updateCategory (
+	@Param("id") id: string,
 		@Body()
 		body: Partial<{
-			name: string;
-			slug: string;
-			description: string;
-			imageUrl: string;
-		}>
+			name: string
+			slug: string
+			description: string
+			imageUrl: string
+		}>,
 	) {
 		return await this.decksService.updateCategory(id, body);
 	}
@@ -212,7 +212,7 @@ export class CategoriesController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Delete(":id")
-	async deleteCategory(@Param("id") id: string) {
+	async deleteCategory (@Param("id") id: string) {
 		await this.decksService.deleteCategory(id);
 		return { success: true };
 	}
@@ -220,15 +220,14 @@ export class CategoriesController {
 
 @Controller("atlas")
 export class AtlasController {
-	constructor(private readonly decksService: DecksService) {}
+	constructor (private readonly decksService: DecksService) {}
 
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAtlas(
-		@Request() req: { user: { id: string } },
-		@Query("category") categorySlug?: string
+	async getAtlas (
+	@Request() req: { user: { id: string } },
+		@Query("category") categorySlug?: string,
 	) {
 		return await this.decksService.getAtlasStats(req.user.id, categorySlug);
 	}
 }
-

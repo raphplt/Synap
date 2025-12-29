@@ -65,4 +65,3 @@ import { JwtAuthGuard } from "./modules/auth/guards/jwt-auth.guard";
 	],
 })
 export class AppModule {}
-

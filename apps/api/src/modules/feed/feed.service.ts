@@ -143,15 +143,46 @@ export class FeedService {
 	async getAnonymousFeed (cursor: number, take: number) {
 		void this.ensureBuffer();
 
+		// Interleave strategy:
+		// 1. Partition by deckId
+		// 2. Order by createdAt DESC within deck (newest first)
+		// 3. Assign row number (rn)
+		// 4. Order global result by rn ASC (pick 1st from all decks, then 2nd, etc.)
+		// 5. Secondary sort by deckId hash to mix them up but keep stable for pagination
+		const rawResults = await this.cardRepository.query(
+			`
+			WITH RankedCards AS (
+				SELECT "id", "deckId", "createdAt",
+					ROW_NUMBER() OVER (PARTITION BY "deckId" ORDER BY "createdAt" DESC) as rn
+				FROM cards
+			)
+			SELECT rc.id
+			FROM RankedCards rc
+			ORDER BY rc.rn ASC, MD5(rc."deckId"::text) ASC
+			OFFSET $1 LIMIT $2
+			`,
+			[cursor, take],
+		);
+
+		const ids = rawResults.map((r: { id: string }) => r.id);
+
+		if (ids.length === 0) {
+			return { items: [], nextCursor: null };
+		}
+
+		// Fetch full entities
 		const cards = await this.cardRepository.find({
-			order: { qualityScore: "DESC", createdAt: "DESC" },
-			skip: cursor,
-			take,
+			where: { id: In(ids) },
 		});
 
+		// Restore order (In() does not guarantee order)
+		const orderedCards = ids
+			.map((id: string) => cards.find((c) => c.id === id))
+			.filter((c: Card | undefined): c is Card => !!c);
+
 		return {
-			items: cards,
-			nextCursor: cards.length === take ? cursor + take : null,
+			items: orderedCards,
+			nextCursor: rawResults.length === take ? cursor + take : null,
 		};
 	}
 }

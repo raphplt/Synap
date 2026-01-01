@@ -29,4 +29,10 @@ export class SeedController {
 	async seedAtlasFull () {
 		return await this.seedService.seedAtlasFull();
 	}
+
+	@Public()
+	@Post("all")
+	async seedAll () {
+		return await this.seedService.seedAll();
+	}
 }

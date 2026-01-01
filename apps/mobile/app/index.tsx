@@ -7,7 +7,6 @@ export default function IndexScreen() {
 	const isInitialized = useAuthStore((state) => state.isInitialized);
 	const isLoading = useAuthStore((state) => state.isLoading);
 
-	// Wait for auth to be fully initialized before redirecting
 	if (!isInitialized || isLoading) {
 		return (
 			<View
@@ -16,10 +15,9 @@ export default function IndexScreen() {
 			>
 				<ActivityIndicator color="#06D6A0" size="large" />
 			</View>
-		);
+		)
 	}
 
-	// Redirect based on auth state
 	if (isAuthenticated) {
 		return <Redirect href={"/(tabs)" as Href} />;
 	}

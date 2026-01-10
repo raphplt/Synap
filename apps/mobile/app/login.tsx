@@ -57,8 +57,12 @@ export default function LoginScreen() {
 			>
 				{/* Header */}
 				<View className="items-center mb-12">
-					<Text className="text-3xl font-bold text-white mb-2">SYNAP</Text>
-					<Text className="text-text-secondary">{t("auth.login")}</Text>
+					<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">
+						SYNAP
+					</Text>
+					<Text className="text-text-secondary text-lg font-medium">
+						{t("auth.login")}
+					</Text>
 				</View>
 
 				{/* Form */}
@@ -69,7 +73,7 @@ export default function LoginScreen() {
 							{t("auth.email")}
 						</Text>
 						<TextInput
-							className="bg-synap-teal-medium border border-synap-teal-light rounded-lg px-4 py-3 text-white"
+							className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 							placeholder="email@example.com"
 							placeholderTextColor="#71717A"
 							keyboardType="email-address"
@@ -86,7 +90,7 @@ export default function LoginScreen() {
 							{t("auth.password")}
 						</Text>
 						<TextInput
-							className="bg-synap-teal-medium border border-synap-teal-light rounded-lg px-4 py-3 text-white"
+							className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 							placeholder="••••••••"
 							placeholderTextColor="#71717A"
 							secureTextEntry
@@ -100,22 +104,24 @@ export default function LoginScreen() {
 
 					{/* Submit */}
 					<Pressable
-						className="bg-synap-pink py-4 rounded-lg mt-4 active:bg-synap-pink-dark disabled:opacity-50"
+						className={`bg-synap-pink py-4 rounded-xl shadow-lg border-b-4 border-synap-pink-dark mt-6 active:border-b-0 active:translate-y-1 transition-all active:bg-synap-pink-light ${
+							isLoading || !email.trim() || !password.trim() ? "opacity-50" : ""
+						}`}
 						onPress={handleLogin}
 						disabled={isLoading || !email.trim() || !password.trim()}
 					>
 						{isLoading ? (
 							<ActivityIndicator color="#FFFFFF" />
 						) : (
-							<Text className="text-white text-lg font-semibold text-center">
+							<Text className="text-white text-lg font-bold text-center tracking-wide">
 								{t("auth.login")}
 							</Text>
 						)}
 					</Pressable>
 
 					{/* Forgot password */}
-					<Pressable className="py-2">
-						<Text className="text-synap-ocean text-center text-sm">
+					<Pressable className="py-2 active:opacity-70">
+						<Text className="text-synap-ocean-light text-center text-sm font-medium">
 							{t("auth.forgotPassword")}
 						</Text>
 					</Pressable>

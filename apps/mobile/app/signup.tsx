@@ -73,8 +73,12 @@ export default function SignupScreen() {
 				>
 					{/* Header */}
 					<View className="items-center mb-12">
-						<Text className="text-3xl font-bold text-white mb-2">SYNAP</Text>
-						<Text className="text-text-secondary">{t("auth.signup")}</Text>
+						<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">
+							SYNAP
+						</Text>
+						<Text className="text-text-secondary text-lg font-medium">
+							{t("auth.signup")}
+						</Text>
 					</View>
 
 					{/* Form */}
@@ -85,7 +89,7 @@ export default function SignupScreen() {
 								{t("auth.email")}
 							</Text>
 							<TextInput
-								className="bg-synap-teal-medium border border-synap-teal-light rounded-lg px-4 py-3 text-white"
+								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="email@example.com"
 								placeholderTextColor="#71717A"
 								keyboardType="email-address"
@@ -102,7 +106,7 @@ export default function SignupScreen() {
 								{t("auth.username")}
 							</Text>
 							<TextInput
-								className="bg-synap-teal-medium border border-synap-teal-light rounded-lg px-4 py-3 text-white"
+								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="synaper42"
 								placeholderTextColor="#71717A"
 								autoCapitalize="none"
@@ -118,7 +122,7 @@ export default function SignupScreen() {
 								{t("auth.password")}
 							</Text>
 							<TextInput
-								className="bg-synap-teal-medium border border-synap-teal-light rounded-lg px-4 py-3 text-white"
+								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="••••••••"
 								placeholderTextColor="#71717A"
 								secureTextEntry
@@ -135,14 +139,16 @@ export default function SignupScreen() {
 
 						{/* Submit */}
 						<Pressable
-							className="bg-synap-pink py-4 rounded-lg mt-4 active:bg-synap-pink-dark disabled:opacity-50"
+							className={`bg-synap-pink py-4 rounded-xl shadow-lg border-b-4 border-synap-pink-dark mt-6 active:border-b-0 active:translate-y-1 transition-all active:bg-synap-pink-light ${
+								isLoading || !isValid ? "opacity-50" : ""
+							}`}
 							onPress={handleSignup}
 							disabled={isLoading || !isValid}
 						>
 							{isLoading ? (
 								<ActivityIndicator color="#FFFFFF" />
 							) : (
-								<Text className="text-white text-lg font-semibold text-center">
+								<Text className="text-white text-lg font-bold text-center tracking-wide">
 									{t("auth.signup")}
 								</Text>
 							)}

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1018240150610",
+    "project_id": "synap-483919",
+    "storage_bucket": "synap-483919.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1018240150610:android:d72148de9f287e1fc4038b",
+        "android_client_info": {
+          "package_name": "com.synap.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUfgdGqme4sjhUwtePVLXBQUe1uBbr-yA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

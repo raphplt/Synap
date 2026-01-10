@@ -56,18 +56,14 @@ export default function LoginScreen() {
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				className="flex-1 justify-center px-8"
 			>
-				{/* Header */}
 				<View className="items-center mb-12">
 					<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">SYNAP</Text>
 					<Text className="text-text-secondary text-lg font-medium">{t("auth.login")}</Text>
 				</View>
 
-				{/* Social Auth Buttons */}
 				<SocialAuthButtons mode="login" />
 
-				{/* Form */}
 				<View className="gap-4">
-					{/* Email */}
 					<View>
 						<Text className="text-text-secondary text-sm mb-2">{t("auth.email")}</Text>
 						<TextInput

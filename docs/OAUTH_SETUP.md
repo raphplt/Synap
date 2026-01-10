@@ -21,61 +21,56 @@ Ce guide détaille la configuration nécessaire pour activer l'authentification 
 
 ---
 
-## Configuration Google
+## Configuration Google (Setup Natif)
 
-### 1. Créer un projet Google Cloud
+Pour l'authentification native Android, nous utilisons la librairie officielle `@react-native-google-signin/google-signin` qui nécessite un projet Firebase.
 
-1. Aller sur [Google Cloud Console](https://console.cloud.google.com/)
-2. Créer un nouveau projet ou sélectionner un existant
-3. Activer l'API "Google Identity Toolkit API"
+### 1. Créer un projet Firebase
 
-### 2. Configurer l'écran de consentement OAuth
+1. Aller sur [Firebase Console](https://console.firebase.google.com/)
+2. Cliquer sur **"Ajouter un projet"**
+3. Sélectionner votre projet Google Cloud existant (celui où vous avez créé les identifiants)
+4. Continuer et valider
 
-1. Aller dans **APIs & Services > OAuth consent screen**
-2. Choisir "External" (utilisateurs en dehors de l'organisation)
-3. Remplir les informations :
-   - Nom de l'application : `SYNAP`
-   - Email d'assistance utilisateur : votre email
-   - Logo de l'application (optionnel)
-4. Ajouter les scopes : `email`, `profile`, `openid`
-5. Ajouter vos emails de test si en mode "Testing"
+### 2. Ajouter l'application Android
 
-### 3. Créer les identifiants OAuth
+1. Dans la vue d'ensemble du projet Firebase, cliquer sur l'icône **Android**
+2. **Package name** : `com.synap.app`
+3. **App nickname** : `Synap Android`
+4. **Debug signing certificate SHA-1** : (Le même que vous avez utilisé précédemment)
+   ```bash
+   keytool -keystore ~/.android/debug.keystore -list -v -storepass android
+   ```
+5. Cliquer sur **Enregistrer l'application**
+6. **Télécharger le fichier configuration `google-services.json`**
+7. Placer ce fichier dans le dossier `apps/mobile/` racine
 
-1. Aller dans **APIs & Services > Credentials**
-2. Cliquer sur **Create Credentials > OAuth client ID**
+### 3. Récupérer le Client ID Web
 
-#### Pour iOS :
-- Type : iOS
-- Bundle ID : `com.synap.app`
-- Récupérer le **Client ID iOS**
+La librairie native nécessite un Client ID de type **Web** pour renvoyer un ID Token valide au backend.
 
-#### Pour Android :
-- Type : Android
-- Package name : `com.synap.app`
-- SHA-1 certificate fingerprint : 
-  ```bash
-  # Développement (debug)
-  keytool -keystore ~/.android/debug.keystore -list -v -storepass android
-  
-  # Production (via EAS)
-  eas credentials -p android
-  ```
-- Récupérer le **Client ID Android**
+1. Aller dans **Authentication > Sign-in method** sur Firebase
+2. Activer **Google**
+3. Dans la configuration Google, vous devriez voir un "Client Web" configuré. Sinon, aller dans Google Cloud Console > Credentials.
+4. Repérer le **Client ID de type "Application Web"** (ça peut être créé automatiquement par Firebase sous le nom "Web client (auto created by Google Service)")
+5. Copier ce Client ID (qui termine par `.apps.googleusercontent.com`)
 
-#### Pour le Web (API Backend) :
-- Type : Web application
-- Nom : `SYNAP API`
-- Récupérer le **Client ID Web** → C'est celui à utiliser dans `GOOGLE_CLIENT_ID` de l'API
+### 4. Mettre à jour les variables d'environnement
 
-### 4. Noter les Client IDs
+C'est ce **Client ID Web** qu'il faut utiliser dans vos variables d'environnement (et pas l'Android ID).
 
-Vous aurez besoin de :
-- **Client ID iOS** → pour `EXPO_PUBLIC_GOOGLE_CLIENT_ID` (mobile iOS)
-- **Client ID Android** → pour `EXPO_PUBLIC_GOOGLE_CLIENT_ID` (mobile Android) 
-- **Client ID Web** → pour `GOOGLE_CLIENT_ID` (API backend)
+**`apps/mobile/.env`** :
+```env
+# Mettre le Client Web ici !
+EXPO_PUBLIC_GOOGLE_CLIENT_ID=xxxxxxxxxxxx-xxxxxxxx.apps.googleusercontent.com
+```
 
-> **Note** : Expo utilise un client ID unique. Pour simplifier, vous pouvez utiliser le Client ID Web avec l'option `webClientId` dans la configuration.
+**`apps/api/.env`** :
+```env
+GOOGLE_CLIENT_ID=xxxxxxxxxxxx-xxxxxxxx.apps.googleusercontent.com
+```
+
+> **Pourquoi ?** L'app Android utilise son propre ID (dans `google-services.json`) pour parler à Google, mais demande à Google de générer un token pour le `webClientId` (votre backend). C'est la configuration standard sécurisée.
 
 ---
 

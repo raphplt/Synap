@@ -1,53 +1,73 @@
 {
   "expo": {
-		"name": "SYNAP",
-		"slug": "synap",
-		"scheme": "synap",
-		"version": "0.1.0",
-		"orientation": "portrait",
-		"icon": "./assets/icon.png",
-		"splash": {
-			"image": "./assets/splash.png",
-			"resizeMode": "contain",
-			"backgroundColor": "#0f172a"
-		},
-		"ios": {
-			"bundleIdentifier": "com.synap.app",
-			"supportsTablet": true,
-			"usesAppleSignIn": true
-		},
-		"android": {
-			"package": "com.synap.app",
-			"adaptiveIcon": {
-				"foregroundImage": "./assets/icon.png",
-				"backgroundColor": "#0f172a"
-			}
-		},
-		"assetBundlePatterns": ["**/*"],
-		"experiments": {
-			"typedRoutes": true
-		},
-		"plugins": [
-			"expo-router",
-			"expo-secure-store",
-			"expo-localization",
-			"expo-apple-authentication",
-			[
-				"expo-splash-screen",
-				{
-					"backgroundColor": "#0f172a",
-					"image": "./assets/splash.png",
-					"imageWidth": 200
-				}
-			],
-			"expo-web-browser"
-		],
-		"extra": {
-			"eas": {
-				"projectId": "2f2dbe0e-b9f8-4264-a826-c044984e9aac"
-			},
-			"router": {}
-		},
-		"owner": "synap"
-	}
+    "name": "SYNAP",
+    "slug": "synap",
+    "scheme": "synap",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0f172a"
+    },
+    "ios": {
+      "bundleIdentifier": "com.synap.app",
+      "supportsTablet": true,
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
+      "buildNumber": "2"
+    },
+    "android": {
+      "package": "com.synap.app",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0f172a"
+      },
+      "versionCode": 2
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-localization",
+      "expo-apple-authentication",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0f172a",
+          "image": "./assets/splash.png",
+          "imageWidth": 200
+        }
+      ],
+      "expo-web-browser"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2f2dbe0e-b9f8-4264-a826-c044984e9aac"
+      },
+      "router": {}
+    },
+    "owner": "synap",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2f2dbe0e-b9f8-4264-a826-c044984e9aac"
+    }
+  }
 }

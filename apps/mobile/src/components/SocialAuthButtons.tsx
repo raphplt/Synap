@@ -1,6 +1,7 @@
 import { View, Text, Pressable, ActivityIndicator, Platform } from "react-native";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import { useAppleAuth } from "../hooks/useAppleAuth";
+import { GoogleLogo } from "phosphor-react-native";
 
 interface SocialAuthButtonsProps {
 	mode?: "login" | "signup";
@@ -16,9 +17,7 @@ export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
 		<View className="gap-3">
 			{/* Error message */}
 			{combinedError && (
-				<Text className="text-synap-pink text-center text-sm">
-					{combinedError}
-				</Text>
+				<Text className="text-synap-pink text-center text-sm">{combinedError}</Text>
 			)}
 
 			{/* Google Button */}
@@ -34,7 +33,7 @@ export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
 						<ActivityIndicator size="small" color="#1f2937" />
 					) : (
 						<>
-							<GoogleIcon />
+							<GoogleLogo size={20} />
 							<Text className="text-gray-800 font-semibold text-base">
 								{mode === "login" ? "Continuer avec Google" : "S'inscrire avec Google"}
 							</Text>
@@ -73,15 +72,6 @@ export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
 					<View className="flex-1 h-px bg-synap-teal-light" />
 				</View>
 			)}
-		</View>
-	);
-}
-
-// Simple inline SVG icons as text-based placeholders
-function GoogleIcon() {
-	return (
-		<View className="w-5 h-5 items-center justify-center">
-			<Text className="text-lg font-bold" style={{ color: "#4285F4" }}>G</Text>
 		</View>
 	);
 }

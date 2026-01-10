@@ -13,7 +13,7 @@ module.exports = {
 		"@typescript-eslint/explicit-function-return-type": "off",
 		"@typescript-eslint/strict-boolean-expressions": "off",
 		indent: "off",
-		"@typescript-eslint/indent": ["error", "tab"],
+		"@typescript-eslint/indent": "off",
 		"no-tabs": "off",
 		quotes: "off",
 		"@typescript-eslint/quotes": ["error", "double"],
@@ -22,6 +22,6 @@ module.exports = {
 		"comma-dangle": "off",
 		"@typescript-eslint/comma-dangle": ["error", "always-multiline"],
 		"space-before-function-paren": "off",
-		"@typescript-eslint/space-before-function-paren": ["error", "always"],
+		"@typescript-eslint/space-before-function-paren": "off",
 	},
-}
+};

@@ -139,6 +139,31 @@ export async function getMe(
 	return response.json();
 }
 
+// OAuth API
+export async function oauthLogin(
+	data: {
+		provider: "google" | "apple";
+		idToken: string;
+		username?: string;
+	},
+	baseUrl = getApiBaseUrl()
+): Promise<LoginResponseDto> {
+	const response = await fetch(`${baseUrl}/auth/oauth`, {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify(data),
+	});
+
+	if (!response.ok) {
+		const error = await response
+			.json()
+			.catch(() => ({ message: "Unknown error" }));
+		throw new Error(error.message ?? `HTTP ${response.status}`);
+	}
+
+	return response.json();
+}
+
 // SRS API
 export type SrsRating = "AGAIN" | "HARD" | "GOOD" | "EASY";
 

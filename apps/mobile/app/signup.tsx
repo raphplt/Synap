@@ -14,6 +14,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../src/stores/useAuthStore";
 import { signup as apiSignup } from "../src/lib/api";
+import { SocialAuthButtons } from "../src/components/SocialAuthButtons";
 
 export default function SignupScreen() {
 	const { t } = useTranslation();
@@ -73,21 +74,18 @@ export default function SignupScreen() {
 				>
 					{/* Header */}
 					<View className="items-center mb-12">
-						<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">
-							SYNAP
-						</Text>
-						<Text className="text-text-secondary text-lg font-medium">
-							{t("auth.signup")}
-						</Text>
+						<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">SYNAP</Text>
+						<Text className="text-text-secondary text-lg font-medium">{t("auth.signup")}</Text>
 					</View>
+
+					{/* Social Auth Buttons */}
+					<SocialAuthButtons mode="signup" />
 
 					{/* Form */}
 					<View className="gap-4">
 						{/* Email */}
 						<View>
-							<Text className="text-text-secondary text-sm mb-2">
-								{t("auth.email")}
-							</Text>
+							<Text className="text-text-secondary text-sm mb-2">{t("auth.email")}</Text>
 							<TextInput
 								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="email@example.com"
@@ -102,9 +100,7 @@ export default function SignupScreen() {
 
 						{/* Username */}
 						<View>
-							<Text className="text-text-secondary text-sm mb-2">
-								{t("auth.username")}
-							</Text>
+							<Text className="text-text-secondary text-sm mb-2">{t("auth.username")}</Text>
 							<TextInput
 								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="synaper42"
@@ -118,9 +114,7 @@ export default function SignupScreen() {
 
 						{/* Password */}
 						<View>
-							<Text className="text-text-secondary text-sm mb-2">
-								{t("auth.password")}
-							</Text>
+							<Text className="text-text-secondary text-sm mb-2">{t("auth.password")}</Text>
 							<TextInput
 								className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 								placeholder="••••••••"
@@ -129,9 +123,7 @@ export default function SignupScreen() {
 								value={password}
 								onChangeText={setPassword}
 							/>
-							<Text className="text-text-tertiary text-xs mt-1">
-								Minimum 8 caractères
-							</Text>
+							<Text className="text-text-tertiary text-xs mt-1">Minimum 8 caractères</Text>
 						</View>
 
 						{/* Error */}
@@ -159,9 +151,7 @@ export default function SignupScreen() {
 					<View className="flex-row justify-center mt-8 pb-8">
 						<Text className="text-text-secondary">{t("auth.hasAccount")} </Text>
 						<Pressable onPress={() => router.push("/login" as Href)}>
-							<Text className="text-synap-emerald font-semibold">
-								{t("auth.login")}
-							</Text>
+							<Text className="text-synap-emerald font-semibold">{t("auth.login")}</Text>
 						</Pressable>
 					</View>
 				</ScrollView>

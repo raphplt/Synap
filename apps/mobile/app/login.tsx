@@ -13,6 +13,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "../src/stores/useAuthStore";
 import { login as apiLogin } from "../src/lib/api";
+import { SocialAuthButtons } from "../src/components/SocialAuthButtons";
 
 export default function LoginScreen() {
 	const { t } = useTranslation();
@@ -57,21 +58,18 @@ export default function LoginScreen() {
 			>
 				{/* Header */}
 				<View className="items-center mb-12">
-					<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">
-						SYNAP
-					</Text>
-					<Text className="text-text-secondary text-lg font-medium">
-						{t("auth.login")}
-					</Text>
+					<Text className="text-4xl font-extrabold text-white mb-2 tracking-tight">SYNAP</Text>
+					<Text className="text-text-secondary text-lg font-medium">{t("auth.login")}</Text>
 				</View>
+
+				{/* Social Auth Buttons */}
+				<SocialAuthButtons mode="login" />
 
 				{/* Form */}
 				<View className="gap-4">
 					{/* Email */}
 					<View>
-						<Text className="text-text-secondary text-sm mb-2">
-							{t("auth.email")}
-						</Text>
+						<Text className="text-text-secondary text-sm mb-2">{t("auth.email")}</Text>
 						<TextInput
 							className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 							placeholder="email@example.com"
@@ -86,9 +84,7 @@ export default function LoginScreen() {
 
 					{/* Password */}
 					<View>
-						<Text className="text-text-secondary text-sm mb-2">
-							{t("auth.password")}
-						</Text>
+						<Text className="text-text-secondary text-sm mb-2">{t("auth.password")}</Text>
 						<TextInput
 							className="bg-synap-teal-medium border border-synap-teal-light rounded-xl px-4 py-3.5 text-white shadow-sm focus:border-synap-emerald transition-colors"
 							placeholder="••••••••"
@@ -131,9 +127,7 @@ export default function LoginScreen() {
 				<View className="flex-row justify-center mt-8">
 					<Text className="text-text-secondary">{t("auth.noAccount")} </Text>
 					<Pressable onPress={() => router.push("/signup" as Href)}>
-						<Text className="text-synap-emerald font-semibold">
-							{t("auth.signup")}
-						</Text>
+						<Text className="text-synap-emerald font-semibold">{t("auth.signup")}</Text>
 					</Pressable>
 				</View>
 			</KeyboardAvoidingView>

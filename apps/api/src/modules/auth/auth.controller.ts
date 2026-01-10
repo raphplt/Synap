@@ -11,16 +11,17 @@ import {
 import { AuthService } from "./auth.service";
 import { JwtAuthGuard } from "./guards/jwt-auth.guard";
 import { CreateUserDto, LoginDto } from "./dto/auth.dto";
+import { OAuthLoginDto } from "./dto/oauth.dto";
 import { Public } from "./decorators/public.decorator";
 import { ResponseMapper } from "../../common/mappers/response.mapper";
 
 @Controller("auth")
 export class AuthController {
-	constructor (private readonly authService: AuthService) {}
+	constructor(private readonly authService: AuthService) {}
 
 	@Public()
 	@Post("signup")
-	async signup (@Body() dto: CreateUserDto) {
+	async signup(@Body() dto: CreateUserDto) {
 		return await this.authService.signup({
 			email: dto.email,
 			username: dto.username,
@@ -32,13 +33,24 @@ export class AuthController {
 	@Public()
 	@Post("login")
 	@HttpCode(HttpStatus.OK)
-	async login (@Body() dto: LoginDto) {
+	async login(@Body() dto: LoginDto) {
 		return await this.authService.login(dto.email, dto.password);
+	}
+
+	@Public()
+	@Post("oauth")
+	@HttpCode(HttpStatus.OK)
+	async oauthLogin(@Body() dto: OAuthLoginDto) {
+		return await this.authService.oauthLogin({
+			provider: dto.provider,
+			idToken: dto.idToken,
+			username: dto.username,
+		});
 	}
 
 	@UseGuards(JwtAuthGuard)
 	@Get("me")
-	async getMe (@Request() req: { user: { id: string, email: string } }) {
+	async getMe(@Request() req: { user: { id: string; email: string } }) {
 		const user = await this.authService.validateUser(req.user.id);
 		if (!user) {
 			return null;

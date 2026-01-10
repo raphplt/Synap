@@ -97,10 +97,10 @@ export default function OnboardingScreen() {
 				</View>
 
 				<View className="mb-8">
-					<Text className="text-xl font-semibold text-white mb-2">
+					<Text className="text-2xl font-bold text-white mb-2">
 						{t("onboarding.pickInterests")}
 					</Text>
-					<Text className="text-text-secondary mb-6">
+					<Text className="text-base text-text-secondary mb-6 leading-relaxed">
 						{t("onboarding.pickInterestsSubtitle")}
 					</Text>
 
@@ -116,15 +116,17 @@ export default function OnboardingScreen() {
 									<Pressable
 										key={category.id}
 										onPress={() => toggleInterest(category.slug)}
-										className={`flex-row items-center gap-2 px-4 py-3 rounded-lg border ${
+										className={`flex-row items-center gap-1.5 px-3 py-2 rounded-full border shadow-sm ${
 											isSelected
 												? "bg-synap-emerald border-synap-emerald"
-												: "bg-synap-teal-medium border-synap-teal-light"
-										}`}
+												: "bg-synap-teal-medium border-synap-teal-light active:bg-synap-teal-light"
+										} active:scale-95 transition-all`}
 									>
-										<Text className="text-lg">{getEmojiForCategory(category.slug)}</Text>
+										<Text className="text-base">
+											{getEmojiForCategory(category.slug)}
+										</Text>
 										<Text
-											className={`font-medium ${
+											className={`text-sm font-medium ${
 												isSelected ? "text-synap-teal" : "text-white"
 											}`}
 										>
@@ -146,10 +148,10 @@ export default function OnboardingScreen() {
 
 			<View className="px-6 pb-8 pt-4">
 				<Pressable
-					className={`py-4 rounded-lg ${
+					className={`py-4 rounded-xl shadow-lg border-b-4 active:border-b-0 active:translate-y-1 transition-all ${
 						isValid && !isSaving
-							? "bg-synap-pink active:bg-synap-pink-dark"
-							: "bg-gray-600"
+							? "bg-synap-pink border-synap-pink-dark active:bg-synap-pink-light"
+							: "bg-gray-700 border-gray-800 opacity-50"
 					}`}
 					onPress={handleContinue}
 					disabled={!isValid || isSaving}
@@ -157,7 +159,7 @@ export default function OnboardingScreen() {
 					{isSaving ? (
 						<ActivityIndicator color="white" />
 					) : (
-						<Text className="text-white text-lg font-semibold text-center">
+						<Text className="text-white text-lg font-bold text-center tracking-wide">
 							{t("onboarding.letsGo")}
 						</Text>
 					)}

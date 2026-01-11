@@ -220,14 +220,32 @@ export class CategoriesController {
 
 @Controller("atlas")
 export class AtlasController {
-	constructor (private readonly decksService: DecksService) {}
+	constructor(private readonly decksService: DecksService) {}
 
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAtlas (
-	@Request() req: { user: { id: string } },
+	async getAtlas(
+		@Request() req: { user: { id: string } },
 		@Query("category") categorySlug?: string,
 	) {
 		return await this.decksService.getAtlasStats(req.user.id, categorySlug);
+	}
+
+	/**
+	 * Get deck detail with cards and user progress
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Get("deck/:deckId")
+	async getDeck(@Request() req: { user: { id: string } }, @Param("deckId") deckId: string) {
+		return await this.decksService.getDeckWithProgress(req.user.id, deckId);
+	}
+
+	/**
+	 * Get cards for a specific deck with user progress
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Get("deck/:deckId/cards")
+	async getDeckCards(@Request() req: { user: { id: string } }, @Param("deckId") deckId: string) {
+		return await this.decksService.getDeckCardsWithProgress(req.user.id, deckId);
 	}
 }

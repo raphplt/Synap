@@ -1,16 +1,16 @@
 module.exports = {
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    project: './tsconfig.json',
-    tsconfigRootDir: __dirname
-  },
-  plugins: ['@typescript-eslint'],
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
-  env: {
-    es2021: true,
-    node: true
-  },
-  rules: {
-    '@typescript-eslint/explicit-function-return-type': 'off'
-  }
+	parser: "@typescript-eslint/parser",
+	parserOptions: {
+		project: "./tsconfig.json",
+		tsconfigRootDir: __dirname,
+	},
+	plugins: ["@typescript-eslint"],
+	extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+	env: {
+		es2021: true,
+		node: true,
+	},
+	rules: {
+		"@typescript-eslint/explicit-function-return-type": "off",
+	},
 };

@@ -19,6 +19,10 @@ export default function IndexScreen() {
 	}
 
 	if (isAuthenticated) {
+		const user = useAuthStore.getState().user;
+		if (!user?.interests || user.interests.length === 0) {
+			return <Redirect href={"/onboarding" as Href} />;
+		}
 		return <Redirect href={"/(tabs)" as Href} />;
 	}
 

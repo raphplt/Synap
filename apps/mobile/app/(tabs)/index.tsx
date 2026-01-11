@@ -1,43 +1,62 @@
 import { StatusBar } from "expo-status-bar";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 import { ActivityIndicator, Text, View, Pressable } from "react-native";
 import { useTranslation } from "react-i18next";
 import { FeedList } from "../../src/components/FeedList";
+import { SessionRecap } from "../../src/components/SessionRecap";
 import { useFeed } from "../../src/hooks/useFeed";
 import { useAuthStore } from "../../src/stores/useAuthStore";
-import { reviewCard, awardXp } from "../../src/lib/api";
+import { useSessionStore } from "../../src/stores/useSessionStore";
+import { reviewCard, awardXp, likeCard, bookmarkCard } from "../../src/lib/api";
 
 export default function HomeScreen() {
 	const { t } = useTranslation();
 	const token = useAuthStore((state) => state.token);
+	const user = useAuthStore((state) => state.user);
 
+	// Session store
 	const {
-		data,
-		isLoading,
-		refetch,
-		isRefetching,
-		loadMore,
-		isFetchingNextPage,
-		error,
-	} = useFeed();
+		stats,
+		showRecap,
+		sessionActive,
+		startSession,
+		recordCardView,
+		recordRetained,
+		recordForgot,
+		addXp,
+		continueSession,
+		endSession,
+	} = useSessionStore();
 
-	const items = useMemo(
-		() => data?.pages.flatMap((page) => page.items) ?? [],
-		[data?.pages]
-	);
+	// Start session on mount
+	useEffect(() => {
+		if (!sessionActive) {
+			startSession();
+		}
+	}, [sessionActive, startSession]);
 
-	// Handle review feedback (for review cards)
+	const { data, isLoading, refetch, isRefetching, loadMore, isFetchingNextPage, error } = useFeed();
+
+	const items = useMemo(() => data?.pages.flatMap((page) => page.items) ?? [], [data?.pages]);
+
 	const handleReview = useCallback(
 		async (cardId: string, rating: "forgot" | "retained") => {
 			if (!token) return;
 			try {
 				const srsRating = rating === "retained" ? "GOOD" : "AGAIN";
 				await reviewCard(cardId, srsRating, token);
+
+				// Track in session
+				if (rating === "retained") {
+					recordRetained(10);
+				} else {
+					recordForgot(2);
+				}
 			} catch (err) {
 				console.error("Failed to submit review:", err);
 			}
 		},
-		[token]
+		[token, recordRetained, recordForgot],
 	);
 
 	// Handle quiz answers
@@ -47,22 +66,57 @@ export default function HomeScreen() {
 			try {
 				// Award XP for quiz
 				await awardXp(correct ? "QUIZ_SUCCESS" : "CARD_VIEW", cardId, token);
+
+				// Track in session
+				if (correct) {
+					addXp(25);
+				}
 			} catch (err) {
 				console.error("Failed to submit quiz answer:", err);
 			}
 		},
-		[token]
+		[token, addXp],
 	);
 
-	const handleLike = useCallback((cardId: string) => {
-		// TODO: Implement like API
-		console.log("Liked card:", cardId);
-	}, []);
+	const handleLike = useCallback(
+		async (cardId: string) => {
+			if (!token) return;
+			try {
+				await likeCard(cardId, token);
+			} catch (err) {
+				console.error("Failed to toggle like:", err);
+			}
+		},
+		[token],
+	);
 
-	const handleBookmark = useCallback((cardId: string) => {
-		// TODO: Implement bookmark API
-		console.log("Bookmarked card:", cardId);
-	}, []);
+	const handleBookmark = useCallback(
+		async (cardId: string) => {
+			if (!token) return;
+			try {
+				await bookmarkCard(cardId, token);
+			} catch (err) {
+				console.error("Failed to toggle bookmark:", err);
+			}
+		},
+		[token],
+	);
+
+	// Track card views (called from FeedList on scroll)
+	const handleCardView = useCallback(() => {
+		recordCardView();
+		// Award passive XP
+		addXp(5);
+	}, [recordCardView, addXp]);
+
+	const handleContinueSession = useCallback(() => {
+		continueSession();
+	}, [continueSession]);
+
+	const handleFinishSession = useCallback(() => {
+		endSession();
+		// Could navigate to profile or show a summary page
+	}, [endSession]);
 
 	if (isLoading) {
 		return (
@@ -82,12 +136,8 @@ export default function HomeScreen() {
 				className="flex-1 items-center justify-center px-6"
 				style={{ backgroundColor: "#073B4C" }}
 			>
-				<Text className="text-synap-pink text-lg font-semibold mb-2">
-					{t("feed.error")}
-				</Text>
-				<Text className="text-text-secondary text-center mb-4">
-					{(error as Error).message}
-				</Text>
+				<Text className="text-synap-pink text-lg font-semibold mb-2">{t("feed.error")}</Text>
+				<Text className="text-text-secondary text-center mb-4">{(error as Error).message}</Text>
 				<Pressable onPress={() => refetch()}>
 					<Text className="text-synap-emerald underline">{t("common.retry")}</Text>
 				</Pressable>
@@ -107,8 +157,21 @@ export default function HomeScreen() {
 				onQuizAnswer={handleQuizAnswer}
 				onLike={handleLike}
 				onBookmark={handleBookmark}
+				onCardView={handleCardView}
 			/>
 			<StatusBar style="light" />
+
+			{/* Session Recap Modal */}
+			<SessionRecap
+				visible={showRecap}
+				stats={{
+					...stats,
+					streak: user?.streak ?? 0,
+				}}
+				onContinue={handleContinueSession}
+				onFinish={handleFinishSession}
+			/>
 		</View>
 	);
 }
+

@@ -291,7 +291,7 @@ export class GamificationService {
 
 		return events.map((e) => ({
 			date: e.date,
-			count: parseInt(e.count, 10),
+			count: parseInt(e.count as string, 10),
 		}));
 	}
 }

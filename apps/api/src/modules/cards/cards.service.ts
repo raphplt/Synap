@@ -76,13 +76,15 @@ export class CardsService {
 
 		const existing = hasSourceKey
 			? await this.cardsRepository.findOne({
-				where: {
-					sourceType: payload.sourceType!,
-					sourceId: payload.sourceId!,
-				},
+					where: {
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						sourceType: payload.sourceType!,
+						// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+						sourceId: payload.sourceId!,
+					},
 			  })
 			: await this.cardsRepository.findOne({
-				where: { sourceLink: payload.sourceLink },
+					where: { sourceLink: payload.sourceLink },
 			  });
 
 		if (existing != null) {

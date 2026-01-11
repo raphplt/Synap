@@ -11,6 +11,7 @@ export interface CardBase {
 	// Quiz support
 	quizAnswers?: string[] | null;
 	quizCorrectIndex?: number | null;
+	category?: string | null;
 	createdAt?: string | Date;
 	updatedAt?: string | Date;
 }

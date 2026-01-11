@@ -5,11 +5,11 @@ import { IS_PUBLIC_KEY } from "../decorators/public.decorator";
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard("jwt") {
-	constructor (private readonly reflector: Reflector) {
+	constructor(private readonly reflector: Reflector) {
 		super();
 	}
 
-	async canActivate (context: ExecutionContext) {
+	async canActivate(context: ExecutionContext) {
 		// Check if route is marked as public
 		const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
 			context.getHandler(),

@@ -101,7 +101,7 @@ function ProgressRing({
 	);
 }
 
-function DeckCard({ deck }: { deck: DeckStats }) {
+function DeckCard({ deck, onPress }: { deck: DeckStats; onPress: () => void }) {
 	const { t } = useTranslation();
 	const isGold = deck.progressPercent >= 100;
 
@@ -110,6 +110,7 @@ function DeckCard({ deck }: { deck: DeckStats }) {
 			className={`bg-synap-teal-medium rounded-xl p-4 border ${
 				isGold ? "border-synap-gold" : "border-synap-teal-light"
 			} active:bg-synap-teal-light`}
+			onPress={onPress}
 		>
 			<View className="flex-row items-center justify-between">
 				<View className="flex-1 mr-3">
@@ -121,8 +122,7 @@ function DeckCard({ deck }: { deck: DeckStats }) {
 					</Text>
 					<View className="flex-row mt-2 gap-4">
 						<Text className="text-text-tertiary text-xs">
-							{deck.masteredCards}/{deck.totalCards}{" "}
-							{t("atlas.mastered", "maîtrisées")}
+							{deck.masteredCards}/{deck.totalCards} {t("atlas.mastered", "maîtrisées")}
 						</Text>
 						{deck.goldCards > 0 && (
 							<Text className="text-synap-gold text-xs">
@@ -131,7 +131,10 @@ function DeckCard({ deck }: { deck: DeckStats }) {
 						)}
 					</View>
 				</View>
-				<ProgressRing percent={deck.progressPercent} />
+				<View className="flex-row items-center">
+					<ProgressRing percent={deck.progressPercent} />
+					<Ionicons name="chevron-forward" size={20} color="#4A6572" style={{ marginLeft: 8 }} />
+				</View>
 			</View>
 		</Pressable>
 	);
@@ -197,7 +200,11 @@ export default function CategoryDecksScreen() {
 					<ScrollView showsVerticalScrollIndicator={false}>
 						<View className="gap-3">
 							{decks.map((deck) => (
-								<DeckCard key={deck.id} deck={deck} />
+								<DeckCard
+									key={deck.id}
+									deck={deck}
+									onPress={() => router.push(`/atlas/deck/${deck.id}`)}
+								/>
 							))}
 						</View>
 					</ScrollView>

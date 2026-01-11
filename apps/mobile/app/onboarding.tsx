@@ -13,32 +13,6 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useAuthStore } from "../src/stores/useAuthStore";
 import { getCategories, updateUserInterests, Category } from "../src/lib/api";
 
-const CATEGORY_EMOJIS: Record<string, string> = {
-	histoire: "📜",
-	philosophie: "🤔",
-	sciences: "🔬",
-	technologie: "💻",
-	psychologie: "🧠",
-	economie: "📊",
-	art: "🎨",
-	litterature: "📚",
-	politique: "🏛️",
-	"biais-cognitifs": "🎯",
-	astronomie: "🚀",
-	nature: "🌿",
-	geographie: "�",
-	musique: "🎵",
-	cinema: "🎬",
-	sport: "⚽",
-	cuisine: "🍳",
-	sante: "🏥",
-	langues: "🗣️",
-	mathematiques: "📐",
-};
-
-function getEmojiForCategory(slug: string): string {
-	return CATEGORY_EMOJIS[slug] ?? "📚";
-}
 
 export default function OnboardingScreen() {
 	const { t } = useTranslation();
@@ -122,9 +96,7 @@ export default function OnboardingScreen() {
 												: "bg-synap-teal-medium border-synap-teal-light active:bg-synap-teal-light"
 										} active:scale-95 transition-all`}
 									>
-										<Text className="text-base">
-											{getEmojiForCategory(category.slug)}
-										</Text>
+										<Text className="text-base">{category.imageUrl}</Text>
 										<Text
 											className={`text-sm font-medium ${
 												isSelected ? "text-synap-teal" : "text-white"

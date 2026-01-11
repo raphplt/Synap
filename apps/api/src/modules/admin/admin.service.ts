@@ -11,7 +11,7 @@ import { UserCategoryProgress } from "../gamification/user-category-progress.ent
 
 @Injectable()
 export class AdminService {
-	constructor (
+	constructor(
 		@InjectRepository(Card)
 		private readonly cardRepository: Repository<Card>,
 		@InjectRepository(Deck)
@@ -30,9 +30,33 @@ export class AdminService {
 	) {}
 
 	/**
+	 * Get dashboard statistics
+	 */
+	async getStats(): Promise<{
+		totalUsers: number
+		totalCards: number
+		totalDecks: number
+		totalCategories: number
+	}> {
+		const [totalUsers, totalCards, totalDecks, totalCategories] = await Promise.all([
+			this.userRepository.count(),
+			this.cardRepository.count(),
+			this.deckRepository.count(),
+			this.categoryRepository.count(),
+		]);
+
+		return {
+			totalUsers,
+			totalCards,
+			totalDecks,
+			totalCategories,
+		};
+	}
+
+	/**
 	 * Delete all cards from the database
 	 */
-	async clearAllCards (): Promise<{ deleted: number }> {
+	async clearAllCards(): Promise<{ deleted: number }> {
 		// First delete all interactions (foreign key constraint)
 		await this.interactionRepository.delete({});
 
@@ -45,7 +69,7 @@ export class AdminService {
 	/**
 	 * Reset the entire database, keeping admin users
 	 */
-	async resetDatabase (adminEmail: string): Promise<{
+	async resetDatabase(adminEmail: string): Promise<{
 		cardsDeleted: number
 		decksDeleted: number
 		categoriesDeleted: number
@@ -79,10 +103,7 @@ export class AdminService {
 			});
 
 			// 3. Delete all card interactions
-			const interactionResult = await queryRunner.manager.delete(
-				UserCardInteraction,
-				{},
-			);
+			const interactionResult = await queryRunner.manager.delete(UserCardInteraction, {});
 
 			// 4. Delete all cards
 			const cardResult = await queryRunner.manager.delete(Card, {});

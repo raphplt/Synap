@@ -1,6 +1,6 @@
 import { CardBase } from "@synap/shared";
 import { FlashList } from "@shopify/flash-list";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { ActivityIndicator, RefreshControl, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { FeedCard, FeedCardType } from "./FeedCard";
@@ -12,7 +12,7 @@ export interface FeedItem extends CardBase {
 
 type FeedListProps = {
 	items: CardBase[];
-	reviewCardIds?: string[]; // IDs of cards that need review
+	reviewCardIds?: string[];
 	onEndReached: () => void;
 	refreshing: boolean;
 	onRefresh: () => void;
@@ -21,6 +21,7 @@ type FeedListProps = {
 	onQuizAnswer?: (cardId: string, correct: boolean) => void;
 	onLike?: (cardId: string) => void;
 	onBookmark?: (cardId: string) => void;
+	onCardView?: () => void;
 };
 
 export function FeedList({
@@ -34,19 +35,16 @@ export function FeedList({
 	onQuizAnswer,
 	onLike,
 	onBookmark,
+	onCardView,
 }: FeedListProps) {
-	const [listHeight, setListHeight] = React.useState<number>(0);
+	const [listHeight, setListHeight] = useState<number>(0);
 	const insets = useSafeAreaInsets();
 
-	// Transform items into FeedItems with types and generate quiz distractors
 	const feedItems: FeedItem[] = useMemo(() => {
 		const reviewSet = new Set(reviewCardIds);
 
 		return items.map((item, index) => {
-			// Every 7th card is a quiz (starting from 6th)
 			const isQuiz = (index + 1) % 7 === 0 && index > 0;
-
-			// Check if card needs review
 			const isReview = reviewSet.has(item.id);
 
 			let cardType: FeedCardType = "discovery";
@@ -56,10 +54,8 @@ export function FeedList({
 				cardType = "review";
 			}
 
-			// Generate distractors for quiz cards from nearby cards
 			let distractors: string[] = [];
 			if (cardType === "quiz") {
-				// Pick 3 random summaries from other cards as distractors
 				const otherCards = items.filter((c) => c.id !== item.id);
 				const shuffled = [...otherCards].sort(() => Math.random() - 0.5);
 				distractors = shuffled.slice(0, 3).map((c) => c.summary);
@@ -112,12 +108,16 @@ export function FeedList({
 						) : null
 					}
 					refreshControl={
-						<RefreshControl
-							refreshing={refreshing}
-							onRefresh={onRefresh}
-							tintColor="#06D6A0"
-						/>
+						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#06D6A0" />
 					}
+					onViewableItemsChanged={({ viewableItems }) => {
+						if (viewableItems.length > 0 && onCardView) {
+							onCardView();
+						}
+					}}
+					viewabilityConfig={{
+						itemVisiblePercentThreshold: 50,
+					}}
 				/>
 			)}
 		</View>

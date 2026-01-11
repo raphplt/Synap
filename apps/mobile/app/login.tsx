@@ -26,11 +26,17 @@ export default function LoginScreen() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	const user = useAuthStore((state) => state.user);
+
 	useEffect(() => {
 		if (isAuthenticated) {
-			router.replace("/(tabs)" as Href);
+			if (!user?.interests || user.interests.length === 0) {
+				router.replace("/onboarding" as Href);
+			} else {
+				router.replace("/(tabs)" as Href);
+			}
 		}
-	}, [isAuthenticated, router]);
+	}, [isAuthenticated, router, user?.interests]);
 
 	const handleLogin = async () => {
 		if (!email.trim() || !password.trim()) return;
@@ -41,7 +47,11 @@ export default function LoginScreen() {
 		try {
 			const response = await apiLogin(email.trim().toLowerCase(), password);
 			await authLogin(response);
-			router.replace("/(tabs)" as Href);
+			if (!response.user.interests || response.user.interests.length === 0) {
+				router.replace("/onboarding" as Href);
+			} else {
+				router.replace("/(tabs)" as Href);
+			}
 		} catch (err) {
 			setError(t("auth.invalidCredentials"));
 		} finally {

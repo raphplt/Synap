@@ -14,7 +14,7 @@ export type AuthProvider = "email" | "google" | "apple";
 @Index(["username"], { unique: true })
 @Index(["authProvider", "authProviderId"], {
 	unique: true,
-	where: '"authProviderId" IS NOT NULL',
+	where: "\"authProviderId\" IS NOT NULL",
 })
 export class User {
 	@PrimaryGeneratedColumn("uuid")

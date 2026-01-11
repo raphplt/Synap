@@ -8,7 +8,7 @@ module.exports = {
 		node: true,
 		es2021: true,
 	},
-	extends: ["standard-with-typescript"],
+	extends: ["standard-with-typescript", "prettier"],
 	rules: {
 		"@typescript-eslint/explicit-function-return-type": "off",
 		"@typescript-eslint/strict-boolean-expressions": "off",

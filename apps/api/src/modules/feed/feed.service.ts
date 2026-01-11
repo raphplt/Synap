@@ -1,20 +1,24 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository, Not, In } from "typeorm";
+import { Repository, In } from "typeorm";
 import { Card } from "../cards/card.entity";
+import type { Deck } from "../decks/deck.entity";
 import { UserCardInteraction } from "../srs/user-card-interaction.entity";
 import { WikiIngestService } from "../wiki/wiki.service";
 
 interface FeedCard extends Card {
-	interaction?: UserCardInteraction | null
+	interaction?: UserCardInteraction | null;
+	category?: string | null;
 }
+
+type FeedCardCandidate = Card & { deckSlug: string; categorySlug: string };
 
 @Injectable()
 export class FeedService {
 	private readonly logger = new Logger(FeedService.name);
 	private filling = false;
 
-	constructor (
+	constructor(
 		@InjectRepository(Card)
 		private readonly cardRepository: Repository<Card>,
 		@InjectRepository(UserCardInteraction)
@@ -22,18 +26,18 @@ export class FeedService {
 		private readonly wikiService: WikiIngestService,
 	) {}
 
-	private getBufferMin (): number {
+	private getBufferMin(): number {
 		const value = Number(process.env.SYNAP_FEED_BUFFER_MIN ?? 200);
 		return Number.isFinite(value) ? Math.max(0, value) : 200;
 	}
 
-	private getFillBatchSize (): number {
+	private getFillBatchSize(): number {
 		const value = Number(process.env.SYNAP_FEED_FILL_BATCH ?? 50);
 		const clamped = Number.isFinite(value) ? value : 50;
 		return Math.min(100, Math.max(1, clamped));
 	}
 
-	private async ensureBuffer (): Promise<void> {
+	private async ensureBuffer(): Promise<void> {
 		if (this.filling) return;
 
 		const min = this.getBufferMin();
@@ -45,9 +49,7 @@ export class FeedService {
 			if (count >= min) return;
 
 			// Use TOP articles and FEATURED instead of random
-			this.logger.log(
-				`Buffer Wiki: ${count}/${min} -> ingest top articles + featured`,
-			);
+			this.logger.log(`Buffer Wiki: ${count}/${min} -> ingest top articles + featured`);
 
 			// First ingest featured articles (high quality)
 			await this.wikiService.ingestFeatured();
@@ -64,25 +66,20 @@ export class FeedService {
 
 	/**
 	 * Get personalized feed for authenticated user
-	 * Rule: 70% New / 20% Review / 10% Challenge
+	 * Rule: 50% New / 35% Review / 15% Challenge
+	 * Warm-up: Start with 2-3 MASTERED cards for confidence boost
 	 */
-	async getPersonalizedFeed (
-		userId: string,
-		take: number = 10,
-	): Promise<FeedCard[]> {
+	async getPersonalizedFeed(userId: string, take: number = 10): Promise<FeedCard[]> {
 		void this.ensureBuffer();
 
-		// Calculate distribution
-		const newCount = Math.ceil(take * 0.7);
-		const reviewCount = Math.ceil(take * 0.2);
-		const challengeCount = take - newCount - reviewCount;
+		// Warm-up: 2-3 easy cards at the start
+		const warmUpCount = Math.min(3, Math.ceil(take * 0.2));
+		const mainCount = take - warmUpCount;
 
-		// Get cards user has already seen
-		const seenInteractions = await this.interactionRepository.find({
-			where: { userId },
-			select: ["cardId"],
-		});
-		const seenCardIds = seenInteractions.map((i) => i.cardId);
+		// Calculate distribution for main feed (50/35/15)
+		const newCount = Math.ceil(mainCount * 0.5);
+		const reviewCount = Math.ceil(mainCount * 0.35);
+		const challengeCount = Math.max(0, mainCount - newCount - reviewCount);
 
 		// Get cards due for review
 		const dueInteractions = await this.interactionRepository.find({
@@ -90,22 +87,88 @@ export class FeedService {
 				userId,
 				status: In(["LEARNING", "REVIEW"]),
 			},
-			relations: ["card"],
+			relations: ["card", "card.deck", "card.deck.category"],
 			order: { nextReviewDate: "ASC" },
 			take: reviewCount,
 		});
 
-		// 1. NEW cards (never seen)
-		const newCards = await this.cardRepository.find({
-			where: seenCardIds.length > 0 ? { id: Not(In(seenCardIds)) } : {},
-			order: { qualityScore: "DESC", createdAt: "DESC" },
-			take: newCount,
-		});
+		// 1. Get candidate cards from all decks using LATERAL JOIN
+		// We fetch the next 3 available cards per deck to allow for some "streaking" (0, 1, 2)
+		// while maintaining diversity.
+		const candidates = await this.cardRepository.query(
+			`
+			SELECT c.*, d.slug as "deckSlug", cat.slug as "categorySlug"
+			FROM decks d
+			JOIN categories cat ON d."categoryId" = cat.id
+			CROSS JOIN LATERAL (
+				SELECT c.*
+				FROM cards c
+				WHERE c."deckId" = d.id
+				AND c.id NOT IN (SELECT "cardId" FROM user_card_interactions WHERE "userId" = $1)
+				ORDER BY c."sortOrder" ASC
+				LIMIT 3
+			) c
+			WHERE d."isActive" = true
+			`,
+			[userId],
+		);
 
+		// 2. Organize candidates into queues per deck
+		const queues: Record<string, FeedCard[]> = {};
+		for (const raw of candidates as FeedCardCandidate[]) {
+			const card = this.cardRepository.create(raw);
+			card.deck = {
+				...raw,
+				slug: raw.deckSlug,
+				category: { slug: raw.categorySlug },
+			} as unknown as Deck;
+
+			const dId = card.deckId;
+			if (dId) {
+				if (!queues[dId]) {
+					queues[dId] = [];
+				}
+				queues[dId].push({
+					...card,
+					category: raw.categorySlug,
+				});
+			}
+		}
+
+		// 3. Draft from queues randomly until we have enough new cards
+		// This ensures we always respect sortOrder (0 before 1) but randomize between decks.
+		const newCards: FeedCard[] = [];
+		const deckIds = Object.keys(queues);
+
+		while (newCards.length < newCount && deckIds.length > 0) {
+			// Pick a random deck
+			const randomDeckIndex = Math.floor(Math.random() * deckIds.length);
+			const deckId = deckIds[randomDeckIndex];
+			const queue = queues[deckId];
+
+			// Dequeue the next card
+			const card = queue.shift();
+			if (card) {
+				newCards.push(card);
+			}
+
+			// If queue empty, remove deck from selection
+			if (queue.length === 0) {
+				deckIds.splice(randomDeckIndex, 1);
+			}
+		}
+
+		// 2. REVIEW cards (due for review)
+
+		// 2. REVIEW cards (due for review)
 		// 2. REVIEW cards (due for review)
 		const reviewCards = dueInteractions
 			.filter((i) => i.card)
-			.map((i) => ({ ...i.card!, interaction: i }));
+			.map((i) => ({
+				...i.card!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+				interaction: i,
+				category: i.card?.deck?.category?.slug,
+			}));
 
 		// 3. CHALLENGE cards (mastered, for reinforcement)
 		const masteredInteractions = await this.interactionRepository.find({
@@ -113,34 +176,48 @@ export class FeedService {
 				userId,
 				status: In(["MASTERED", "GOLD"]),
 			},
-			relations: ["card"],
-			order: { lastReviewedAt: "ASC" },
-			take: challengeCount,
+			relations: ["card", "card.deck", "card.deck.category"],
+			order: { consecutiveSuccesses: "DESC", lastReviewedAt: "ASC" },
+			take: challengeCount + warmUpCount, // Get extra for warm-up
 		});
-		const challengeCards = masteredInteractions
+		const allMasteredCards = masteredInteractions
 			.filter((i) => i.card)
-			.map((i) => ({ ...i.card!, interaction: i }));
+			.map((i) => ({
+				...i.card!, // eslint-disable-line @typescript-eslint/no-non-null-assertion
+				interaction: i,
+				category: i.card?.deck?.category?.slug,
+			}));
 
-		// Combine and shuffle
-		const feed: FeedCard[] = [...newCards, ...reviewCards, ...challengeCards];
+		// Split mastered cards: warm-up (easy ones first) and challenge
+		const warmUpCards = allMasteredCards.slice(0, warmUpCount);
+		const challengeCards = allMasteredCards.slice(warmUpCount, warmUpCount + challengeCount);
 
-		// Fisher-Yates shuffle
-		for (let i = feed.length - 1; i > 0; i--) {
+		// Combine main feed and shuffle
+		const mainFeed: FeedCard[] = [...newCards, ...reviewCards, ...challengeCards];
+
+		// Fisher-Yates shuffle for main feed only
+		for (let i = mainFeed.length - 1; i > 0; i--) {
 			const j = Math.floor(Math.random() * (i + 1));
-			[feed[i], feed[j]] = [feed[j], feed[i]];
+			[mainFeed[i], mainFeed[j]] = [mainFeed[j], mainFeed[i]];
 		}
 
+		// Warm-up cards go first (not shuffled), then shuffled main feed
+		const feed: FeedCard[] = [...warmUpCards, ...mainFeed];
+
 		this.logger.log(
-			`Feed for ${userId}: ${newCards.length} new, ${reviewCards.length} review, ${challengeCards.length} challenge`,
+			`Feed for ${userId}: ${warmUpCards.length} warm-up, ${newCards.length} new, ${reviewCards.length} review, ${challengeCards.length} challenge`,
 		);
 
-		return feed.slice(0, take);
+		return feed.slice(0, take).map((card) => ({
+			...card,
+			category: card.deck?.category?.slug ?? card.category,
+		}));
 	}
 
 	/**
 	 * Get anonymous feed (for non-authenticated users)
 	 */
-	async getAnonymousFeed (cursor: number, take: number) {
+	async getAnonymousFeed(cursor: number, take: number) {
 		void this.ensureBuffer();
 
 		// Interleave strategy:
@@ -164,7 +241,7 @@ export class FeedService {
 			[cursor, take],
 		);
 
-		const ids = rawResults.map((r: { id: string }) => r.id);
+		const ids = (rawResults as Array<{ id: string }>).map((r) => r.id);
 
 		if (ids.length === 0) {
 			return { items: [], nextCursor: null };
@@ -173,12 +250,17 @@ export class FeedService {
 		// Fetch full entities
 		const cards = await this.cardRepository.find({
 			where: { id: In(ids) },
+			relations: ["deck", "deck.category"],
 		});
 
 		// Restore order (In() does not guarantee order)
 		const orderedCards = ids
 			.map((id: string) => cards.find((c) => c.id === id))
-			.filter((c: Card | undefined): c is Card => !!c);
+			.filter((c: Card | undefined): c is Card => !!c)
+			.map((card) => ({
+				...card,
+				category: card.deck?.category?.slug,
+			}));
 
 		return {
 			items: orderedCards,

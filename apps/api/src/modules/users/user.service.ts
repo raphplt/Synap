@@ -32,7 +32,7 @@ export interface PaginatedUserResult {
 export class UserService {
 	constructor(
 		@InjectRepository(User)
-		private readonly userRepository: Repository<User>
+		private readonly userRepository: Repository<User>,
 	) {}
 
 	private toUserWithoutPassword(user: User): UserWithoutPassword {
@@ -43,7 +43,7 @@ export class UserService {
 	async findAllPaginated(
 		page: number = 1,
 		limit: number = 20,
-		search?: string
+		search?: string,
 	): Promise<PaginatedUserResult> {
 		const safePage = Math.max(1, page);
 		const safeLimit = Math.min(100, Math.max(1, limit));
@@ -54,7 +54,7 @@ export class UserService {
 		if (search?.trim()) {
 			queryBuilder.where(
 				"user.username ILIKE :search OR user.email ILIKE :search",
-				{ search: `%${search.trim()}%` }
+				{ search: `%${search.trim()}%` },
 			);
 		}
 
@@ -125,7 +125,7 @@ export class UserService {
 
 	async findByProviderAndId(
 		provider: string,
-		providerId: string
+		providerId: string,
 	): Promise<User | null> {
 		return await this.userRepository.findOne({
 			where: { authProvider: provider as any, authProviderId: providerId },
@@ -173,7 +173,7 @@ export class UserService {
 			xp: number;
 			streak: number;
 			interests: string[];
-		}>
+		}>,
 	): Promise<UserWithoutPassword> {
 		const user = await this.findById(id);
 		if (!user) {

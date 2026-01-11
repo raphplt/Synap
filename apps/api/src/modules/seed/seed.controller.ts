@@ -4,35 +4,17 @@ import { SeedService } from "./seed.service";
 
 @Controller("seed")
 export class SeedController {
-	constructor (private readonly seedService: SeedService) {}
-
-	@Public()
-	@Post("gold")
-	async seedGoldDataset () {
-		return await this.seedService.seedGoldDataset();
-	}
+	constructor(private readonly seedService: SeedService) {}
 
 	@Public()
 	@Post("admin")
-	async seedAdminUser () {
+	async seedAdminUser() {
 		return await this.seedService.seedAdminUser();
 	}
 
 	@Public()
-	@Post("atlas")
-	async seedAtlas () {
-		return await this.seedService.seedAtlas();
-	}
-
-	@Public()
-	@Post("atlas-full")
-	async seedAtlasFull () {
-		return await this.seedService.seedAtlasFull();
-	}
-
-	@Public()
 	@Post("all")
-	async seedAll () {
+	async seedAll() {
 		return await this.seedService.seedAll();
 	}
 }

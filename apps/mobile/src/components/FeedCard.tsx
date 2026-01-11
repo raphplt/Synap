@@ -2,7 +2,7 @@ import { CardBase } from "@synap/shared";
 import { Image } from "expo-image";
 import { LinearGradient, LinearGradientProps } from "expo-linear-gradient";
 import React, { useCallback, useMemo, useState } from "react";
-import { Pressable, ScrollView, Text, View, Share } from "react-native";
+import { DimensionValue, Pressable, ScrollView, Text, View, Share, TextStyle } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
 	useAnimatedStyle,
@@ -11,6 +11,33 @@ import Animated, {
 	runOnJS,
 } from "react-native-reanimated";
 import { Ionicons } from "@expo/vector-icons";
+
+const CATEGORY_THEMES: Record<string, { label: string; color: string; emojis: string[] }> = {
+	science: { label: "Sciences", color: "#4CC9F0", emojis: ["🧬", "🔬", "🔭", "⚛️"] },
+	history: { label: "Histoire", color: "#F72585", emojis: ["📜", "🏺", "🏛️", "⚔️"] },
+	art: { label: "Art", color: "#7209B7", emojis: ["🎨", "🎭", "🎻", "🖌️"] },
+	nature: { label: "Nature", color: "#4361EE", emojis: ["🌿", "🌊", "🏔️", "🐾"] },
+	tech: { label: "Tech", color: "#3A0CA3", emojis: ["💻", "🤖", "🚀", "📡"] },
+	geography: { label: "Géographie", color: "#4895EF", emojis: ["🌍", "🗺️", "compass", "🌋"] },
+	literature: { label: "Littérature", color: "#F48C06", emojis: ["📚", "✒️", "📖", "📜"] },
+	philosophy: { label: "Philo", color: "#E0AFA0", emojis: ["🧠", "🤔", "💭", "🏛️"] },
+	default: { label: "Découverte", color: "#FFD166", emojis: ["✨", "🧠", "💡", "🎲"] },
+};
+
+function getCategoryTheme(category?: string | null) {
+	if (!category) return CATEGORY_THEMES.default;
+	const key = Object.keys(CATEGORY_THEMES).find(
+		(k) =>
+			category.toLowerCase().includes(k.toLowerCase()) ||
+			k.toLowerCase().includes(category.toLowerCase()),
+	);
+	return (
+		CATEGORY_THEMES[key as keyof typeof CATEGORY_THEMES] || {
+			...CATEGORY_THEMES.default,
+			label: category.charAt(0).toUpperCase() + category.slice(1).toLowerCase(),
+		}
+	);
+}
 
 export type FeedCardType = "discovery" | "review" | "quiz";
 
@@ -37,8 +64,7 @@ export function FeedCard({
 	onBookmark,
 }: FeedCardProps) {
 	const insets = useSafeAreaInsets();
-	const Gradient =
-		LinearGradient as unknown as React.ComponentType<LinearGradientProps>;
+	const Gradient = LinearGradient as unknown as React.ComponentType<LinearGradientProps>;
 	const rotation = useSharedValue(0);
 
 	const [isFlipped, setIsFlipped] = useState(false);
@@ -55,11 +81,36 @@ export function FeedCard({
 			hash = card.title.charCodeAt(i) + ((hash << 5) - hash);
 		}
 		const hue = Math.abs(hash) % 360;
-		return [
-			`hsla(${hue}, 70%, 20%, 1)`,
-			`hsla(${(hue + 40) % 360}, 60%, 15%, 1)`,
-		] as [string, string];
+		return [`hsla(${hue}, 70%, 20%, 1)`, `hsla(${(hue + 40) % 360}, 60%, 15%, 1)`] as [
+			string,
+			string,
+		];
 	}, [card.title]);
+
+	const categoryTheme = useMemo(() => getCategoryTheme(card.category), [card.category]);
+
+	const backgroundEmojis = useMemo(() => {
+		// Pick 3 random emojis from the set deterministically based on title
+		const emojis = categoryTheme.emojis;
+		const count = 3;
+		const result: { emoji: string; style: TextStyle }[] = [];
+		for (let i = 0; i < count; i++) {
+			const index = (card.title.length + i) % emojis.length;
+			result.push({
+				emoji: emojis[index],
+				style: {
+					top: `${20 + i * 30}%` as DimensionValue,
+					left: (i % 2 === 0 ? `${10 + i * 10}%` : undefined) as DimensionValue | undefined,
+					right: (i % 2 !== 0 ? `${10 + i * 10}%` : undefined) as DimensionValue | undefined,
+					transform: [{ rotate: `${i * 45 - 20}deg` }],
+					opacity: 0.15,
+					fontSize: 80 + i * 20,
+					position: "absolute",
+				},
+			});
+		}
+		return result;
+	}, [categoryTheme, card.title]);
 
 	const hasImage = card.mediaUrl && card.mediaUrl.length > 0;
 	const [imageError, setImageError] = useState(false);
@@ -95,7 +146,7 @@ export function FeedCard({
 			showXpAnimation(xp);
 			onReview?.(card.id, rating);
 		},
-		[card.id, onReview, reviewSubmitted, showXpAnimation]
+		[card.id, onReview, reviewSubmitted, showXpAnimation],
 	);
 
 	const handleQuizAnswer = useCallback(
@@ -108,7 +159,7 @@ export function FeedCard({
 			}
 			onQuizAnswer?.(card.id, isCorrect);
 		},
-		[card.id, onQuizAnswer, quizAnswered, showXpAnimation]
+		[card.id, onQuizAnswer, quizAnswered, showXpAnimation],
 	);
 
 	const handleLike = useCallback(() => {
@@ -163,13 +214,7 @@ export function FeedCard({
 			allAnswers: answers.sort(() => Math.random() - 0.5),
 			correctAnswer: card.summary,
 		};
-	}, [
-		cardType,
-		card.summary,
-		card.quizAnswers,
-		card.quizCorrectIndex,
-		distractors,
-	]);
+	}, [cardType, card.summary, card.quizAnswers, card.quizCorrectIndex, distractors]);
 
 	// ========== QUIZ MODE ==========
 	if (cardType === "quiz") {
@@ -256,9 +301,7 @@ export function FeedCard({
 						className="absolute top-1/4 left-1/2 bg-synap-gold px-6 py-3 rounded-full"
 						style={{ marginLeft: -50 }}
 					>
-						<Text className="text-synap-teal font-bold text-lg">
-							+{xpGained} XP ⚡
-						</Text>
+						<Text className="text-synap-teal font-bold text-lg">+{xpGained} XP ⚡</Text>
 					</Animated.View>
 				)}
 			</View>
@@ -271,9 +314,7 @@ export function FeedCard({
 	return (
 		<View style={{ height }} className="bg-synap-teal">
 			{/* Front face */}
-			<Animated.View
-				style={[frontAnimatedStyle, { position: "absolute", inset: 0 }]}
-			>
+			<Animated.View style={[frontAnimatedStyle, { position: "absolute", inset: 0 }]}>
 				<Pressable style={{ flex: 1 }} onPress={toggle}>
 					{showTextOnly ? (
 						<Gradient
@@ -291,25 +332,36 @@ export function FeedCard({
 							<View className="absolute top-12 right-8 w-32 h-32 rounded-full bg-white/5" />
 							<View className="absolute bottom-40 left-8 w-24 h-24 rounded-full bg-white/5" />
 
+							{/* Background Emojis */}
+							{backgroundEmojis.map((item, idx) => (
+								<Text key={idx} style={[{ position: "absolute" }, item.style]}>
+									{item.emoji}
+								</Text>
+							))}
+
 							{cardType === "review" && (
 								<View className="flex-row items-center mb-4">
 									<View className="bg-synap-pink/20 px-3 py-1 rounded-full">
-										<Text className="text-synap-pink font-semibold text-xs">
-											🔔 À réviser
-										</Text>
+										<Text className="text-synap-pink font-semibold text-xs">🔔 À réviser</Text>
 									</View>
 								</View>
 							)}
 
 							<View className="flex-row items-center mb-6">
-								<View className="h-2 w-12 rounded-full bg-synap-gold mr-3" />
-								<Text className="text-text-secondary text-xs uppercase tracking-widest">
-									SYNAP
-								</Text>
+								<View
+									className="flex-row items-center px-3 py-1 rounded-full border border-white/20"
+									style={{ backgroundColor: `${categoryTheme.color}20` }}
+								>
+									<Text style={{ fontSize: 12, marginRight: 6 }}>{categoryTheme.emojis[0]}</Text>
+									<Text
+										className="font-bold text-xs uppercase tracking-wider"
+										style={{ color: categoryTheme.color }}
+									>
+										{categoryTheme.label}
+									</Text>
+								</View>
 							</View>
-							<Text className="text-white text-4xl font-bold mb-6 leading-tight">
-								{card.title}
-							</Text>
+							<Text className="text-white text-4xl font-bold mb-6 leading-tight">{card.title}</Text>
 							{/* Show summary only for discovery */}
 							{cardType === "discovery" && (
 								<Text className="text-white/80 text-lg leading-7">{card.summary}</Text>
@@ -345,25 +397,27 @@ export function FeedCard({
 								{cardType === "review" && (
 									<View className="flex-row items-center mb-4">
 										<View className="bg-synap-pink/20 px-3 py-1 rounded-full">
-											<Text className="text-synap-pink font-semibold text-xs">
-												🔔 À réviser
-											</Text>
+											<Text className="text-synap-pink font-semibold text-xs">🔔 À réviser</Text>
 										</View>
 									</View>
 								)}
 								<View className="flex-row items-center mb-4">
-									<View className="h-2 w-12 rounded-full bg-synap-gold mr-3" />
-									<Text className="text-text-secondary text-xs uppercase tracking-widest">
-										SYNAP
-									</Text>
+									<View
+										className="flex-row items-center px-3 py-1 rounded-full border border-white/20"
+										style={{ backgroundColor: `${categoryTheme.color}20` }}
+									>
+										<Text style={{ fontSize: 12, marginRight: 6 }}>{categoryTheme.emojis[0]}</Text>
+										<Text
+											className="font-bold text-xs uppercase tracking-wider"
+											style={{ color: categoryTheme.color }}
+										>
+											{categoryTheme.label}
+										</Text>
+									</View>
 								</View>
-								<Text className="text-white text-3xl font-semibold mb-3">
-									{card.title}
-								</Text>
+								<Text className="text-white text-3xl font-semibold mb-3">{card.title}</Text>
 								{cardType === "discovery" && (
-									<Text className="text-text-secondary text-base leading-6">
-										{card.summary}
-									</Text>
+									<Text className="text-text-secondary text-base leading-6">{card.summary}</Text>
 								)}
 								<View className="mt-6 flex-row items-center">
 									<View className="h-2 w-2 rounded-full bg-synap-emerald mr-2" />
@@ -378,9 +432,7 @@ export function FeedCard({
 			</Animated.View>
 
 			{/* Back face */}
-			<Animated.View
-				style={[backAnimatedStyle, { position: "absolute", inset: 0 }]}
-			>
+			<Animated.View style={[backAnimatedStyle, { position: "absolute", inset: 0 }]}>
 				<Pressable style={{ flex: 1 }} onPress={toggle}>
 					<Gradient colors={["#073B4C", "#0A5266"]} style={{ flex: 1 }}>
 						<ScrollView
@@ -413,15 +465,10 @@ export function FeedCard({
 			</Animated.View>
 
 			{/* HUD Overlay - Right side actions */}
-			<View
-				className="absolute right-4 items-center gap-6"
-				style={{ bottom: insets.bottom + 140 }}
-			>
+			<View className="absolute right-4 items-center gap-6" style={{ bottom: insets.bottom + 140 }}>
 				<Pressable className="items-center" onPress={handleLike}>
 					<View
-						className={`p-3 rounded-full ${
-							liked ? "bg-synap-pink" : "bg-synap-teal-medium/80"
-						}`}
+						className={`p-3 rounded-full ${liked ? "bg-synap-pink" : "bg-synap-teal-medium/80"}`}
 					>
 						<Ionicons
 							name={liked ? "heart" : "heart-outline"}
@@ -479,9 +526,7 @@ export function FeedCard({
 					className="absolute top-1/3 left-1/2 bg-synap-gold px-6 py-3 rounded-full"
 					style={{ marginLeft: -50 }}
 				>
-					<Text className="text-synap-teal font-bold text-lg">
-						+{xpGained} XP ⚡
-					</Text>
+					<Text className="text-synap-teal font-bold text-lg">+{xpGained} XP ⚡</Text>
 				</Animated.View>
 			)}
 		</View>

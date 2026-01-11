@@ -1,18 +1,20 @@
-import {
-	Controller,
-	Delete,
-	UseGuards,
-	Request,
-	HttpCode,
-	HttpStatus,
-} from "@nestjs/common";
+import { Controller, Delete, Get, UseGuards, Request, HttpCode, HttpStatus } from "@nestjs/common";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { AdminService } from "./admin.service";
 
 @Controller("admin")
 @UseGuards(JwtAuthGuard)
 export class AdminController {
-	constructor (private readonly adminService: AdminService) {}
+	constructor(private readonly adminService: AdminService) {}
+
+	/**
+	 * GET /admin/stats
+	 * Get dashboard statistics
+	 */
+	@Get("stats")
+	async getStats() {
+		return await this.adminService.getStats();
+	}
 
 	/**
 	 * DELETE /admin/cards
@@ -20,7 +22,7 @@ export class AdminController {
 	 */
 	@Delete("cards")
 	@HttpCode(HttpStatus.OK)
-	async clearAllCards () {
+	async clearAllCards() {
 		const result = await this.adminService.clearAllCards();
 		return {
 			success: true,
@@ -35,7 +37,7 @@ export class AdminController {
 	 */
 	@Delete("reset")
 	@HttpCode(HttpStatus.OK)
-	async resetDatabase (@Request() req: { user: { email: string } }) {
+	async resetDatabase(@Request() req: { user: { email: string } }) {
 		const result = await this.adminService.resetDatabase(req.user.email);
 		return {
 			success: true,

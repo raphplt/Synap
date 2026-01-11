@@ -9,32 +9,37 @@ import {
 	Patch,
 	Post,
 	Query,
+	Request,
 	UseGuards,
 	DefaultValuePipe,
 	ParseIntPipe,
 } from "@nestjs/common";
 import { IsInt, Min, Max } from "class-validator";
 import { CardsService } from "./cards.service";
+import { BookmarksService } from "./bookmarks.service";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 
 class RateCardDto {
 	@IsInt()
 	@Min(-1)
 	@Max(1)
-		rating!: number;
+	rating!: number;
 }
 
 @Controller("cards")
 export class CardsController {
-	constructor (private readonly cardsService: CardsService) {}
+	constructor(
+		private readonly cardsService: CardsService,
+		private readonly bookmarksService: BookmarksService,
+	) {}
 
 	/**
 	 * Get all cards (paginated, for admin)
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get()
-	async getAll (
-	@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
+	async getAll(
+		@Query("page", new DefaultValuePipe(1), ParseIntPipe) page: number,
 		@Query("limit", new DefaultValuePipe(20), ParseIntPipe) limit: number,
 		@Query("search") search?: string,
 	) {
@@ -46,7 +51,7 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Get(":id")
-	async getById (@Param("id") id: string) {
+	async getById(@Param("id") id: string) {
 		return await this.cardsService.findById(id);
 	}
 
@@ -55,8 +60,8 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Post()
-	async create (
-	@Body()
+	async create(
+		@Body()
 		body: {
 			title: string
 			summary: string
@@ -85,8 +90,8 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Patch(":id")
-	async update (
-	@Param("id") id: string,
+	async update(
+		@Param("id") id: string,
 		@Body()
 		body: Partial<{
 			title: string
@@ -105,7 +110,7 @@ export class CardsController {
 	 */
 	@UseGuards(JwtAuthGuard)
 	@Delete(":id")
-	async delete (@Param("id") id: string) {
+	async delete(@Param("id") id: string) {
 		await this.cardsService.delete(id);
 		return { success: true };
 	}
@@ -115,7 +120,50 @@ export class CardsController {
 	 */
 	@Patch(":id/rate")
 	@HttpCode(HttpStatus.OK)
-	async rate (@Param("id") id: string, @Body() body: RateCardDto) {
+	async rate(@Param("id") id: string, @Body() body: RateCardDto) {
 		return await this.cardsService.rateCard(id, body.rating);
+	}
+
+	// ==================== LIKE/BOOKMARK ENDPOINTS ====================
+
+	/**
+	 * Toggle like on a card
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Post(":id/like")
+	@HttpCode(HttpStatus.OK)
+	async toggleLike(@Param("id") cardId: string, @Request() req: { user: { id: string } }) {
+		return await this.bookmarksService.toggle(req.user.id, cardId, "LIKE");
+	}
+
+	/**
+	 * Toggle bookmark on a card
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Post(":id/bookmark")
+	@HttpCode(HttpStatus.OK)
+	async toggleBookmark(@Param("id") cardId: string, @Request() req: { user: { id: string } }) {
+		return await this.bookmarksService.toggle(req.user.id, cardId, "BOOKMARK");
+	}
+
+	/**
+	 * Get like/bookmark status for a card
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Get(":id/bookmark-status")
+	async getBookmarkStatus(@Param("id") cardId: string, @Request() req: { user: { id: string } }) {
+		return await this.bookmarksService.getStatus(req.user.id, cardId);
+	}
+
+	/**
+	 * Get user's bookmarked cards
+	 */
+	@UseGuards(JwtAuthGuard)
+	@Get("bookmarks/me")
+	async getMyBookmarks(
+		@Request() req: { user: { id: string } },
+		@Query("type") type?: "LIKE" | "BOOKMARK",
+	) {
+		return await this.bookmarksService.getUserBookmarks(req.user.id, type);
 	}
 }

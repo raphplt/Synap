@@ -53,7 +53,11 @@ export function useAppleAuth() {
 				});
 
 				await authLogin(response);
-				router.replace("/(tabs)" as Href);
+				if (!response.user.interests || response.user.interests.length === 0) {
+					router.replace("/onboarding" as Href);
+				} else {
+					router.replace("/(tabs)" as Href);
+				}
 			}
 		} catch (err: unknown) {
 			const error = err as { code?: string; message?: string };

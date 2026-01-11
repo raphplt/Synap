@@ -14,6 +14,7 @@ import {
 	type CategoryResponseDto,
 } from "../dto/response.dto";
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ResponseMapper {
 	/**
 	 * Map User entity to UserResponseDto (excludes passwordHash)

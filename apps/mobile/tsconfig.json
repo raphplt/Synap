@@ -14,12 +14,13 @@
 				}
   },
   "include": [
-    ".expo/types/**/*.ts",
-    "expo-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "nativewind-env.d.ts"
-  ],
+		".expo/types/**/*.ts",
+		"expo-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"nativewind-env.d.ts",
+		".eslintrc.js"
+	],
   "exclude": [
     "node_modules",
     "dist"

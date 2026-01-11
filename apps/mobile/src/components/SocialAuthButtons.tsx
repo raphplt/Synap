@@ -1,7 +1,6 @@
-import { View, Text, Pressable, ActivityIndicator, Platform } from "react-native";
+import { View, Text, Pressable, ActivityIndicator, Platform, Image } from "react-native";
 import { useGoogleAuth } from "../hooks/useGoogleAuth";
 import { useAppleAuth } from "../hooks/useAppleAuth";
-import { GoogleLogo } from "phosphor-react-native";
 
 interface SocialAuthButtonsProps {
 	mode?: "login" | "signup";
@@ -15,12 +14,10 @@ export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
 
 	return (
 		<View className="gap-3">
-			{/* Error message */}
 			{combinedError && (
 				<Text className="text-synap-pink text-center text-sm">{combinedError}</Text>
 			)}
 
-			{/* Google Button */}
 			{google.isAvailable && (
 				<Pressable
 					className={`bg-white py-3.5 rounded-xl flex-row items-center justify-center gap-2 shadow-sm ${
@@ -33,7 +30,11 @@ export function SocialAuthButtons({ mode = "login" }: SocialAuthButtonsProps) {
 						<ActivityIndicator size="small" color="#1f2937" />
 					) : (
 						<>
-							<GoogleLogo size={20} />
+							<Image
+								source={require("../../assets/icons/icon-google.png")}
+								alt="Google"
+								className="w-6 h-6"
+							/>
 							<Text className="text-gray-800 font-semibold text-base">
 								{mode === "login" ? "Continuer avec Google" : "S'inscrire avec Google"}
 							</Text>

@@ -14,7 +14,6 @@ export default function HomeScreen() {
 	const token = useAuthStore((state) => state.token);
 	const user = useAuthStore((state) => state.user);
 
-	// Session store
 	const {
 		stats,
 		showRecap,
@@ -28,7 +27,6 @@ export default function HomeScreen() {
 		endSession,
 	} = useSessionStore();
 
-	// Start session on mount
 	useEffect(() => {
 		if (!sessionActive) {
 			startSession();
@@ -46,7 +44,6 @@ export default function HomeScreen() {
 				const srsRating = rating === "retained" ? "GOOD" : "AGAIN";
 				await reviewCard(cardId, srsRating, token);
 
-				// Track in session
 				if (rating === "retained") {
 					recordRetained(10);
 				} else {
@@ -59,15 +56,12 @@ export default function HomeScreen() {
 		[token, recordRetained, recordForgot],
 	);
 
-	// Handle quiz answers
 	const handleQuizAnswer = useCallback(
 		async (cardId: string, correct: boolean) => {
 			if (!token) return;
 			try {
-				// Award XP for quiz
 				await awardXp(correct ? "QUIZ_SUCCESS" : "CARD_VIEW", cardId, token);
 
-				// Track in session
 				if (correct) {
 					addXp(25);
 				}
@@ -102,10 +96,8 @@ export default function HomeScreen() {
 		[token],
 	);
 
-	// Track card views (called from FeedList on scroll)
 	const handleCardView = useCallback(() => {
 		recordCardView();
-		// Award passive XP
 		addXp(5);
 	}, [recordCardView, addXp]);
 
@@ -115,7 +107,6 @@ export default function HomeScreen() {
 
 	const handleFinishSession = useCallback(() => {
 		endSession();
-		// Could navigate to profile or show a summary page
 	}, [endSession]);
 
 	if (isLoading) {
